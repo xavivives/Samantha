@@ -1,14 +1,11 @@
-# Starting from a tensorflow image
 FROM b.gcr.io/tensorflow/tensorflow
 
-# Install Python.
-RUN \
-  apt-get update && \
-  apt-get install -y python python-dev python-pip python-virtualenv && \
-  rm -rf /var/lib/apt/lists/*
+# Install Python
+RUN apt-get install -y python2.7 python2.7-dev
 
-# Copying the script from host current directory to container
+# Copying files from host to container
 ADD First.py First.py
+ADD Log.py Log.py
 
-# Run the python script
-CMD python -u First.py
+CMD python First.py
+
