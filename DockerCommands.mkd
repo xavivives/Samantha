@@ -1,0 +1,17 @@
+#Create image container
+docker build -t sam .
+
+#Runs container
+docker run sam
+
+#Runs container and logs python on runtime (not at the end)
+docker run -it sam
+
+# Delete all containers
+docker rm $(docker ps -a -q)
+
+# Delete all images
+docker rmi $(docker images -q)
+
+# Remove previous image, create image, run image
+docker rmi -f sam && docker build -t sam . && docker run -it sam
