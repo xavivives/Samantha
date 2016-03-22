@@ -1,29 +1,28 @@
-document.addEventListener('copy',onCopy, true); 
+var port = chrome.runtime.connect();
+port.onMessage.addListener(onBackgroundMessage);
+document.addEventListener('copy',onCopy, true);
 
-function onCopy(e) { 
-    console.log("Copying");
-    port.postMessage("IU");
-
-    chrome.runtime.sendMessage("HEEELOO", function(response) {
-  console.log(response);
-});
-
+function onBackgroundMessage (message, sender)
+{
+    console.log("background message: "+ message);
 }
 
+function onCopy(e)
+{ 
+    setTimeout(sendCurrentClipboard,1);
+}
 
-var port = chrome.runtime.connect({name:"mycontentscript"});
-
-port.onMessage.addListener(function(message, sender)
+function sendCurrentClipboard()
 {
-    console.log("GOT message from Background")
-});
+    message = makeMessage("copy", getClipboardText());
+    chrome.runtime.sendMessage(message);
+}
 
-
-
-chrome.runtime.sendMessage("HEEELOO", function(response) {
-  console.log(response);
-});
-
+function makeMessage(event, value)
+{
+    var message = {event:"copy", value:value};
+    return message;
+}
 
 function getClipboardText() {
     // create div element for pasting into

@@ -1,44 +1,47 @@
-chrome.runtime.onConnect.addListener(function(port){
-  port.postMessage("IU");
-});
+chrome.runtime.onConnect.addListener(onContentConnected);
+chrome.runtime.onMessage.addListener(onContentMessage);
+chrome.omnibox.onInputEntered.addListener(onOmniboxEntered);
 
+var clipboard = "";
 
-var port = chrome.runtime.connect();
-
-port.onMessage.addListener(function(message, sender)
+function onContentConnected ( port )
 {
-    console.log("GOT message from Content")
-});;
+    port.postMessage("Conected with content");
+}
 
-var clipboard = "Empty";
+function onContentMessage(message, sender, sendResponse)
+{
+    console.log(message.value);
+    processMessage(message.event, message.value);
+}
 
+function processMessage(event, value)
+{
+    if(event == "copy")
+        onCopy(value);  
+}
 
+function onCopy(str)
+{
+    console.log(str);
+    console.log(clipboard);
+    clipboard = str;
+    setOmniboxSuggestion(str);
+}
 
+function onOmniboxEntered(str)
+{
+    console.log(str);
+}
 
+function goToUrl(url)
+{
+    chrome.tabs.update(null, {url:"url"});
+}
 
-
-
-
-
-
-
-
-
-
-
-//Set Text to show for custom suggested URL(s)
-chrome.omnibox.setDefaultSuggestion({
-    "description": "Open Bug %s "+ clipboard
-});
-
-//Fired when Enter or a suggested Link is selected
-chrome.omnibox.onInputEntered.addListener(function (bugId) {
-    port.postMessage("asdfa");
-    //Use your custom URL
-    chrome.tabs.update({
-        "url": "http://bugs.example.com/BUG-" + bugId
-    }, function () {
-        console.log("Bug Page is open");
-    });
-    console.log("Input Entered is " + bugId);
-});
+function setOmniboxSuggestion(str)
+{
+    console.log(str);
+    var obj = {description: str};
+    chrome.omnibox.setDefaultSuggestion(obj);
+}
