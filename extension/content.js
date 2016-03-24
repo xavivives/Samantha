@@ -1,6 +1,7 @@
 var port = chrome.runtime.connect();
 port.onMessage.addListener(onBackgroundMessage);
 document.addEventListener('copy',onCopy, true);
+document.addEventListener('mouseup', onMouseUp);
 
 function onBackgroundMessage (message, sender)
 {
@@ -12,16 +13,33 @@ function onCopy(e)
     setTimeout(sendCurrentClipboard,1);
 }
 
-function sendCurrentClipboard()
-{
-    message = makeMessage("copy", getClipboardText());
-    chrome.runtime.sendMessage(message);
+function onMouseUp(e)
+{ 
+    sendCurrentSelection();
 }
 
-function makeMessage(event, value)
+function sendCurrentSelection()
 {
-    var message = {event:"copy", value:value};
-    return message;
+    var currentSelection = getCurrentSelection();
+
+    if(currentSelection)
+        sendMessage("onSelected", currentSelection);   
+}
+
+function sendCurrentClipboard()
+{
+    sendMessage("onCopy", getClipboardText());
+}
+
+function getCurrentSelection()
+{
+    return window.getSelection().toString();
+}
+
+function sendMessage(event, value)
+{
+    var message = {event:event, value:value};
+    chrome.runtime.sendMessage(message);
 }
 
 function getClipboardText() {

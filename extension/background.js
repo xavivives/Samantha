@@ -1,6 +1,6 @@
 chrome.runtime.onConnect.addListener(onContentConnected);
 chrome.runtime.onMessage.addListener(onContentMessage);
-chrome.omnibox.onInputEntered.addListener(onOmniboxEntered);
+chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 
 var clipboard = "";
 
@@ -17,19 +17,24 @@ function onContentMessage(message, sender, sendResponse)
 
 function processMessage(event, value)
 {
-    if(event == "copy")
+    if(event == "onCopy")
         onCopy(value);  
+    if(event == "onSelected")
+        onSelected(value);  
 }
 
 function onCopy(str)
 {
-    console.log(str);
-    console.log(clipboard);
     clipboard = str;
     setOmniboxSuggestion(str);
 }
 
-function onOmniboxEntered(str)
+function onSelected(str)
+{
+    console.log("Str: "+str);
+}
+
+function onOmniboxEnter(str)
 {
     console.log(str);
 }
