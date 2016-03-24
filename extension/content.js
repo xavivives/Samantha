@@ -21,9 +21,17 @@ function onMouseUp(e)
 function sendCurrentSelection()
 {
     var currentSelection = getCurrentSelection();
+    
+    if(!currentSelection)
+        return;
 
-    if(currentSelection)
-        sendMessage("onSelected", currentSelection);   
+    var selectionObj =
+    {
+        "url": getCurrentTabUrl(),
+        "selectedText" : currentSelection
+    }
+
+    sendMessage("onSelected", selectionObj);   
 }
 
 function sendCurrentClipboard()
@@ -34,6 +42,11 @@ function sendCurrentClipboard()
 function getCurrentSelection()
 {
     return window.getSelection().toString();
+}
+
+function getCurrentTabUrl()
+{
+    return document.location.href;
 }
 
 function sendMessage(event, value)
