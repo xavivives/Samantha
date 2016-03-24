@@ -11,7 +11,6 @@ function onContentConnected ( port )
 
 function onContentMessage(message, sender, sendResponse)
 {
-    console.log(message.value);
     processMessage(message.event, message.value);
 }
 
@@ -29,14 +28,43 @@ function onCopy(str)
     setOmniboxSuggestion(str);
 }
 
-function onSelected(str)
+function onSelected(selectionObj)
 {
-    console.log("Str: "+str);
+    addSearchEntry(selectionObj.url, selectionObj.selectedText);
 }
 
 function onOmniboxEnter(str)
 {
-    console.log(str);
+    var config = 
+    {
+        fields:
+        {
+            url: {boost: 2},
+            content: {boost: 1}
+        }
+    }
+
+    config =
+    {
+        fields:
+        {
+            url:
+            {
+                boost: 2,
+                bool: "OR"
+            },
+            content:
+            {
+                boost: 1
+            }
+        },
+        bool: "OR",
+        expand: true
+    }
+
+    var results = index.search(str, config);
+
+    console.log(results);
 }
 
 function goToUrl(url)
@@ -49,4 +77,36 @@ function setOmniboxSuggestion(str)
     console.log(str);
     var obj = {description: str};
     chrome.omnibox.setDefaultSuggestion(obj);
+}
+
+//SEARCH
+
+var index = elasticlunr(function () {
+    this.setRef('id');
+    this.addField('url');
+    this.addField('content');
+});
+
+//removes stemmers and no words
+index.pipeline.reset();
+
+
+function addSearchEntry(url, content)
+{
+    var entry = 
+    {
+        "id" : getNewUId(),
+        "url" : url,
+        "content" : content
+    }
+    console.log(entry);
+    index.addDoc(entry);
+}
+
+var _currentUId = 0;
+
+function getNewUId()
+{
+    _currentUId ++;
+    return _currentUId;
 }

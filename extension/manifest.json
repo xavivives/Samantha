@@ -1,19 +1,36 @@
 {
   "background": {
-    "scripts": ["background.js"]
+    "scripts": [
+        "elasticlunr.min.js",
+      "background.js"
+    ]
   },
-    "content_scripts": [
+  "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"]
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ],
   "description": "I'm Samantha, here to help you",
   "name": "S",
-  "omnibox": { "keyword" : "x" },
-  "permissions": [ "<all_urls>", "clipboardRead", "clipboardWrite", "geolocation" ],
+  "omnibox": {
+    "keyword": "x"
+  },
+  "permissions": [
+    "<all_urls>",
+    "clipboardRead",
+    "clipboardWrite",
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "geolocation"
+  ],
   "version": "1",
   "minimum_chrome_version": "9",
-
   "manifest_version": 2
 }
