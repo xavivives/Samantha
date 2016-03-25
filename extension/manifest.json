@@ -17,9 +17,9 @@
     }
   ],
   "description": "I'm Samantha, here to help you",
-  "name": "S",
+  "name": "Samantha",
   "omnibox": {
-    "keyword": "x"
+    "keyword": "s"
   },
   "permissions": [
     "<all_urls>",
