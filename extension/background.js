@@ -1,6 +1,7 @@
 chrome.runtime.onConnect.addListener(onContentConnected);
 chrome.runtime.onMessage.addListener(onContentMessage);
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
+chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 
 var clipboard = "";
 
@@ -36,7 +37,7 @@ function onSelected(selectionObj)
 
 function onOmniboxEnter(str)
 {
-    console.log(results);
+    goToUrl(str);
 }
 
 function getSearchResults(textToSearch)
@@ -86,11 +87,10 @@ function resultsIntoSuggestions(results, maxResults, minScore)
 
 function goToUrl(url)
 {
-    chrome.tabs.update(null, {url:"url"});
+    chrome.tabs.update(null, {url:url});
 }
-//OMNIBOX
 
-chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
+//OMNIBOX
 
 function onOmniboxInputChanged(text, suggest)
 {
