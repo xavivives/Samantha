@@ -38,6 +38,7 @@ function onSelected(selectionObj)
     var entry = getNewEntry(selectionObj.url, selectionObj.selectedText);
     addSearchEntry(entry);
     saveEnry(entry);
+    saveIndex();
     saveStateConfig();
 }
 
@@ -76,15 +77,18 @@ function resultsIntoSuggestions(results, maxResults, minScore)
     var suggestions = [];
     for (i = 0; i < results.length; i++)
     { 
-        if(results[i].score<minScore)
+        var score = results[i].score ;
+
+        if(score < minScore)
             return suggestions;
 
         var entry = index.documentStore.getDoc(results[i].ref);
+        var scoreStr = (Math.round(score*100)/100).toString();
 
         var suggestion =
         {
             content: entry.url,
-            description: entry.content
+            description: scoreStr + ": "+entry.content
         }
         suggestions.push(suggestion);
     }
@@ -147,13 +151,16 @@ function getNewUId()
     return stateConfig.currentUId.toString();
 }
 
-function populateSearchIndex()
+function reIndex()
 {
-    for (var i = 0; i<stateConfig.currentUId; i++)
-    {
-        getEntry(i.toString(), onEntryRetrived);
-        
+    function onEntryRetrived(entry)
+    {   
+        if(entry)
+            addSearchEntry(entry);
     }
+
+    for (var i = 0; i<stateConfig.currentUId; i++)
+        loadElement(i.toString(), onEntryRetrived);       
 }
 
 
@@ -161,25 +168,43 @@ function populateSearchIndex()
 
 function saveEnry(entry)
 {   
+    saveElement(entry.id, entry);
+}
+
+function saveIndex()
+{
+    saveElement("index", index.toJSON());
+}
+
+function saveElement(key, element, onSaved)
+{
+    console.log("Saving :"+key);
+    console.log(element);
     var obj= {};
-    obj[entry.id] = entry;
-    chrome.storage.local.set(obj, function(){});
+    obj[key] = element;
+    chrome.storage.local.set(obj, onSaved);
+}
+
+function loadElement(key, onLoaded)
+{
+    //console.log("Loading :"+key);
+
+    function onElementLoaded(obj)
+    {
+        console.log(obj)
+        if(obj[key])
+            onLoaded(obj[key]);
+        else
+            throw("Trying to load key: '"+ key +"'' but doesn't exists");
+    }
+
+    chrome.storage.local.get(key, onElementLoaded);
 }
 
 function getEntry(id, onEntryRetrivedCallback)
 {
     chrome.storage.local.get(id, onEntryRetrivedCallback);
 }
-
-function onEntryRetrived(obj)
-{   
-    var entry = obj[Object.keys(obj)[0]];//first object of the object
-    console.log(entry);
-    if(!entry)
-        return;
-    addSearchEntry(entry);
-}
-
 
 
 //CONFIG
@@ -188,28 +213,32 @@ function start()
 {
     //chrome.storage.local.clear();
     console.log("start");
-    chrome.storage.local.get("stateConfig", onStateConfigRetrivedCallback);
+    loadElement("stateConfig", onStateConfigLoaded );
 }
 
 function saveStateConfig()
 {
-    chrome.storage.local.set({ stateConfig: stateConfig }, function(){});
+    saveElement("stateConfig", stateConfig);
 }
 
-function onStateConfigRetrivedCallback(obj)
+function onStateConfigLoaded(config)
 {
-    console.log("onStateConfigRetrivedCallback");
-    console.log(obj);
-    initStateConfig(obj);
-    initSearch();
-    populateSearchIndex();
-}
-
-function initStateConfig(obj)
-{
-    if(obj.stateConfig && obj.stateConfig.currentUId )
+    function onIndexLoaded(loadedIndex)
     {
-        stateConfig = obj.stateConfig;
+        index = elasticlunr.Index.load(loadedIndex);
+    }
+    
+    initStateConfig(config);
+    //initSearch();
+    loadElement("index", onIndexLoaded);
+    //reIndex();
+}
+
+function initStateConfig(config)
+{
+    if(config && config.currentUId)
+    {
+        stateConfig = config;
     }
     else
     {
