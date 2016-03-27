@@ -103,7 +103,17 @@ function onOmniboxInputChanged(text, suggest)
     }
     else
     {   
-        setOmniboxSuggestion();
+        var bestResultScore = results[0].score;
+        if(bestResultScore < 1)
+        {
+            setOmniboxSuggestion("Mostra resultats per '"+text+"'", "/public/index.html");
+        }
+        else
+        {
+            var firstSuggestion = suggestions.shift();
+            setOmniboxSuggestion(firstSuggestion.description, firstSuggestion.content);
+        }
+        
         suggest(suggestions);
     }
 }
