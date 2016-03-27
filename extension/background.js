@@ -30,10 +30,14 @@ function onContentMessage(message, sender, sendResponse)
 
 function processMessage(event, value)
 {
+    //content
     if(event == "onCopy")
         onCopy(value);  
     if(event == "onSelected")
         onSelected(value);  
+    //app
+    if(event == "searchRequest")
+        onSearchRequested(value);  
 }
 
 function onCopy(str)
@@ -44,12 +48,17 @@ function onCopy(str)
 function onSelected(selectionObj)
 {
     console.log("selected");
-    sendMessage("updateSearchResults", "WOOWOWOWOWH!");
     var entry = getNewEntry(selectionObj.url, selectionObj.selectedText);
     addSearchEntry(entry);
     saveEnry(entry);
     saveIndex();
     saveStateConfig();
+}
+
+function onSearchRequested(searchStr)
+{
+    console.log("searchRequest receved");
+    sendMessage("updateSearchResults", "WOOWOWOWOWH!");
 }
 
 function getSearchResults(textToSearch)
