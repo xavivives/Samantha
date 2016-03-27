@@ -12,11 +12,10 @@
         "https://*/*"
       ],
       "js": [
-        "content.js",
-        "public/bundle.js"
+        "contentBase.js",
+        "content.js"
       ],
       "html": [
-        "/public/index.html"
       ]
     }
   ],
