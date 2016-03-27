@@ -504,8 +504,10 @@ function cleanUpNextTick(){draining=!1,currentQueue.length?queue=currentQueue.co
 },{"./Object.assign":51,"_process":28,"fbjs/lib/emptyFunction":8,"fbjs/lib/warning":27}],158:[function(require,module,exports){
 "use strict";module.exports=require("./lib/React");
 },{"./lib/React":53}],159:[function(require,module,exports){
-function updateSearchResults(e){results=e}var React=require("react"),ReactDOM=require("react-dom"),currentUrl=document.location.href,url=new URL(currentUrl),params=new URLSearchParams(url.search.slice(1)),searchStr=params.get("search");params.set("baz",3);var results="No results for now";ReactDOM.render(React.createElement("h1",null,"Searching for: ",searchStr,": Results:",results),document.getElementById("root"));
-},{"react":158,"react-dom":29}]},{},[159])
+module.exports.backgroundPort=chrome.runtime.connect(),module.exports.backgroundPort.onMessage.addListener(function(e,o){console.log(e),module.exports.processMessage(e)}),module.exports.sendMessage=function(e,o){var r={event:e,value:o};chrome.runtime.sendMessage(r)},module.exports.processMessage=function(e){console.log("Override me!")},module.exports.getCurrentTabUrl=function(){return document.location.href};
+},{}],160:[function(require,module,exports){
+function updateSearchResults(e){console.log(e),ReactDOM.render(React.createElement("h1",null,"Searching for: ",searchStr,": Results:",e),document.getElementById("root"))}var React=require("react"),ReactDOM=require("react-dom"),Connector=require("./connector.js"),currentUrl=document.location.href,url=new URL(currentUrl),params=new URLSearchParams(url.search.slice(1)),searchStr=params.get("search"),results="No results for now";Connector.sendMessage("searchRequest",searchStr),Connector.processMessage=function(e){console.log(e),console.log(e.value);var r=e.event,t=e.value;"updateSearchResults"==r&&updateSearchResults(t)},ReactDOM.render(React.createElement("h1",null,"Searching for: ",searchStr,": Results:",results),document.getElementById("root"));
+},{"./connector.js":159,"react":158,"react-dom":29}]},{},[160])
 
 
 //# sourceMappingURL=app.js.map
