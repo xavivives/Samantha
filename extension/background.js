@@ -1,14 +1,8 @@
-chrome.runtime.onConnect.addListener(onContentConnected);
-chrome.runtime.onMessage.addListener(onContentMessage);
-chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
-chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
-
 var stateConfig = null;
 var index = null;
 var clipboard = "";
-setOmniboxSuggestion("What are you looking for?");
 
-start();
+start();    
 
 function onContentConnected ( port )
 {
@@ -42,11 +36,6 @@ function onSelected(selectionObj)
     saveStateConfig();
 }
 
-function onOmniboxEnter(str)
-{
-    goToUrl(str);
-}
-
 function getSearchResults(textToSearch)
 {
     var config =
@@ -72,7 +61,7 @@ function getSearchResults(textToSearch)
     return results;
 }
 
-function resultsIntoSuggestions(results, maxResults, minScore)
+function resultsIntoSuggestions(results, minScore)
 {
     var suggestions = [];
     for (i = 0; i < results.length; i++)
@@ -102,22 +91,41 @@ function goToUrl(url)
 
 //OMNIBOX
 
+var urlToGo = "";
 function onOmniboxInputChanged(text, suggest)
 {
     var results =  getSearchResults(text);
-    var suggestions = resultsIntoSuggestions(results);
-    suggest(suggestions);
+    var minScore = 0.1;
+    var suggestions = resultsIntoSuggestions(results, minScore);
+    if(suggestions.length==0)
+    {
+        setOmniboxSuggestion("Mostra resultats per '"+text+"'", "/public/index.html");
+    }
+    else
+    {   
+        setOmniboxSuggestion();
+        suggest(suggestions);
+    }
 }
 
-function setOmniboxSuggestion(str)
+function setOmniboxSuggestion(str, url)
 {
+    urlToGo = url;
     var obj = {description: str};
     chrome.omnibox.setDefaultSuggestion(obj);
 }
 
+function onOmniboxEnter(str)
+{
+    if(urlToGo)
+        goToUrl(urlToGo);
+    else
+        goToUrl(str);
+}
+
 //SEARCH
 
-function initSearch()
+function initNewIndex()
 {
     index = elasticlunr(function () {
         this.setRef('id');
@@ -195,7 +203,7 @@ function loadElement(key, onLoaded)
         if(obj[key])
             onLoaded(obj[key]);
         else
-            throw("Trying to load key: '"+ key +"'' but doesn't exists");
+            onLoaded(null);
     }
 
     chrome.storage.local.get(key, onElementLoaded);
@@ -225,17 +233,20 @@ function onStateConfigLoaded(config)
 {
     function onIndexLoaded(loadedIndex)
     {
-        index = elasticlunr.Index.load(loadedIndex);
+        if(loadedIndex)
+            index = elasticlunr.Index.load(loadedIndex);
+        else
+            initNewIndex();
     }
     
     initStateConfig(config);
-    //initSearch();
     loadElement("index", onIndexLoaded);
     //reIndex();
 }
 
 function initStateConfig(config)
 {
+    console.log("here");
     if(config && config.currentUId)
     {
         stateConfig = config;
@@ -247,4 +258,7 @@ function initStateConfig(config)
     }
 }
 
-
+chrome.runtime.onConnect.addListener(onContentConnected);
+chrome.runtime.onMessage.addListener(onContentMessage);
+chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
+chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
