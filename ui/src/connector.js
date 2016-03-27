@@ -3,7 +3,8 @@ module.exports.backgroundPort = chrome.runtime.connect();
 
 module.exports.backgroundPort.onMessage.addListener(function (message, sender)
 {
-     module.exports.processMessage(message.event, message.value);
+    console.log(message);
+     module.exports.processMessage(message);
 });
 
 module.exports.sendMessage = function(event, value)
@@ -12,7 +13,7 @@ module.exports.sendMessage = function(event, value)
     chrome.runtime.sendMessage(message);
 }
 
-module.exports.processMessage = function(event, value)
+module.exports.processMessage = function(message)
 {
     console.log("Override me!");
 }

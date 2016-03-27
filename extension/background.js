@@ -20,6 +20,7 @@ function onContentConnected ( port )
 function sendMessage(event, value)
 {
     var message = {event:event, value:value};
+    console.log(message);
     contentPort.postMessage(message);
 }
 
@@ -57,8 +58,9 @@ function onSelected(selectionObj)
 
 function onSearchRequested(searchStr)
 {
-    console.log("searchRequest receved");
-    sendMessage("updateSearchResults", "WOOWOWOWOWH!");
+    var results =  getSearchResults(searchStr);
+    console.log(results);
+    sendMessage("updateSearchResults", searchStr);
 }
 
 function getSearchResults(textToSearch)
@@ -108,7 +110,7 @@ function resultsIntoSuggestions(results, minScore)
         var suggestion =
         {
             content: entry.url,
-            description: scoreStr + ": "+entry.content.trim() //linebreaks are not supported
+            description: scoreStr + ": "+prepareSuggestion(entry.content)//linebreaks are not supported
         }
         suggestions.push(suggestion);
     }
@@ -122,6 +124,11 @@ function goToUrl(url)
 
 //OMNIBOX
 
+function getSearchPageUrl(searchStr)
+{
+    return searchPage+"?search="+searchStr;
+}
+
 var urlToGo = "";
 function onOmniboxInputChanged(text, suggest)
 {
@@ -130,7 +137,7 @@ function onOmniboxInputChanged(text, suggest)
     var suggestions = resultsIntoSuggestions(results, minScore);
     if(suggestions.length == 0)
     {
-        setOmniboxSuggestion("Mostra resultats per '"+text+"'", searchPage);
+        setOmniboxSuggestion("Mostra resultats per '"+text+"'", getSearchPageUrl(text));
     }
     else
     {   
@@ -138,7 +145,7 @@ function onOmniboxInputChanged(text, suggest)
 
         if(bestResultScore < 1)
         {
-            setOmniboxSuggestion("Mostra resultats per '"+text+"'", searchPage);
+            setOmniboxSuggestion("Mostra resultats per '"+text+"'", getSearchPageUrl(text));
         }
         else
         {
@@ -298,4 +305,9 @@ function initStateConfig(config)
         stateConfig = {};
         stateConfig.currentUId = 0;
     }
+}
+
+function prepareSuggestion(str)
+{
+    return str.replace(/(\r\n|\n|\r)/gm,"");
 }

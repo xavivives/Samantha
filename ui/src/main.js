@@ -12,20 +12,23 @@ var results = "No results for now";
 
 Connector.sendMessage("searchRequest", searchStr);
 
-Connector.processMessage = function (event, value)
+Connector.processMessage = function (message)
 {
-    console.log("GOT YOU");
+    console.log(message);
+    console.log(message.value);
+    var event = message.event;
+    var value = message.value;
     if(event == "updateSearchResults")
         updateSearchResults(value);
 }
 
-function updateSearchResults(value)
+function updateSearchResults(results)
 {
+    console.log(results);
     ReactDOM.render(
-  <h1>Searching for: {searchStr}: Results:{value}</h1>,
-  document.getElementById('root')
-);
-
+      <h1>Searching for: {searchStr}: Results:{results}</h1>,
+      document.getElementById('root')
+    );
 }
 
 
