@@ -7,6 +7,7 @@ var stateConfig = null;
 var index = null;
 var clipboard = "";
 var contentPort = {};
+var searchPage ="index.html";
 
 start();    
 
@@ -120,7 +121,7 @@ function onOmniboxInputChanged(text, suggest)
     var suggestions = resultsIntoSuggestions(results, minScore);
     if(suggestions.length == 0)
     {
-        setOmniboxSuggestion("Mostra resultats per '"+text+"'", "/public/index.html");
+        setOmniboxSuggestion("Mostra resultats per '"+text+"'", searchPage);
     }
     else
     {   
@@ -128,7 +129,7 @@ function onOmniboxInputChanged(text, suggest)
 
         if(bestResultScore < 1)
         {
-            setOmniboxSuggestion("Mostra resultats per '"+text+"'", "/public/index.html");
+            setOmniboxSuggestion("Mostra resultats per '"+text+"'", searchPage);
         }
         else
         {
