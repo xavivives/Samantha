@@ -1,17 +1,27 @@
-var port = chrome.runtime.connect();
-port.onMessage.addListener(onBackgroundMessage);
+//This file relies on contentBase.js to exists
+
+
 document.addEventListener('copy',onCopy, true);
 document.addEventListener('mouseup', onMouseUp);
 
-function onBackgroundMessage (message, sender)
+function processMessage(event, value)
 {
-    console.log("background message: "+ message);
-}
+    if(event == "log")
+        console.log(value);
+    if(event == "updateSearchResults")
+        onUpdateSearchResults(value);
+}   
 
 function onCopy(e)
 { 
     setTimeout(sendCurrentClipboard,1);
 }
+
+function sendCurrentClipboard()
+{
+    sendMessage("onCopy", getClipboardText());
+}
+
 
 function onMouseUp(e)
 { 
@@ -34,25 +44,10 @@ function sendCurrentSelection()
     sendMessage("onSelected", selectionObj);   
 }
 
-function sendCurrentClipboard()
-{
-    sendMessage("onCopy", getClipboardText());
-}
 
 function getCurrentSelection()
 {
     return window.getSelection().toString();
-}
-
-function getCurrentTabUrl()
-{
-    return document.location.href;
-}
-
-function sendMessage(event, value)
-{
-    var message = {event:event, value:value};
-    chrome.runtime.sendMessage(message);
 }
 
 function getClipboardText() {
