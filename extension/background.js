@@ -1,12 +1,25 @@
+chrome.runtime.onConnect.addListener(onContentConnected);
+chrome.runtime.onMessage.addListener(onContentMessage);
+chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
+chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
+
 var stateConfig = null;
 var index = null;
 var clipboard = "";
+var contentPort = {};
 
 start();    
 
 function onContentConnected ( port )
 {
-    port.postMessage("Conected with content");
+    contentPort = port;
+    sendMessage("log", "Connected with background");
+}
+
+function sendMessage(event, value)
+{
+    var message = {event:event, value:value};
+    contentPort.postMessage(message);
 }
 
 function onContentMessage(message, sender, sendResponse)
@@ -29,6 +42,8 @@ function onCopy(str)
 
 function onSelected(selectionObj)
 {
+    console.log("selected");
+    sendMessage("updateSearchResults", "WOOWOWOWOWH!");
     var entry = getNewEntry(selectionObj.url, selectionObj.selectedText);
     addSearchEntry(entry);
     saveEnry(entry);
@@ -64,7 +79,13 @@ function getSearchResults(textToSearch)
 function resultsIntoSuggestions(results, minScore)
 {
     var suggestions = [];
-    for (i = 0; i < results.length; i++)
+    var suggestionsNumber = results.length;
+    var maxSuggestions = 5; //This is what chrome allows. Throws an error if bigger
+
+    if(maxSuggestions<results.length)
+        suggestionsNumber = maxSuggestions;
+
+    for (i = 0; i < suggestionsNumber; i++)
     { 
         var score = results[i].score ;
 
@@ -77,7 +98,7 @@ function resultsIntoSuggestions(results, minScore)
         var suggestion =
         {
             content: entry.url,
-            description: scoreStr + ": "+entry.content
+            description: scoreStr + ": "+entry.content.trim() //linebreaks are not supported
         }
         suggestions.push(suggestion);
     }
@@ -97,13 +118,14 @@ function onOmniboxInputChanged(text, suggest)
     var results =  getSearchResults(text);
     var minScore = 0.1;
     var suggestions = resultsIntoSuggestions(results, minScore);
-    if(suggestions.length==0)
+    if(suggestions.length == 0)
     {
         setOmniboxSuggestion("Mostra resultats per '"+text+"'", "/public/index.html");
     }
     else
     {   
         var bestResultScore = results[0].score;
+
         if(bestResultScore < 1)
         {
             setOmniboxSuggestion("Mostra resultats per '"+text+"'", "/public/index.html");
@@ -113,9 +135,9 @@ function onOmniboxInputChanged(text, suggest)
             var firstSuggestion = suggestions.shift();
             setOmniboxSuggestion(firstSuggestion.description, firstSuggestion.content);
         }
-        
-        suggest(suggestions);
     }
+    console.log(suggestions);
+    suggest(suggestions);
 }
 
 function setOmniboxSuggestion(str, url)
@@ -267,8 +289,3 @@ function initStateConfig(config)
         stateConfig.currentUId = 0;
     }
 }
-
-chrome.runtime.onConnect.addListener(onContentConnected);
-chrome.runtime.onMessage.addListener(onContentMessage);
-chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
-chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);

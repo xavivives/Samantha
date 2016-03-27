@@ -504,8 +504,8 @@ function cleanUpNextTick(){draining=!1,currentQueue.length?queue=currentQueue.co
 },{"./Object.assign":51,"_process":28,"fbjs/lib/emptyFunction":8,"fbjs/lib/warning":27}],158:[function(require,module,exports){
 "use strict";module.exports=require("./lib/React");
 },{"./lib/React":53}],159:[function(require,module,exports){
-var React=require("react"),ReactDOM=require("react-dom");ReactDOM.render(React.createElement("h1",null,"Hello, world!"),document.getElementById("root"));
+function updateSearchResults(e){results=e}var React=require("react"),ReactDOM=require("react-dom"),currentUrl=document.location.href,url=new URL(currentUrl),params=new URLSearchParams(url.search.slice(1)),searchStr=params.get("search");params.set("baz",3);var results="No results for now";ReactDOM.render(React.createElement("h1",null,"Searching for: ",searchStr,": Results:",results),document.getElementById("root"));
 },{"react":158,"react-dom":29}]},{},[159])
 
 
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=app.js.map

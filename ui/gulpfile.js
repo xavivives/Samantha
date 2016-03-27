@@ -23,8 +23,8 @@ var options =
 var b = browserify(options);
 var w = watchify(b);
 w.plugin('minifyify', {
-            map: 'bundle.js.map',
-            output: 'public/bundle.js.map',
+            map: 'app.js.map',
+            output: '../extension/app.js.map',
             compress: { // Options passed to Uglify
                 drop_debugger: true,
                 drop_console: true
@@ -35,11 +35,11 @@ w.plugin('minifyify', {
 function bundle ()
 {
     return w.bundle()
-    .pipe(source('bundle.js'))
-    .pipe(gulp.dest('./public'))
+    .pipe(source('app.js'))
+    .pipe(gulp.dest('./../extension'))
 }
 
-//converts JSX to JS, wraps all modules in single file in /public/bundle.js
+//converts JSX to JS, wraps all modules in single file in/../extension/bundle.js
 gulp.task('compile', bundle); 
 
 gulp.task('default', function cb ()
