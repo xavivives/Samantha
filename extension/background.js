@@ -58,9 +58,10 @@ function onSelected(selectionObj)
 
 function onSearchRequested(searchStr)
 {
-    var results =  getLunrSearchResults(searchStr);
-    console.log(results);
-    sendMessage("updateSearchResults", results);
+    var lunrResults =  getLunrSearchResults(searchStr);
+    var uiResults = lunrResultsToUiResults(lunrResults);
+    console.log(uiResults);
+    sendMessage("updateSearchResults", uiResults);
 }
 
 function getLunrSearchResults(textToSearch)
@@ -323,4 +324,29 @@ function prepareSuggestion(str)
 {
     //linebreaks are not supported on Omnibox
     return str.replace(/(\r\n|\n|\r)/gm,"");
+}
+
+//SAMANTHA SEARCH PAGE
+function lunrResultToUiResult(result)
+{
+    var entry = index.documentStore.getDoc(result.ref);
+
+    var uiResult =
+    {
+        score: result.score,
+        timestamp:entry.timestamp,
+        id:entry.id,
+        url: entry.url, 
+        content: entry.content
+    }
+
+    return uiResult;
+}
+
+function lunrResultsToUiResults(results)
+{
+    var uiResults = [];
+    for (i = 0; i < results.length; i++)
+        uiResults.push(lunrResultToUiResult(results[i]));
+    return uiResults;
 }
