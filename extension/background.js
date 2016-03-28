@@ -58,12 +58,12 @@ function onSelected(selectionObj)
 
 function onSearchRequested(searchStr)
 {
-    var results =  getSearchResults(searchStr);
+    var results =  getLunrSearchResults(searchStr);
     console.log(results);
     sendMessage("updateSearchResults", results);
 }
 
-function getSearchResults(textToSearch)
+function getLunrSearchResults(textToSearch)
 {
     var config =
     {
@@ -88,36 +88,7 @@ function getSearchResults(textToSearch)
     return results;
 }
 
-function resultsToOmniboxSuggestions(results, minScore)
-{
-    var suggestions = [];
-    var suggestionsNumber = results.length;
-    var maxSuggestions = 5; //This is what chrome allows. Throws an error if bigger
-
-    if(maxSuggestions<results.length)
-        suggestionsNumber = maxSuggestions;
-
-    for (i = 0; i < suggestionsNumber; i++)
-    { 
-        var score = results[i].score ;
-
-        if(score < minScore)
-            return suggestions;
-
-        var entry = index.documentStore.getDoc(results[i].ref);
-        var scoreStr = (Math.round(score*100)/100).toString();
-
-        var suggestion =
-        {
-            content: entry.url,
-            description: scoreStr + ": "+prepareSuggestion(entry.content)//linebreaks are not supported
-        }
-        suggestions.push(suggestion);
-    }
-    return suggestions;
-}
-
-function filterResults(results, minScore, maxResults)
+function filterLunrResults(results, minScore, maxResults)
 {
     var filteredResults = [];
     var resultsNumber = results.length;
@@ -152,9 +123,9 @@ function onOmniboxInputChanged(text, suggest)
 {
     var omniboxMaxSuggestions = 5;
     var minScore = 0.1;
-    var results =  filterResults(getSearchResults(text),minScore, omniboxMaxSuggestions);
+    var results =  filterLunrResults(getLunrSearchResults(text),minScore, omniboxMaxSuggestions);
 
-    var suggestions = resultsToSuggestions(results);
+    var suggestions = lunrResultsToSuggestions(results);
     if(suggestions.length == 0)
     {
         setOmniboxSuggestion("Mostra resultats per '"+text+"'", getSearchPageUrl(text));
@@ -177,15 +148,15 @@ function onOmniboxInputChanged(text, suggest)
     suggest(suggestions);
 }
 
-function resultsToSuggestions(results)
+function lunrResultsToSuggestions(results)
 {
     var suggestions = [];
     for (i = 0; i < results.length; i++)
-        suggestions.push(resultToSuggestion(results[i]));
+        suggestions.push(lunrResultToSuggestion(results[i]));
     return suggestions;
 }
 
-function resultToSuggestion(result)
+function lunrResultToSuggestion(result)
 {
     var entry = index.documentStore.getDoc(result.ref);
     var scoreStr = (Math.round(result.score * 100) / 100).toString();
