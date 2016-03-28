@@ -1,5 +1,7 @@
 var config      = require('./gulpConfig');
 
+var reactPreset        = require('babel-preset-react');
+var es2015Preset        = require('babel-preset-es2015');
 //Utils
 
 //bundlelogger
@@ -124,7 +126,7 @@ gulp.task('browserify', function(callback) {
         .on('end', reportFinished);
     };
 
-    bundler.transform(babelify.configure());
+    bundler.transform(babelify.configure({'presets': [reactPreset, es2015Preset]}));
 
     if (global.isWatching) {
       // Wrap with watchify and rebundle on changes
@@ -182,12 +184,12 @@ gulp.task('setWatch', function() {
   global.isWatching = true;
 });
 
+
 //watch
 /* Notes:
    - gulp/tasks/browserify.js handles js recompiling with watchify
    - gulp/tasks/browserSync.js watches and reloads compiled files
 */
-
 var gulp   = require('gulp');
 //var config = require('./gulpConfig');
 gulp.task('watch', ['setWatch', 'browserSync'], function() {
