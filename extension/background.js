@@ -60,7 +60,7 @@ function onSearchRequested(searchStr)
 {
     var results =  getSearchResults(searchStr);
     console.log(results);
-    sendMessage("updateSearchResults", searchStr);
+    sendMessage("updateSearchResults", results);
 }
 
 function getSearchResults(textToSearch)
@@ -88,7 +88,7 @@ function getSearchResults(textToSearch)
     return results;
 }
 
-function resultsIntoSuggestions(results, minScore)
+function resultsToOmniboxSuggestions(results, minScore)
 {
     var suggestions = [];
     var suggestionsNumber = results.length;
@@ -117,6 +117,24 @@ function resultsIntoSuggestions(results, minScore)
     return suggestions;
 }
 
+function filterResults(results, minScore, maxResults)
+{
+    var filteredResults = [];
+    var resultsNumber = results.length;
+
+    if(maxResults<results.length)
+        resultsNumber = maxResults;
+
+    for (i = 0; i < resultsNumber; i++)
+    { 
+        if(results[i].score < minScore)//results are sorted by score
+            return filteredResults;
+
+        filteredResults.push(results[i]);
+    }
+    return filteredResults;
+}
+
 function goToUrl(url)
 {
     chrome.tabs.update(null, {url:url});
@@ -132,9 +150,11 @@ function getSearchPageUrl(searchStr)
 var urlToGo = "";
 function onOmniboxInputChanged(text, suggest)
 {
-    var results =  getSearchResults(text);
+    var omniboxMaxSuggestions = 5;
     var minScore = 0.1;
-    var suggestions = resultsIntoSuggestions(results, minScore);
+    var results =  filterResults(getSearchResults(text),minScore, omniboxMaxSuggestions);
+
+    var suggestions = resultsToSuggestions(results);
     if(suggestions.length == 0)
     {
         setOmniboxSuggestion("Mostra resultats per '"+text+"'", getSearchPageUrl(text));
@@ -155,6 +175,27 @@ function onOmniboxInputChanged(text, suggest)
     }
     console.log(suggestions);
     suggest(suggestions);
+}
+
+function resultsToSuggestions(results)
+{
+    var suggestions = [];
+    for (i = 0; i < results.length; i++)
+        suggestions.push(resultToSuggestion(results[i]));
+    return suggestions;
+}
+
+function resultToSuggestion(result)
+{
+    var entry = index.documentStore.getDoc(result.ref);
+    var scoreStr = (Math.round(result.score * 100) / 100).toString();
+
+    var suggestion =
+    {
+        content: entry.url,
+        description: scoreStr + ": " + prepareSuggestion(entry.content)
+    }
+    return suggestion;
 }
 
 function setOmniboxSuggestion(str, url)
@@ -309,5 +350,6 @@ function initStateConfig(config)
 
 function prepareSuggestion(str)
 {
+    //linebreaks are not supported on Omnibox
     return str.replace(/(\r\n|\n|\r)/gm,"");
 }
