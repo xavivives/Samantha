@@ -14,12 +14,12 @@ export default class searchResultItem extends React.Component
     onClicked(result)
     {
       this.setState({open: true});
-      this.gotoUrl(url);
+      this.gotoUrl(result.url);
     }
 
     gotoUrl(url)
     {
-      window.location.href = result.url;
+      window.location.href = url;
     }
 
     render() {
