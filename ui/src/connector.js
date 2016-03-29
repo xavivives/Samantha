@@ -22,7 +22,7 @@ export default class Connector
         var event = message.event;
         var value = message.value; 
 
-        for(var i = 0;i < this.registredEvents.length; i++)
+        for (var i = 0 ; i < this.registredEvents.length ; i++)
         {
             if(this.registredEvents[i].eventName == event)
             {
@@ -44,6 +44,5 @@ export default class Connector
     {
         return document.location.href;
     }
-
     
 }
