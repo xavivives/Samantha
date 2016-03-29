@@ -1,47 +1,49 @@
-
-module.exports.backgroundPort = chrome.runtime.connect();
-
-module.exports.backgroundPort.onMessage.addListener(function (message, sender)
+export default class Connector
 {
-    console.log(message);
-     module.exports.processMessage(message);
-});
-
-module.exports.sendMessage = function(event, value)
-{
-    var message = {event:event, value:value};
-    chrome.runtime.sendMessage(message);
-}
-
-module.exports.processMessage = function(message)
-{
-    var event = message.event;
-    var value = message.value; 
-    
-    for(var i = 0;i < module.exports.registredEvents.length; i++)
-    {
-        console.log("Event: "+module.exports.registredEvents.eventName);
-
-        if(module.exports.registredEvents[i].eventName == event)
+    constructor() {
+        this.registredEvents = [];
+        this.backgroundPort = chrome.runtime.connect();
+        var that = this;
+        this.backgroundPort.onMessage.addListener(function (message, sender)
         {
-            module.exports.registredEvents[i].functionCallback(value);
-        }
+            console.log(that);
+             that.processMessage(message);
+        });
     }
+
+    sendMessage (event, value)
+    {
+        var message = {event:event, value:value};
+        chrome.runtime.sendMessage(message);
+    }
+
+    processMessage(message)
+    {
+        var event = message.event;
+        var value = message.value; 
+
+        for(var i = 0;i < this.registredEvents.length; i++)
+        {
+            if(this.registredEvents[i].eventName == event)
+            {
+                this.registredEvents[i].functionCallback(value);
+            }
+        } 
+    }
+
+    registerEvent (eventName, functionCallback)
+    {
+        var event = {
+            eventName : eventName,
+            functionCallback : functionCallback
+        }
+        this.registredEvents.push(event);
+    }
+
+    getCurrentTabUrl()
+    {
+        return document.location.href;
+    }
+
     
 }
-
-module.exports.registerEvent = function(eventName, functionCallback)
-{
-    var event = {
-        eventName : eventName,
-        functionCallback : functionCallback
-    }
-    module.exports.registredEvents.push(event);
-}
-
-module.exports.getCurrentTabUrl = function()
-{
-    return document.location.href;
-}
-
-module.exports.registredEvents = [];

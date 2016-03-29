@@ -13,19 +13,13 @@ var currentUrl = document.location.href
 var url = new URL(currentUrl);
 var params = new URLSearchParams(url.search.slice(1));
 var searchStr= params.get("search");
-var results = []; 
+var results = [];
+var connector = new Connector();
 
-Connector.registerEvent("updateSearchResults", updateSearchResults);
+connector.registerEvent("updateSearchResults", updateSearchResults);
 
-Connector.sendMessage("searchRequest", searchStr);
+connector.sendMessage("searchRequest", searchStr);
 
-Connector._processMessage = function (message)
-{
-    var event = message.event; 
-    var value = message.value;
-    if(event == "updateSearchResults")
-        updateSearchResults(value);
-}
  
 function updateSearchResults(results)
 {
