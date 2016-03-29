@@ -5,43 +5,38 @@ import RaisedButton from 'material-ui/lib/raised-button';
 
 export default class searchResultItem extends React.Component
 {
+    constructor(props)
+    {
+      super(props);
+      this.onClicked = this.onClicked.bind(this);
+    }
 
-  constructor(props)
-  {
-    super(props);
-    this.state = {
-      open: true,
-    };
+    onClicked(result)
+    {
+      this.setState({open: true});
+      this.gotoUrl(url);
+    }
 
-    this.onClicked = this.onClicked.bind(this);
-  }
+    gotoUrl(url)
+    {
+      window.location.href = result.url;
+    }
 
-  onClicked()
-  {
-    console.log("!open");
-    this.setState({open: true});
-  }
+    render() {
+        return (
+            <div>
+                <p style = {{color: 'gray', margin:'0px'}}> 
+                    {this.props.result.content}
+                </p>
+                <p onClick= {()=>this.onClicked(this.props.result)}
+                    style = {{color: 'red'}}> 
 
-
-  render() {
-    const actions = [
-      <FlatButton
-        label="Cancel"
-        secondary={true}
-        onTouchTap={this.onClicked}
-      />,
-      <FlatButton
-        label="Submit"
-        primary={true}
-        keyboardFocused={true}
-        onTouchTap={this.onClicked}
-      />,
-    ];
-
-    return (
-      <div>
-        {actions}
-      </div>
-    );
-  }
+                    <span style = {{color: 'green'}}>
+                        <b>{Math.round(this.props.result.score*100)/100+ " "}</b>
+                    </span>
+                    <b>{this.props.result.url}</b>
+                </p> 
+            </div>
+        );
+    }
 }
