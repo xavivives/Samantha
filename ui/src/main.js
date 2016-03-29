@@ -4,19 +4,24 @@ import ReactDOM from 'react-dom';
 import Connector from './connector.js';
 import FlatButton from 'material-ui/lib/flat-button';
 import Dialog from 'material-ui/lib/dialog';
+import searchResultsList from './searchResultsList.js';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+injectTapEventPlugin();
 
 var currentUrl = document.location.href
 
 var url = new URL(currentUrl);
 var params = new URLSearchParams(url.search.slice(1));
 var searchStr= params.get("search");
-var results = "No results for now"; 
+var results = []; 
+
+Connector.registerEvent("updateSearchResults", updateSearchResults);
 
 Connector.sendMessage("searchRequest", searchStr);
 
-Connector.processMessage = function (message)
+Connector._processMessage = function (message)
 {
-    var event = message.event;
+    var event = message.event; 
     var value = message.value;
     if(event == "updateSearchResults")
         updateSearchResults(value);
@@ -26,10 +31,16 @@ function updateSearchResults(results)
 {
     console.log("HHEERERHRH");
     console.log(results);
+
+    ReactDOM.render(
+        React.createElement(searchResultsList,{results: results}),
+        document.getElementById('root')
+    );
+
 }
 //<h1>Searching for: {searchStr}: Results:{results}</h1>
 ReactDOM.render(
-  <h1>Searching for: {searchStr}: Results:{results}</h1>,
+    React.createElement(searchResultsList,{results: results}),
 
   document.getElementById('root')
 );
