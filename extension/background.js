@@ -2,12 +2,15 @@ chrome.runtime.onConnect.addListener(onContentConnected);
 chrome.runtime.onMessage.addListener(onContentMessage);
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
+chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
 
 var stateConfig = null;
 var index = null;
 var clipboard = "";
 var contentPort = {};
 var searchPage ="index.html";
+
+console.log("asfasdfa");
 
 start();    
 
@@ -26,6 +29,7 @@ function sendMessage(event, value)
 
 function onContentMessage(message, sender, sendResponse)
 {
+    console.log(sender);
     processMessage(message.event, message.value);
 }
 
@@ -233,7 +237,6 @@ function reIndex()
         loadElement(i.toString(), onEntryRetrived);       
 }
 
-
 //STORAGE
 
 function saveEnry(entry)
@@ -275,7 +278,6 @@ function getEntry(id, onEntryRetrivedCallback)
 {
     chrome.storage.local.get(id, onEntryRetrivedCallback);
 }
-
 
 //CONFIG
 
@@ -349,4 +351,10 @@ function lunrResultsToUiResults(results)
     for (i = 0; i < results.length; i++)
         uiResults.push(lunrResultToUiResult(results[i]));
     return uiResults;
+}
+
+//BROWSER ACTION
+function onBrowserActionClicked(tabId)
+{
+    console.log(tabId);
 }
