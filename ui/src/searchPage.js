@@ -35,15 +35,10 @@ export default class SearchPage extends React.Component
             defaultSearch:searchText,
             baseUrl: currentUrl
         };
-
-
-
     }
 
-     
     getChildContext()
     {
-        //console.log(GetMuiTheme);
         return { muiTheme: GetMuiTheme(theme)};
     }
 

@@ -8,8 +8,6 @@ function processMessage(event, value)
 {
     if(event == "log")
         console.log(value);
-    if(event == "updateSearchResults")
-        onUpdateSearchResults(value);
 }   
 
 function onCopy(e)
@@ -21,7 +19,6 @@ function sendCurrentClipboard()
 {
     sendMessage("onCopy", getClipboardText());
 }
-
 
 function onMouseUp(e)
 { 
