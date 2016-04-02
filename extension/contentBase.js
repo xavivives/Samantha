@@ -1,5 +1,7 @@
-var backgroundPort = chrome.runtime.connect();
-backgroundPort.onMessage.addListener(onBackgroundMessage);
+var backgroundPort;
+document.addEventListener("visibilitychange", onVisibilityChanged);
+window.addEventListener("blur", onBlur);
+window.addEventListener("focus", onFocus);
 
 function onBackgroundMessage (message, sender)
 {
@@ -20,4 +22,27 @@ function processMessage(event, value)
 function getCurrentTabUrl()
 {
     return document.location.href;
+}
+
+function onVisibilityChanged(e)
+{
+    var isVisible = document.visibilityState == "visible";
+    if(isVisible)
+        connectToBackground();
+}
+
+function connectToBackground()
+{
+    backgroundPort = chrome.runtime.connect();
+    backgroundPort.onMessage.addListener(onBackgroundMessage);
+}
+
+function onFocus()
+{
+    //console.log("focus");
+}
+
+function onBlur()
+{
+    //console.log("blur");
 }

@@ -2,13 +2,33 @@ export default class Connector
 {
     constructor() {
         this.registredEvents = [];
-        this.backgroundPort = chrome.runtime.connect();
         var that = this;
-        this.backgroundPort.onMessage.addListener(function (message, sender)
+
+        this.onVisibilityChanged = this.onVisibilityChanged.bind(this);
+        this.connectToBackground = this.connectToBackground.bind(this);
+
+        document.addEventListener("visibilitychange", function(){ that.onVisibilityChanged()});
+        this.connectToBackground();
+    }
+
+    connectToBackground()
+    {
+        var that = this;
+        var backgroundPort = chrome.runtime.connect();
+        backgroundPort.onMessage.addListener(function (message, sender)
         {
             console.log(that);
              that.processMessage(message);
         });
+    }
+
+    onVisibilityChanged()
+    {
+        var isVisible = document.visibilityState == "visible";
+        if(isVisible)
+            this.connectToBackground();
+
+        console.log("isVIsible:"+isVisible);
     }
 
     sendMessage (event, value)
@@ -43,6 +63,5 @@ export default class Connector
     getCurrentTabUrl()
     {
         return document.location.href;
-    }
-    
+    }  
 }
