@@ -15,8 +15,7 @@
         "contentBase.js",
         "content.js"
       ],
-      "html": [
-      ]
+      "html": []
     }
   ],
   "description": "I'm Samantha, here to help you",
@@ -40,5 +39,20 @@
     "16": "helix16.png",
     "48": "helix48.png",
     "128": "helix128.png"
+  },
+  "browser_action":
+  {
+    "default_icon":
+    {
+      "16": "helix16.png",
+      "48": "helix48.png",
+      "128": "helix128.png"
+    },
+    "default_title": "Save this page",
+    "default_popup": "index.html"
+  },
+  
+   "chrome_url_overrides" : {
+    "newtab": "index.html"
   }
 }
