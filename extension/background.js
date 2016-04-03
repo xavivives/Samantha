@@ -50,7 +50,8 @@ function onCopy(str)
 
 function onSelected(selectionObj)
 {
-    var entry = getNewEntry(selectionObj.url, selectionObj.selectedText);
+    return;
+    var entry = createEntryFromSelection(selectionObj.url, selectionObj.selectedText);
     addEntry(entry);
 }
 
@@ -209,13 +210,25 @@ function addSearchEntry(entry)
     index.addDoc(entry);
 }
 
-function getNewEntry(url, content)
+function createEntryFromSelection(url, content)
 {
     var entry = 
     {
         "id" : getNewUId(),
         "url" : url,
         "content" : content
+    }
+
+    return entry;
+}
+
+function createEntryFromAtom(atom)
+{
+     var entry = 
+    {
+        "id" : getNewUId(),
+        "url" : atom.page.url,
+        "content" : atom.page.title,
     }
 
     return entry;
@@ -359,12 +372,10 @@ function lunrResultsToUiResults(results)
 //BROWSER ACTION
 function onBrowserActionClicked(tab)
 {
-    console.log(tab);
-    var favIconUrl = tab.favIconUrl;
-    var title = tab.title;
-    var url = tab.url;
-    var time = getCurrentTime();
-    var entry = getNewEntry(tab.url, "");
+    var page = createPage(tab.url, tab.title, tab.favIconUrl);
+    var content = null;
+    var atom = createAtom(page, content);
+    var entry = createEntryFromAtom(atom);
     addEntry(entry);
 }
 
@@ -381,12 +392,13 @@ function createAtom(page, content)
     return atom;
 }
 
-function createPage(url, title)
+function createPage(url, title, favicon)
 {
     var page =
     {
         url:url,
-        title:tile
+        title:title,
+        favicon: favicon
     }
     return page;
 }
