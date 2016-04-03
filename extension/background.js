@@ -10,8 +10,6 @@ var clipboard = "";
 var contentPort = {};
 var searchPage ="index.html";
 
-console.log("asfasdfa");
-
 start();    
 
 function onContentConnected ( port )
@@ -52,10 +50,14 @@ function onCopy(str)
 
 function onSelected(selectionObj)
 {
-    console.log("selected");
     var entry = getNewEntry(selectionObj.url, selectionObj.selectedText);
+    addEntry(entry);
+}
+
+function addEntry(entry)
+{
     addSearchEntry(entry);
-    saveEnry(entry);
+    saveEntry(entry);
     saveIndex();
     saveStateConfig();
 }
@@ -239,7 +241,7 @@ function reIndex()
 
 //STORAGE
 
-function saveEnry(entry)
+function saveEntry(entry)
 {   
     saveElement(entry.id, entry);
 }
@@ -274,10 +276,11 @@ function loadElement(key, onLoaded)
     chrome.storage.local.get(key, onElementLoaded);
 }
 
-function getEntry(id, onEntryRetrivedCallback)
+//delete me
+/*function getEntry(id, onEntryRetrivedCallback)
 {
     chrome.storage.local.get(id, onEntryRetrivedCallback);
-}
+}*/
 
 //CONFIG
 
@@ -354,7 +357,63 @@ function lunrResultsToUiResults(results)
 }
 
 //BROWSER ACTION
-function onBrowserActionClicked(tabId)
+function onBrowserActionClicked(tab)
 {
-    console.log(tabId);
+    console.log(tab);
+    var favIconUrl = tab.favIconUrl;
+    var title = tab.title;
+    var url = tab.url;
+    var time = getCurrentTime();
+    var entry = getNewEntry(tab.url, "");
+    addEntry(entry);
+}
+
+function createAtom(page, content)
+{
+    var atom =
+    {
+        v:0,
+        page: page,
+        content : content,
+        retrieves : [],
+        relations: [],
+    }
+    return atom;
+}
+
+function createPage(url, title)
+{
+    var page =
+    {
+        url:url,
+        title:tile
+    }
+    return page;
+}
+
+function createRetrieve(searchKeys, history)
+{
+    var retrieve =
+    {
+        time: getCurrentTime(),
+        history:history,
+        searchKeys :searchKeys,
+    }
+    return retrieve;
+}
+
+function createRelation(type, hash)
+{
+    var retrieve =
+    {
+        time: getCurrentTime(),
+        type: type,
+        hash :hash,
+    }
+    return retrieve;
+}
+
+function getCurrentTime()
+{
+    return new Date().toJSON();
 }
