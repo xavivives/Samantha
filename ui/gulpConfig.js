@@ -22,10 +22,17 @@ module.exports = {
     debug: true,
     // A separate bundle will be generated for each
     // bundle config in the list below
-    bundleConfigs: [{
-      entries: src + '/main.js',
+    bundleConfigs:
+    [
+    {
+      entries: src + '/search.js',
       dest: dest,
-      outputName: 'app.js'
+      outputName: 'search.js'
+    },
+    {
+      entries: src + '/popup.js',
+      dest: dest,
+      outputName: 'popup.js'
     }],
     extensions: ['.js'],
   }

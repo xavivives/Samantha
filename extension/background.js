@@ -8,7 +8,7 @@ var stateConfig = null;
 var index = null;
 var clipboard = "";
 var contentPort = {};
-var searchPage ="index.html";
+var searchPage ="search.html";
 
 start();    
 
@@ -21,17 +21,16 @@ function onContentConnected ( port )
 function sendMessage(event, value)
 {
     var message = {event:event, value:value};
-    console.log(message);
     contentPort.postMessage(message);
 }
 
 function onContentMessage(message, sender, sendResponse)
 {
     console.log(sender);
-    processMessage(message.event, message.value);
+    processMessage(message.event, message.value, sender.tab);
 }
 
-function processMessage(event, value)
+function processMessage(event, value, tab)
 {
     //content
     if(event == "onCopy")
@@ -40,7 +39,10 @@ function processMessage(event, value)
         onSelected(value);  
     //app
     if(event == "searchRequest")
-        onSearchRequested(value);  
+        onSearchRequested(value); 
+    //popup 
+    if(event == "saveUrl")
+        onSaveUrl(tab); 
 }
 
 function onCopy(str)
@@ -370,6 +372,7 @@ function lunrResultsToUiResults(results)
 }
 
 //BROWSER ACTION
+//If no popup.html exists
 function onBrowserActionClicked(tab)
 {
     var page = createPage(tab.url, tab.title, tab.favIconUrl);
@@ -377,6 +380,57 @@ function onBrowserActionClicked(tab)
     var atom = createAtom(page, content);
     var entry = createEntryFromAtom(atom);
     addEntry(entry);
+}
+
+function onSaveUrl()
+{
+    getCurrentTab(function(tab)
+    {
+        if(!isUrlSavable(tab.url))
+        {
+            sendSaveError();
+            return;
+        }
+
+        var page = createPage(tab.url, tab.title, tab.favIconUrl);
+        var content = null;
+        var atom = createAtom(page, content);
+        var entry = createEntryFromAtom(atom);
+        addEntry(entry);
+        sendSaveOk();
+    })
+    
+}
+
+function isUrlSavable(url)
+{
+    if(url == null)
+        return false;
+    if(url.indexOf("chrome://") == 0)
+        return false;
+    return true;
+}
+
+function sendSaveError()
+{
+    var status =
+    {
+        statusType : "error",
+        message:"This url can't be saved"
+
+    }
+    sendMessage("updatePopupStatus", status)
+}
+
+function sendSaveOk()
+{
+    var status =
+    {
+        statusType : "ok",
+        message:"Saved"
+
+    }
+    sendMessage("updatePopupStatus", status)
 }
 
 function createAtom(page, content)
@@ -428,4 +482,14 @@ function createRelation(type, hash)
 function getCurrentTime()
 {
     return new Date().toJSON();
+}
+
+function getCurrentTab(onTap)
+{
+     chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
+     var activeTab = arrayOfTabs[0];
+     var activeTabId = activeTab.id; 
+     onTap(activeTab);
+
+  });
 }
