@@ -48,10 +48,11 @@
       "48": "helix48.png",
       "128": "helix128.png"
     },
-    "default_title": "Save this page"
+    "default_title": "Save this page",
+    "default_popup": "popup.html"
   },
 
    "chrome_url_overrides" : {
-    "newtab": "index.html"
+    "newtab": "search.html"
   }
 }

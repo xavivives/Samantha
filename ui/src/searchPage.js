@@ -5,8 +5,6 @@ import TextField from 'material-ui/lib/text-field';
 import GetMuiTheme from 'material-ui/lib/styles/getMuiTheme';
 import theme from './theme.js';
 
-
-
 export default class SearchPage extends React.Component
 {
     constructor(props)
