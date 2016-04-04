@@ -69,7 +69,6 @@ function onSearchRequested(searchStr)
 {
     var lunrResults =  getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
-    console.log(uiResults);
     sendMessage("updateSearchResults", uiResults);
 }
 
@@ -154,7 +153,6 @@ function onOmniboxInputChanged(text, suggest)
             setOmniboxSuggestion(firstSuggestion.description, firstSuggestion.content);
         }
     }
-    console.log(suggestions);
     suggest(suggestions);
 }
 
@@ -268,8 +266,8 @@ function saveIndex()
 
 function saveElement(key, element, onSaved)
 {
-    console.log("Saving :"+key);
-    console.log(element);
+    //console.log("Saving :"+key);
+    //console.log(element);
     var obj= {};
     obj[key] = element;
     chrome.storage.local.set(obj, onSaved);
@@ -328,7 +326,6 @@ function onStateConfigLoaded(config)
 
 function initStateConfig(config)
 {
-    console.log("here");
     if(config && config.currentUId)
     {
         stateConfig = config;
@@ -386,10 +383,15 @@ function onSaveUrl()
 {
     getCurrentTab(function(tab)
     {
-        if(!isUrlSavable(tab.url))
+        if(!urlIsSavable(tab.url))
         {
             sendSaveError();
             return;
+        }
+
+        if(urlIsSavedAlready)
+        {
+            
         }
 
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
@@ -402,7 +404,7 @@ function onSaveUrl()
     
 }
 
-function isUrlSavable(url)
+function urlIsSavable(url)
 {
     if(url == null)
         return false;
@@ -416,7 +418,7 @@ function sendSaveError()
     var status =
     {
         statusType : "error",
-        message:"This url can't be saved"
+        message:"Ops! Can't be save this :("
 
     }
     sendMessage("updatePopupStatus", status)
