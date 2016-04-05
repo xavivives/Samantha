@@ -1,10 +1,15 @@
 import ElasticLunr from 'elasticlunr';
+import HtmlMetadata from 'html-metadata';
+import OtherSearchEngines from './otherSearchEngines.js';
+
+var otherSearchEngines = new OtherSearchEngines();
 
 chrome.runtime.onConnect.addListener(onContentConnected);
 chrome.runtime.onMessage.addListener(onContentMessage);
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
+chrome.tabs.onUpdated.addListener(onTabUpdate);
 
 var stateConfig = null;
 var index = null;
@@ -12,10 +17,13 @@ var clipboard = "";
 var contentPort = {};
 var searchPage ="search.html";
 
+var tabsHistory ={};
+
 start();    
 
 function onContentConnected ( port )
 {
+    console.log(port);
     contentPort = port;
     sendMessage("log", "Connected with background");
 }
@@ -28,7 +36,7 @@ function sendMessage(event, value)
 
 function onContentMessage(message, sender, sendResponse)
 {
-    console.log(sender);
+    //console.log(sender);
     processMessage(message.event, message.value, sender.tab);
 }
 
@@ -281,7 +289,7 @@ function loadElement(key, onLoaded)
 
     function onElementLoaded(obj)
     {
-        console.log(obj)
+        //console.log(obj)
         if(obj[key])
             onLoaded(obj[key]);
         else
@@ -396,6 +404,11 @@ function onSaveUrl()
 
         }
 
+        HtmlMetadata(tab.url).then(function(metadata)
+        {
+            console.log(metadata);
+        });
+
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
         var atom = createAtom(page, content);
@@ -501,4 +514,58 @@ function getCurrentTab(onTap)
      onTap(activeTab);
 
   });
+}
+
+function onTabUpdate(tabId, changeInfo, tab)
+{
+    console.log(changeInfo.status);
+    if(changeInfo.status != "loading")
+        return;
+
+    var isEngine = otherSearchEngines.isEngine(tab.url);
+
+    if(isEngine)
+    {
+        resetTabHistory(tab.id, tab.url);
+    }
+
+    if(tabHistoryExists(tab.id))
+    {
+        addUrlToHistory(tab.id, tab.url);
+    }
+}
+
+function resetTabHistory(tabId, url)
+{
+    var searchText = otherSearchEngines.getSearchText(url);
+    tabsHistory[tabId]={};
+    tabsHistory[tabId].history = [];
+    tabsHistory[tabId].searchStr = searchText;
+}
+
+
+function addUrlToHistory(tabId, url)
+{
+    if(urlIsNotTheSame(tabId, url))
+    {
+        tabsHistory[tabId].history.push(url);
+        console.log(tabsHistory);
+    }
+}
+
+function urlIsNotTheSame(tabId, url)
+{
+    var tabLength = tabsHistory[tabId].history.length-1;
+    if(tabsHistory[tabId].history[tabLength] == url) //url is not the same as the last register
+        return false;
+
+    return true;
+}
+
+function tabHistoryExists(tabId)
+{
+    if (typeof tabsHistory[tabId] != "undefined")
+        return true;
+
+    return false;
 }
