@@ -1,2 +1,4 @@
 ui/node_modules
 npm-debug.log
+extension/background.js
+extension/content.js
