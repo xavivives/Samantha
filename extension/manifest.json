@@ -1,7 +1,6 @@
 {
   "background": {
     "scripts": [
-      "elasticlunr.min.js",
       "background.js"
     ]
   },

@@ -25,6 +25,16 @@ module.exports = {
     bundleConfigs:
     [
     {
+      entries: src + '/background.js',
+      dest: dest,
+      outputName: 'background.js'
+    },
+    {
+      entries: src + '/content.js',
+      dest: dest,
+      outputName: 'content.js'
+    },
+    {
       entries: src + '/search.js',
       dest: dest,
       outputName: 'search.js'
