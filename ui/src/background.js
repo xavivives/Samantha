@@ -98,11 +98,13 @@ function getLunrSearchResults(textToSearch)
             },
             content:
             {
-                boost: 1
+                boost: 1,
+                bool: "OR"
             },
             searchText:
             {
-                boost: 2
+                boost: 3,
+                bool: "OR"
             }
         },
         bool: "OR",
@@ -485,13 +487,13 @@ function createPage(url, title, favicon)
     return page;
 }
 
-function createRetrieve(searchKeys, history)
+function createRetrieve(searchText, history)
 {
     var retrieve =
     {
         time: getCurrentTime(),
         history:history,
-        searchKeys :searchKeys,
+        searchText :searchText,
     }
     return retrieve;
 }
