@@ -10,6 +10,7 @@ chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
 chrome.tabs.onUpdated.addListener(onTabUpdate);
+chrome.tabs.onCreated.addListener(onTabCreated);
 
 var stateConfig = null;
 var index = null;
@@ -94,6 +95,10 @@ function getLunrSearchResults(textToSearch)
                 bool: "OR"
             },
             content:
+            {
+                boost: 1
+            },
+            searchText:
             {
                 boost: 2
             }
@@ -210,6 +215,7 @@ function initNewIndex()
         this.setRef('id');
         this.addField('url');
         this.addField('content');
+        this.addField('searchText');
     });
     //removes stemmers and no words
     index.pipeline.reset();
@@ -239,6 +245,7 @@ function createEntryFromAtom(atom)
         "id" : getNewUId(),
         "url" : atom.page.url,
         "content" : atom.page.title,
+        "searchText":atom.retrieve.searchText
     }
 
     return entry;
@@ -379,14 +386,10 @@ function lunrResultsToUiResults(results)
 }
 
 //BROWSER ACTION
-//If no popup.html exists
+
 function onBrowserActionClicked(tab)
 {
-    var page = createPage(tab.url, tab.title, tab.favIconUrl);
-    var content = null;
-    var atom = createAtom(page, content);
-    var entry = createEntryFromAtom(atom);
-    addEntry(entry);
+    //If no popup.html exists this will be triggered
 }
 
 function onSaveUrl()
@@ -406,17 +409,17 @@ function onSaveUrl()
 
         HtmlMetadata(tab.url).then(function(metadata)
         {
-            console.log(metadata);
+            //console.log(metadata);
         });
-
+        console.log(tab);
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
-        var atom = createAtom(page, content);
+        var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
+        var atom = createAtom(page, content, retrieve);
         var entry = createEntryFromAtom(atom);
         addEntry(entry);
         sendSaveOk();
     })
-    
 }
 
 function urlIsSavable(url)
@@ -455,14 +458,14 @@ function sendSaveOk()
     sendMessage("updatePopupStatus", status)
 }
 
-function createAtom(page, content)
+function createAtom(page, content, retrieve)
 {
     var atom =
     {
         v:0,
         page: page,
         content : content,
-        retrieves : [],
+        retrieve : retrieve,
         relations: [],
     }
     return atom;
@@ -492,13 +495,23 @@ function createRetrieve(searchKeys, history)
 
 function createRelation(type, hash)
 {
-    var retrieve =
+    var relation =
     {
         time: getCurrentTime(),
         type: type,
         hash :hash,
     }
-    return retrieve;
+    return relation;
+}
+
+function getOriginalSearchText(tabId)
+{
+    return tabsHistory[tabId].searchText;
+}
+
+function getHistorySinceSearch(tabId)
+{
+    return tabsHistory[tabId].history;
 }
 
 function getCurrentTime()
@@ -508,49 +521,64 @@ function getCurrentTime()
 
 function getCurrentTab(onTap)
 {
-     chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
-     var activeTab = arrayOfTabs[0];
-     var activeTabId = activeTab.id; 
-     onTap(activeTab);
+    chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
+        var activeTab = arrayOfTabs[0];
+        var activeTabId = activeTab.id; 
+        onTap(activeTab);
+    });
+}
 
-  });
+function onTabCreated(tab)
+{
+    initTabHistory(tab.id);
+
+    if(!exists(tab.openerTabId))
+        return;
+
+    //we add the history and serach text of the tab that opened this one
+    setTabSearch(tab.id, getOriginalSearchText(tab.openerTabId));
+    setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
 }
 
 function onTabUpdate(tabId, changeInfo, tab)
 {
-    console.log(changeInfo.status);
     if(changeInfo.status != "loading")
         return;
 
-    var isEngine = otherSearchEngines.isEngine(tab.url);
-
-    if(isEngine)
+    console.log(tabId);
+    if(otherSearchEngines.isEngine(tab.url))
     {
-        resetTabHistory(tab.id, tab.url);
+        initTabHistory(tab.id);
+        setTabSearch(tab.id, otherSearchEngines.getSearchText(tab.url))
     }
-
+    
     if(tabHistoryExists(tab.id))
-    {
         addUrlToHistory(tab.id, tab.url);
-    }
 }
 
-function resetTabHistory(tabId, url)
+function initTabHistory(tabId)
 {
-    var searchText = otherSearchEngines.getSearchText(url);
     tabsHistory[tabId]={};
+    tabsHistory[tabId].searchText = "";
     tabsHistory[tabId].history = [];
-    tabsHistory[tabId].searchStr = searchText;
 }
 
+function setTabSearch(tabId, searchText)
+{
+    initTabHistory(tabId);
+    tabsHistory[tabId].searchText = searchText;
+}
+
+function setTabHistory(tabId, history)
+{
+    tabsHistory[tabId].history = history;
+}
 
 function addUrlToHistory(tabId, url)
 {
     if(urlIsNotTheSame(tabId, url))
-    {
         tabsHistory[tabId].history.push(url);
-        console.log(tabsHistory);
-    }
+    console.log(tabsHistory);
 }
 
 function urlIsNotTheSame(tabId, url)
@@ -564,7 +592,14 @@ function urlIsNotTheSame(tabId, url)
 
 function tabHistoryExists(tabId)
 {
-    if (typeof tabsHistory[tabId] != "undefined")
+    if(exists(tabsHistory[tabId]))
+        return exists(tabsHistory[tabId].history);
+    return false;
+}
+
+function exists(obj)
+{
+    if (typeof obj != "undefined")
         return true;
 
     return false;
