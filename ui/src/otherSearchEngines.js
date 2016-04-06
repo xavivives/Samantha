@@ -3,7 +3,8 @@ import DomainUtil from 'tldjs';
 
 export default class OtherSearchEngines
 {
-    isEngine(url)
+    //google use some "in between" urls to redirect. This function were detecting them as engines. 
+    isEngineUrl(url) 
     {
         var domain = DomainUtil.getDomain(url);
         if (typeof EnginesData[domain] != "undefined")
@@ -15,6 +16,13 @@ export default class OtherSearchEngines
     //for urls like this: https://www.google.com.hk/search?q=something+sweet&oq=something&aqs=chrome.1.69i59j0l5.2733j0j9&sourceid=chrome&ie=UTF-8
     getSearchText(url)
     {
+        console.log(url);
+        if(!url)
+            return null;
+
+        if(!this.isEngineUrl(url))
+            return;
+
         var urlObj = new URL(url);
         var domain = DomainUtil.getDomain(url);
         var parameterKey = EnginesData[domain];
@@ -28,9 +36,13 @@ export default class OtherSearchEngines
     //for urls like this: https://www.google.com.hk/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=something
     getSearchTextFromHash(url, parameterKey)
     {
+        if(url.indexOf("#")==-1)
+            return;
         var hash = url.split('#')[1];
         //assumes one parameter onluy
-        var searchText = hash.split(parameterKey+"?")[1];
+        if(hash.indexOf("=")==-1)
+            return; 
+        var searchText = hash.split(parameterKey+"=")[1];
         return searchText;
     }
 

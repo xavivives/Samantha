@@ -11,6 +11,8 @@ chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
 chrome.tabs.onUpdated.addListener(onTabUpdate);
 chrome.tabs.onCreated.addListener(onTabCreated);
+chrome.tabs.onRemoved.addListener(onTabRemoved);
+
 
 var stateConfig = null;
 var index = null;
@@ -24,9 +26,9 @@ start();
 
 function onContentConnected ( port )
 {
-    console.log(port);
     contentPort = port;
-    sendMessage("log", "Connected with background");
+    //console.log(port);
+    //sendMessage("log", "Connected with background");
 }
 
 function sendMessage(event, value)
@@ -411,7 +413,6 @@ function onSaveUrl()
         {
             //console.log(metadata);
         });
-        console.log(tab);
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
         var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
@@ -468,7 +469,9 @@ function createAtom(page, content, retrieve)
         retrieve : retrieve,
         relations: [],
     }
+    console.log(atom);
     return atom;
+
 }
 
 function createPage(url, title, favicon)
@@ -511,7 +514,7 @@ function getOriginalSearchText(tabId)
 
 function getHistorySinceSearch(tabId)
 {
-    return tabsHistory[tabId].history;
+    return copy(tabsHistory[tabId].history);
 }
 
 function getCurrentTime()
@@ -545,15 +548,22 @@ function onTabUpdate(tabId, changeInfo, tab)
     if(changeInfo.status != "loading")
         return;
 
-    console.log(tabId);
-    if(otherSearchEngines.isEngine(tab.url))
+    //we use this to know if its a serach engine
+    var searchText = otherSearchEngines.getSearchText(tab.url);
+    if(searchText)
     {
         initTabHistory(tab.id);
-        setTabSearch(tab.id, otherSearchEngines.getSearchText(tab.url))
+        setTabSearch(tab.id, searchText);
     }
     
+
     if(tabHistoryExists(tab.id))
         addUrlToHistory(tab.id, tab.url);
+}
+
+function onTabRemoved(tabId, removeInfo)
+{
+    delete tabsHistory[tabId];
 }
 
 function initTabHistory(tabId)
@@ -578,7 +588,6 @@ function addUrlToHistory(tabId, url)
 {
     if(urlIsNotTheSame(tabId, url))
         tabsHistory[tabId].history.push(url);
-    console.log(tabsHistory);
 }
 
 function urlIsNotTheSame(tabId, url)
@@ -603,4 +612,9 @@ function exists(obj)
         return true;
 
     return false;
+}
+
+function copy(obj)
+{
+    return JSON.parse(JSON.stringify(obj));
 }
