@@ -17,7 +17,6 @@ export default class Connector
         var backgroundPort = chrome.runtime.connect();
         backgroundPort.onMessage.addListener(function (message, sender)
         {
-            console.log(that);
              that.processMessage(message);
         });
     }
@@ -27,8 +26,6 @@ export default class Connector
         var isVisible = document.visibilityState == "visible";
         if(isVisible)
             this.connectToBackground();
-
-        console.log("isVIsible:"+isVisible);
     }
 
     sendMessage (event, value)
