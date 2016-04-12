@@ -5,6 +5,7 @@
     "material-ui": "^0.15.0-alpha.2",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
+    "react-lazy-load": "^3.0.9",
     "react-tap-event-plugin": "^0.2.1"
   },
   "main": "entry.js",
