@@ -65,17 +65,9 @@ function onCopy(str)
 
 function onSelected(selectionObj)
 {
-    return;
+    return; 
     var entry = createEntryFromSelection(selectionObj.url, selectionObj.selectedText);
     addEntry(entry);
-}
-
-function addEntry(entry)
-{
-    addSearchEntry(entry);
-    saveEntry(entry);
-    saveIndex();
-    saveStateConfig();
 }
 
 function onSearchRequested(searchStr)
@@ -93,12 +85,12 @@ function getLunrSearchResults(textToSearch)
         {
             url:
             {
-                boost: 1,
+                boost: 0,
                 bool: "OR"
             },
             content:
             {
-                boost: 1,
+                boost: 0,
                 bool: "OR"
             },
             searchText:
@@ -275,11 +267,6 @@ function reIndex()
 
 //STORAGE
 
-function saveEntry(entry)
-{   
-    saveElement(entry.id, entry);
-}
-
 function saveIndex()
 {
     saveElement("index", index.toJSON());
@@ -334,7 +321,8 @@ function onStateConfigLoaded(config)
 {
     function onIndexLoaded(loadedIndex)
     {
-        if(loadedIndex)
+        if(false)
+        //if(loadedIndex)
             index = ElasticLunr.Index.load(loadedIndex);
         else
             initNewIndex();
@@ -413,16 +401,27 @@ function onSaveUrl()
 
         HtmlMetadata(tab.url).then(function(metadata)
         {
-            //console.log(metadata);
+            console.log(metadata);
         });
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
         var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
         var atom = createAtom(page, content, retrieve);
-        var entry = createEntryFromAtom(atom);
-        addEntry(entry);
+        
+        saveAtom(atom);
+
         sendSaveOk();
     })
+}
+
+function saveAtom(atom)
+{
+    var entry = createEntryFromAtom(atom);
+    addSearchEntry(entry);
+    saveElement(entry.id, atom);
+
+    saveIndex();
+    saveStateConfig();
 }
 
 function urlIsSavable(url)
@@ -511,7 +510,9 @@ function createRelation(type, hash)
 
 function getOriginalSearchText(tabId)
 {
-    return tabsHistory[tabId].searchText;
+    if(tabHistoryExists(tabId))
+        return tabsHistory[tabId].searchText;
+    return null;
 }
 
 function getHistorySinceSearch(tabId)
@@ -535,7 +536,9 @@ function getCurrentTab(onTap)
 
 function onTabCreated(tab)
 {
+    console.log(tab);
     initTabHistory(tab.id);
+    console.log(tabsHistory);
 
     if(!exists(tab.openerTabId))
         return;

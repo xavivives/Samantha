@@ -26,9 +26,7 @@ export default class PopupPage extends React.Component
             that.updatePopupStatus(status);
         });
 
-        this.connector.sendMessage("saveUrl");
-
-        
+        this.connector.sendMessage("saveUrl");      
     }
 
     updatePopupStatus(status)

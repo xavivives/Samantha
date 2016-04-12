@@ -43,6 +43,9 @@ export default class OtherSearchEngines
         if(hash.indexOf("=")==-1)
             return; 
         var searchText = hash.split(parameterKey+"=")[1];
+
+        searchText = decodeURIComponent(searchText);
+        
         return searchText;
     }
 
