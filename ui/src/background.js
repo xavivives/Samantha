@@ -21,12 +21,18 @@ var contentPort = {};
 var searchPage ="search.html";
 
 var tabsHistory ={};
+var queuedMessages=[];
 
 start();    
 
 function onContentConnected ( port )
 {
     contentPort = port;
+
+    while(queuedMessages.length>0)
+    {
+        contentPort.postMessage(queuedMessages.shift());
+    }
     //console.log(port);
     //sendMessage("log", "Connected with background");
 }
@@ -34,6 +40,12 @@ function onContentConnected ( port )
 function sendMessage(event, value)
 {
     var message = {event:event, value:value};
+    if(!contentPort)
+    {
+        queuedMessages.push(message);
+        return;
+    }
+        
     contentPort.postMessage(message);
 }
 
@@ -559,9 +571,9 @@ function onTabUpdate(tabId, changeInfo, tab)
     {
         initTabHistory(tab.id);
         setTabSearch(tab.id, searchText);
+        injectSamanthaResults(searchText);
     }
     
-
     if(tabHistoryExists(tab.id))
         addUrlToHistory(tab.id, tab.url);
 }
@@ -609,6 +621,12 @@ function tabHistoryExists(tabId)
     if(exists(tabsHistory[tabId]))
         return exists(tabsHistory[tabId].history);
     return false;
+}
+
+function injectSamanthaResults(searchText)
+{
+    console.log("injecting");
+    sendMessage("inject", searchText);
 }
 
 function exists(obj)

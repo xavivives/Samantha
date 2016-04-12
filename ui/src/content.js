@@ -2,6 +2,9 @@ import Connector from './connector.js';
 
 document.addEventListener('copy',onCopy, true);
 document.addEventListener('mouseup', onMouseUp);
+var connector = new Connector();
+console.log(connector);
+connector.registerEvent("inject", onInject);
 
 function onCopy(e)
 { 
@@ -32,6 +35,16 @@ function sendCurrentSelection()
     }
 
     Connector.sendMessage("onSelected", selectionObj);   
+}
+
+function onInject(url)
+{
+    console.log("inject");
+    console.log(url);
+    var iframe  = document.createElement ("iframe");
+    iframe.src  = chrome.extension.getURL (url);
+    var yourDIV = document.getElementById("res");
+    yourDIV.appendChild(iframe);
 }
 
 
