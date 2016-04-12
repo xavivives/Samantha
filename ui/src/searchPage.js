@@ -66,7 +66,7 @@ export default class SearchPage extends React.Component
       return (
        
              <div style ={{display: 'flex', justifyContent: 'center'}}>
-                <div style ={{width:500}}>
+                <div style ={{width:450}}>
                     <div style ={{display: 'flex', justifyContent: 'center'}}>
                        <TextField
                             hintText="Your wishes... my desires"
