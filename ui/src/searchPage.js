@@ -4,6 +4,7 @@ import SearchResultItem from './searchResultItem';
 import TextField from 'material-ui/lib/text-field';
 import GetMuiTheme from 'material-ui/lib/styles/getMuiTheme';
 import theme from './theme.js';
+import LazyLoad from 'react-lazy-load';
 
 export default class SearchPage extends React.Component
 {
@@ -66,6 +67,11 @@ export default class SearchPage extends React.Component
       return (
        
              <div style ={{display: 'flex', justifyContent: 'center'}}>
+
+                <LazyLoad height={200} offset={300}>
+                    <img  src="http://cdn3-www.comingsoon.net/assets/uploads/1970/01/file_586311_scarlett-johansson-her-rome-feat.jpg" />
+                </LazyLoad>
+
                 <div style ={{width:450}}>
                     <div style ={{display: 'flex', justifyContent: 'center'}}>
                        <TextField

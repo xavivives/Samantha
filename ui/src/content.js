@@ -1,5 +1,10 @@
 import Connector from './connector.js';
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+import injectTapEventPlugin from 'react-tap-event-plugin';
+import SearchPage from './searchPage.js';
+
 document.addEventListener('copy',onCopy, true);
 document.addEventListener('mouseup', onMouseUp);
 var connector = new Connector();
@@ -18,7 +23,7 @@ function sendCurrentClipboard()
 
 function onMouseUp(e)
 { 
-    sendCurrentSelection();
+    //sendCurrentSelection();
 }
 
 function sendCurrentSelection()
@@ -39,11 +44,20 @@ function sendCurrentSelection()
 
 function onInject(url)
 {
-    console.log("inject");
     console.log(url);
+    injectTapEventPlugin();
+    
+   React.createElement(SearchPage), document.getElementById('extabar');
+    
+    
+}
+
+function injectIframe()
+{
+    console.log("inject");
     var iframe  = document.createElement ("iframe");
     iframe.src  = chrome.extension.getURL (url);
-    var yourDIV = document.getElementById("res");
+    var yourDIV = document.getElementById("before-appbar");
     yourDIV.appendChild(iframe);
 }
 
