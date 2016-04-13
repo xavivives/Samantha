@@ -90,18 +90,19 @@ function onSearchRequested(searchStr)
 
 function getLunrSearchResults(textToSearch)
 {
+    console.log(index);
     var config =
     {
         fields:
         {
             url:
             {
-                boost: 0,
+                boost: 1,
                 bool: "OR"
             },
             content:
             {
-                boost: 0,
+                boost: 1,
                 bool: "OR"
             },
             searchText:
@@ -154,7 +155,9 @@ function onOmniboxInputChanged(text, suggest)
 {
     var omniboxMaxSuggestions = 5;
     var minScore = 0.1;
-    var results =  filterLunrResults(getLunrSearchResults(text),minScore, omniboxMaxSuggestions);
+    var results = getLunrSearchResults(text);
+    console.log(text);
+    results =  filterLunrResults(results, minScore, omniboxMaxSuggestions);
 
     console.log(results);
     var suggestions = lunrResultsToSuggestions(results);
@@ -295,11 +298,8 @@ function saveElement(key, element, onSaved)
 
 function loadElement(key, onLoaded)
 {
-    //console.log("Loading :"+key);
-
     function onElementLoaded(obj)
     {
-        //console.log(obj)
         if(obj[key])
             onLoaded(obj[key]);
         else
@@ -333,8 +333,8 @@ function onStateConfigLoaded(config)
 {
     function onIndexLoaded(loadedIndex)
     {
-        if(false)
-        //if(loadedIndex)
+        //if(false)
+        if(loadedIndex)
             index = ElasticLunr.Index.load(loadedIndex);
         else
             initNewIndex();
@@ -406,7 +406,7 @@ function onSaveUrl()
             return;
         }
 
-        if(urlIsSavedAlready)
+        if(urlIsSavedAlready(tab.url))
         {
 
         }
