@@ -40,11 +40,11 @@ function onContentConnected ( port )
 function sendMessage(event, value)
 {
     var message = {event:event, value:value};
-    if(!contentPort)
+    /*if(!contentPort)
     {
         queuedMessages.push(message);
         return;
-    }
+    }*/
         
     contentPort.postMessage(message);
 }
