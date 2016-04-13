@@ -33,18 +33,16 @@ function onContentConnected ( port )
     {
         contentPort.postMessage(queuedMessages.shift());
     }
-    //console.log(port);
-    //sendMessage("log", "Connected with background");
 }
 
 function sendMessage(event, value)
 {
     var message = {event:event, value:value};
-    /*if(!contentPort)
+    if(!contentPort)
     {
         queuedMessages.push(message);
         return;
-    }*/
+    }
         
     contentPort.postMessage(message);
 }
@@ -59,7 +57,8 @@ function processMessage(event, value, tab)
 {
     //content
     if(event == "onCopy")
-        onCopy(value);  
+        onCopy(value);
+
     if(event == "onSelected")
         onSelected(value);  
     //app
@@ -157,6 +156,7 @@ function onOmniboxInputChanged(text, suggest)
     var minScore = 0.1;
     var results =  filterLunrResults(getLunrSearchResults(text),minScore, omniboxMaxSuggestions);
 
+    console.log(results);
     var suggestions = lunrResultsToSuggestions(results);
     if(suggestions.length == 0)
     {
@@ -417,6 +417,7 @@ function onSaveUrl()
         });
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
+        
         var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
         var atom = createAtom(page, content, retrieve);
         
@@ -529,7 +530,9 @@ function getOriginalSearchText(tabId)
 
 function getHistorySinceSearch(tabId)
 {
-    return copy(tabsHistory[tabId].history);
+    if(tabHistoryExists(tabId))
+        return copy(tabsHistory[tabId].history);
+    return [];
 }
 
 function getCurrentTime()
@@ -562,8 +565,10 @@ function onTabCreated(tab)
 
 function onTabUpdate(tabId, changeInfo, tab)
 {
-    if(changeInfo.status != "loading")
+    if(changeInfo.status != "loading")//loading event can´t connect to port yey
         return;
+
+    contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
 
     //we use this to know if its a serach engine
     var searchText = otherSearchEngines.getSearchText(tab.url);
@@ -626,7 +631,7 @@ function tabHistoryExists(tabId)
 function injectSamanthaResults(searchText)
 {
     console.log("injecting");
-    sendMessage("inject", searchText);
+    sendMessage("inject", getSearchPageUrl(searchText));
 }
 
 function exists(obj)

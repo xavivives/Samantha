@@ -30,7 +30,7 @@ function sendCurrentSelection()
 
     var selectionObj =
     {
-        "url": getCurrentTabUrl(),
+        "url": Connector.getCurrentTabUrl(),
         "selectedText" : currentSelection
     }
 

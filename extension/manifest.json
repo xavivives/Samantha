@@ -16,6 +16,10 @@
       "html": []
     }
   ],
+  "web_accessible_resources": [
+    "search.html",
+    "search.js"
+  ],
   "description": "I'm Samantha, here to help you",
   "name": "Samantha",
   "omnibox": {
@@ -38,10 +42,8 @@
     "48": "helix48.png",
     "128": "helix128.png"
   },
-  "browser_action":
-  {
-    "default_icon":
-    {
+  "browser_action": {
+    "default_icon": {
       "16": "helix16.png",
       "48": "helix48.png",
       "128": "helix128.png"
@@ -49,8 +51,7 @@
     "default_title": "Save this page",
     "default_popup": "popup.html"
   },
-
-   "chrome_url_overrides" : {
+  "chrome_url_overrides": {
     "newtab": "search.html"
   }
 }
