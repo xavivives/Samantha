@@ -8,8 +8,21 @@ import LazyLoad from 'react-lazy-load';
 
 export default class SearchPage extends React.Component
 {
+    static get defaultProps()
+    {
+        var props = 
+        {
+            showSearchInput: true,
+            defaultSearchText: null,
+            width: null
+        }
+
+        return props;
+    }
+
     constructor(props)
     {
+        console.log(props);
         super(props);
 
         var that = this;
@@ -24,10 +37,17 @@ export default class SearchPage extends React.Component
        // this.getChildContext = this.getChildContext.bind(this);
 
         //set search from url parameter
-        var currentUrl = new URL(document.location.href);
-        var params = new URLSearchParams(currentUrl.search.slice(1));
-        var searchText= params.get("search");
-        this.connector.sendMessage("searchRequest", searchText);
+        if(props.defaultSearchText)
+        {
+            this.connector.sendMessage("searchRequest", props.defaultSearchText);
+        }
+        else
+        {
+            var currentUrl = new URL(document.location.href);
+            var params = new URLSearchParams(currentUrl.search.slice(1));
+            var searchText= params.get("search");
+            this.connector.sendMessage("searchRequest", searchText);
+        }
 
         this.state = {
             results: [],
@@ -62,18 +82,29 @@ export default class SearchPage extends React.Component
       //updateUrl(search);
     }
 
-    render() {
+    render()
+    {
+        var searchInputStyle ={};
 
+        if(this.props.showSearchInput)
+            searchInputStyle ={display: 'flex', justifyContent: 'center'};
+        else
+            searchInputStyle ={display: 'none'};
+
+        var containerStyle ={};
+
+        if(this.props.width)
+            containerStyle={width:this.props.width}
+        else
+            containerStyle={flex:1}
+
+        
       return (
        
              <div style ={{display: 'flex', justifyContent: 'center'}}>
 
-                <LazyLoad height={200} offset={300}>
-                    <img  src="http://cdn3-www.comingsoon.net/assets/uploads/1970/01/file_586311_scarlett-johansson-her-rome-feat.jpg" />
-                </LazyLoad>
-
-                <div style ={{width:450}}>
-                    <div style ={{display: 'flex', justifyContent: 'center'}}>
+                <div style ={containerStyle}>
+                    <div style ={searchInputStyle}>
                        <TextField
                             hintText="Your wishes... my desires"
                             defaultValue = {this.state.defaultSearch}

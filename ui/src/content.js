@@ -42,24 +42,23 @@ function sendCurrentSelection()
     Connector.sendMessage("onSelected", selectionObj);   
 }
 
-function onInject(url)
+function onInject(searchText)
 {
     injectTapEventPlugin();
     var googleResultsDiv = document.getElementById('rso');
     var firstResult = googleResultsDiv.children[0];
     var newSearchContainer = document.createElement('div');
     googleResultsDiv.insertBefore(newSearchContainer,firstResult);
-    var reactElement = React.createElement(SearchPage);
+
+    var props ={showSearchInput:false, defaultSearchText:searchText}
+    var reactElement = React.createElement(SearchPage, props);
 
    ReactDOM.render(reactElement, newSearchContainer, onReplaced);
 }
 
-function onReplaced(e)
+function onReplaced()
 {
-    console.log("replaced");
-    console.log(e);
 }
-
 
 function getCurrentSelection()
 {

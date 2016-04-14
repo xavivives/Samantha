@@ -630,8 +630,8 @@ function tabHistoryExists(tabId)
 
 function injectSamanthaResults(searchText)
 {
-    console.log("injecting");
-    sendMessage("inject", getSearchPageUrl(searchText));
+    sendMessage("inject", searchText);
+   // sendMessage("inject", getSearchPageUrl(searchText));
 }
 
 function exists(obj)

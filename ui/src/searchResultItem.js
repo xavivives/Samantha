@@ -78,7 +78,7 @@ export default class searchResultItem extends React.Component
 
     render() {
         return (
-            <div onClick= {()=>this.onClicked(this.props.result)}  style={{cursor: 'pointer', display: 'flex', padding:10}}>
+            <div onClick= {()=>this.onClicked(this.props.result)}  style={{cursor: 'pointer', display: 'flex', paddingBottom:5}}>
 
                 <div style={{flexGrow: 1, paddingRight:10}}>
 
