@@ -16,10 +16,6 @@
       "html": []
     }
   ],
-  "web_accessible_resources": [
-    "search.html",
-    "search.js"
-  ],
   "description": "I'm Samantha, here to help you",
   "name": "Samantha",
   "omnibox": {
