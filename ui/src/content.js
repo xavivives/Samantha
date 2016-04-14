@@ -44,21 +44,20 @@ function sendCurrentSelection()
 
 function onInject(url)
 {
-    console.log(url);
     injectTapEventPlugin();
-    
-   React.createElement(SearchPage), document.getElementById('extabar');
-    
-    
+    var googleResultsDiv = document.getElementById('rso');
+    var firstResult = googleResultsDiv.children[0];
+    var newSearchContainer = document.createElement('div');
+    googleResultsDiv.insertBefore(newSearchContainer,firstResult);
+    var reactElement = React.createElement(SearchPage);
+
+   ReactDOM.render(reactElement, newSearchContainer, onReplaced);
 }
 
-function injectIframe()
+function onReplaced(e)
 {
-    console.log("inject");
-    var iframe  = document.createElement ("iframe");
-    iframe.src  = chrome.extension.getURL (url);
-    var yourDIV = document.getElementById("before-appbar");
-    yourDIV.appendChild(iframe);
+    console.log("replaced");
+    console.log(e);
 }
 
 
