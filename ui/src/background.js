@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener(onContentMessage);
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
-chrome.tabs.onUpdated.addListener(onTabUpdate);
+chrome.tabs.onUpdated.addListener(onTabUpdated);
 chrome.tabs.onCreated.addListener(onTabCreated);
 chrome.tabs.onRemoved.addListener(onTabRemoved);
 
@@ -76,8 +76,8 @@ function onCopy(str)
 function onSelected(selectionObj)
 {
     return; 
-    var entry = createEntryFromSelection(selectionObj.url, selectionObj.selectedText);
-    addEntry(entry);
+    //var entry = createEntryFromSelection(selectionObj.url, selectionObj.selectedText);
+    //addEntry(entry);
 }
 
 function onSearchRequested(searchStr)
@@ -85,6 +85,18 @@ function onSearchRequested(searchStr)
     var lunrResults =  getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
     sendMessage("updateSearchResults", uiResults);
+}
+
+function initNewIndex()
+{
+    index = ElasticLunr(function () {
+        this.setRef('id');
+        this.addField('url');
+        this.addField('urlTitle');
+        this.addField('searchWordsSum');
+    });
+    //removes stemmers and no words
+    index.pipeline.reset();
 }
 
 function getLunrSearchResults(textToSearch)
@@ -98,14 +110,14 @@ function getLunrSearchResults(textToSearch)
                 boost: 1,
                 bool: "OR"
             },
-            content:
+            urlTitle:
             {
                 boost: 1,
                 bool: "OR"
             },
-            searchText:
+            searchWordsSum:
             {
-                boost: 3,
+                boost: 2,
                 bool: "OR"
             }
         },
@@ -117,6 +129,21 @@ function getLunrSearchResults(textToSearch)
 
     return results;
 }
+
+
+function createEntryFromAtom(atom)
+{
+     var entry = 
+    {
+        "id" : getNewUId(),
+        "url" : atom.page.url,
+        "urlTitle" : atom.page.title,
+        "searchWordsSum":atom.searchWordsSum
+    }
+
+    return entry;
+}
+
 
 
 function getLunrUrlSearchResults(urlToSearch)
@@ -223,6 +250,11 @@ function lunrResultToSuggestion(result)
     return suggestion;
 }
 
+function getAtomByRef(ref)
+{
+    return index.documentStore.getDoc(ref);
+}
+
 function setOmniboxSuggestion(str, url)
 {
     urlToGo = url;
@@ -240,18 +272,6 @@ function onOmniboxEnter(str)
 
 //SEARCH
 
-function initNewIndex()
-{
-    index = ElasticLunr(function () {
-        this.setRef('id');
-        this.addField('url');
-        this.addField('content');
-        this.addField('searchText');
-    });
-    //removes stemmers and no words
-    index.pipeline.reset();
-}
-
 function addSearchEntry(entry)
 {
     index.addDoc(entry);
@@ -259,7 +279,7 @@ function addSearchEntry(entry)
 
 function createEntryFromSelection(url, content)
 {
-    var entry = 
+    /*var entry = 
     {
         "id" : getNewUId(),
         "url" : url,
@@ -267,19 +287,7 @@ function createEntryFromSelection(url, content)
     }
 
     return entry;
-}
-
-function createEntryFromAtom(atom)
-{
-     var entry = 
-    {
-        "id" : getNewUId(),
-        "url" : atom.page.url,
-        "content" : atom.page.title,
-        "searchText":atom.retrieve.searchText
-    }
-
-    return entry;
+    */
 }
 
 function getNewUId()
@@ -381,6 +389,7 @@ function initStateConfig(config)
 function prepareSuggestion(str)
 {
     //linebreaks are not supported on Omnibox
+    if(str)
     return str.replace(/(\r\n|\n|\r)/gm,"");
 }
 
@@ -426,8 +435,12 @@ function onSaveUrl()
             return;
         }
 
-        if(isUrlSaved(tab.url))
+        var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
+        var existingAtom = getAtomByUrl(tab.url);
+
+        if(existingAtom)
         {
+            addRetrive(existingAtom, retrieve);
             sendAlreadySaved();
             return;
         }
@@ -435,9 +448,9 @@ function onSaveUrl()
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
         
-        var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
-        var atom = createAtom(page, content, retrieve);
-        
+        var atom = createAtom(page);
+        addRetrive(atom, retrieve);
+
         saveAtom(atom);
 
         sendSaveOk();
@@ -463,14 +476,21 @@ function urlIsSavable(url)
     return true;
 }
 
-function isUrlSaved(url)
+function getAtomByUrl(url)
 {
     var results = getLunrUrlSearchResults(url);
 
-    if(results.length>0)
-        return true;
+    if(results.length>1)
+        console.warn("Some how there are multipe atoms for url:" + url);
 
-    return false;
+    if(results.length>0)
+    {
+       var atom =  getAtomByRef(results[0].ref);
+       console.log(atom);
+       return atom;
+    }
+
+    return null;
 }
 
 function sendSaveError()
@@ -506,19 +526,29 @@ function sendSaveOk()
     sendMessage("updatePopupStatus", status)
 }
 
-function createAtom(page, content, retrieve)
+function createAtom(page)
 {
     var atom =
     {
         v:0,
         page: page,
-        content : content,
-        retrieve : retrieve,
+        //content : content,
+        searchWordsSum: "",
+        retrieves : [],
         relations: [],
     }
-    console.log(atom);
-    return atom;
 
+    return atom;
+}
+
+function addRetrive(atom, retrieve)
+{
+    console.log(atom);
+    if(atom && atom.retrieves && retrieve)
+        atom.retrieves.push(retrieve);
+
+    if(retrieve.history.length>=2 && retrieve.searchText)
+        atom.searchWordsSum += " " + retrieve.searchText;
 }
 
 function createPage(url, title, favicon)
@@ -584,9 +614,7 @@ function getCurrentTab(onTap)
 
 function onTabCreated(tab)
 {
-    console.log(tab);
     initTabHistory(tab.id);
-    console.log(tabsHistory);
 
     if(!exists(tab.openerTabId))
         return;
@@ -596,7 +624,7 @@ function onTabCreated(tab)
     setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
 }
 
-function onTabUpdate(tabId, changeInfo, tab)
+function onTabUpdated(tabId, changeInfo, tab)
 {
     if(changeInfo.status != "loading")//loading event can´t connect to port yey
         return;
@@ -607,6 +635,7 @@ function onTabUpdate(tabId, changeInfo, tab)
     var searchText = otherSearchEngines.getSearchText(tab.url);
     if(searchText)
     {
+        console.log("Is search engine");
         initTabHistory(tab.id);
         setTabSearch(tab.id, searchText);
         injectSamanthaResults(searchText);

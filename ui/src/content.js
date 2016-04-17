@@ -45,7 +45,7 @@ function sendCurrentSelection()
 function onInject(searchText)
 {
     injectTapEventPlugin();
-    var googleResultsDiv = document.getElementById('rso');
+    var googleResultsDiv = document.getElementById('ires');
     var firstResult = googleResultsDiv.children[0];
     var newSearchContainer = document.createElement('div');
     googleResultsDiv.insertBefore(newSearchContainer,firstResult);

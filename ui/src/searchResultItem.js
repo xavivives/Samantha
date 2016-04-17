@@ -26,6 +26,7 @@ export default class searchResultItem extends React.Component
 
       HtmlMetadata(props.result.url).then(function(metadata)
         {
+            console.log(metadata)
             var imageUrl = that.getImageUrl(metadata);
             if(imageUrl)
             {   
