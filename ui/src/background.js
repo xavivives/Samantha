@@ -13,7 +13,6 @@ chrome.tabs.onUpdated.addListener(onTabUpdate);
 chrome.tabs.onCreated.addListener(onTabCreated);
 chrome.tabs.onRemoved.addListener(onTabRemoved);
 
-
 var stateConfig = null;
 var index = null;
 var clipboard = "";
@@ -90,7 +89,6 @@ function onSearchRequested(searchStr)
 
 function getLunrSearchResults(textToSearch)
 {
-    console.log(index);
     var config =
     {
         fields:
@@ -116,6 +114,28 @@ function getLunrSearchResults(textToSearch)
     }
 
     var results = index.search(textToSearch, config);
+
+    return results;
+}
+
+
+function getLunrUrlSearchResults(urlToSearch)
+{
+    var config =
+    {
+        fields:
+        {
+            url:
+            {
+                boost: 1,
+                bool: "OR"
+            }
+        },
+        bool: "OR",
+        expand: true
+    }
+
+    var results = index.search(urlToSearch, config);
 
     return results;
 }
@@ -406,15 +426,12 @@ function onSaveUrl()
             return;
         }
 
-        if(urlIsSavedAlready(tab.url))
+        if(isUrlSaved(tab.url))
         {
-
+            sendAlreadySaved();
+            return;
         }
 
-        HtmlMetadata(tab.url).then(function(metadata)
-        {
-            console.log(metadata);
-        });
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
         
@@ -446,8 +463,13 @@ function urlIsSavable(url)
     return true;
 }
 
-function urlIsSavedAlready(url)
+function isUrlSaved(url)
 {
+    var results = getLunrUrlSearchResults(url);
+
+    if(results.length>0)
+        return true;
+
     return false;
 }
 
@@ -457,6 +479,17 @@ function sendSaveError()
     {
         statusType : "error",
         message:"Ops! Can't be save this :("
+
+    }
+    sendMessage("updatePopupStatus", status)
+}
+
+function sendAlreadySaved()
+{
+    var status =
+    {
+        statusType : "ok",
+        message:"Already saved!"
 
     }
     sendMessage("updatePopupStatus", status)
