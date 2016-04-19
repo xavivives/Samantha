@@ -161,7 +161,6 @@ function getLunrSearchResults(textToSearch)
     return results;
 }
 
-
 function createEntryFromAtom(atom)
 {
      var entry = 
@@ -174,8 +173,6 @@ function createEntryFromAtom(atom)
 
     return entry;
 }
-
-
 
 function getLunrUrlSearchResults(urlToSearch)
 {
@@ -652,15 +649,35 @@ function onTabCreated(tab)
 
 function onCommitted(e)
 {
-   // console.log("Committed");
-    //    console.log(e);
+    if(doesTransitionTypeResetSearch(e.transitionType))
+    {
+        resetTabHisoryAndSearch();
+    }
+
 }
 
+function resetTabHisoryAndSearch(tabId)
+{
+    setTabSearch(tabId, "");
+    setTabHistory(tabId, []);
+
+}
+
+function doesTransitionTypeResetSearch(transitionType)
+{
+    if(transitionType == "link")
+        return false;
+    if(transitionType == "manual_subframe") //back and forth button
+        return false;
+    if(transitionType == "reload") //back and forth button
+        return false;
+    return true;
+}
 
 function onDOMContentLoaded(e)
 {
- //   console.log("Dom");
- //   console.log(e);
+    console.log("Dom");
+    console.log(e);
 }
 
 function onTabUpdated(tabId, changeInfo, tab)
@@ -678,8 +695,8 @@ function onTabUpdated(tabId, changeInfo, tab)
     var searchText = otherSearchEngines.getSearchText(tab.url);
     if(searchText)
     {
-        setTabSearch(tab.id, searchText);
-        setTabHistory(tab.id, []);
+        resetTabHisoryAndSearch(tabId);
+        setTabSearch(tabId, searchText);
         injectSamanthaResults(tab.id, searchText);
     }
     
