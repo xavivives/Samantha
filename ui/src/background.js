@@ -12,6 +12,9 @@ chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
 chrome.tabs.onUpdated.addListener(onTabUpdated);
 chrome.tabs.onCreated.addListener(onTabCreated);
 chrome.tabs.onRemoved.addListener(onTabRemoved);
+chrome.webNavigation.onCommitted.addListener(onCommitted);
+chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
+
 
 var stateConfig = null;
 var index = null;
@@ -21,11 +24,13 @@ var searchPage ="search.html";
 
 var tabsHistory ={};
 var queuedMessages=[];
+var tabs =[];
 
 start();    
 
 function onContentConnected ( port )
 {
+    console.log(port);
     contentPort = port;
 
     while(queuedMessages.length>0)
@@ -624,8 +629,23 @@ function onTabCreated(tab)
     setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
 }
 
+function onCommitted(e)
+{
+    console.log("Committed");
+    console.log(e);
+}
+
+
+function onDOMContentLoaded(e)
+{
+    console.log("Dom");
+    console.log(e);
+}
+
 function onTabUpdated(tabId, changeInfo, tab)
 {
+    console.log("onTabUpdated");
+    console.log(changeInfo);
     if(changeInfo.status != "loading")//loading event can´t connect to port yey
         return;
 
