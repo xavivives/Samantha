@@ -651,16 +651,17 @@ function onCommitted(e)
 {
     if(doesTransitionTypeResetSearch(e.transitionType))
     {
-        resetTabHisoryAndSearch();
+        resetTabHisoryAndSearch(e.tabId);
     }
-
 }
 
 function resetTabHisoryAndSearch(tabId)
 {
+    if(!exists(tabs[tabId]))
+        return;
+    
     setTabSearch(tabId, "");
     setTabHistory(tabId, []);
-
 }
 
 function doesTransitionTypeResetSearch(transitionType)
@@ -676,8 +677,8 @@ function doesTransitionTypeResetSearch(transitionType)
 
 function onDOMContentLoaded(e)
 {
-    console.log("Dom");
-    console.log(e);
+    //console.log("Dom");
+    //console.log(e);
 }
 
 function onTabUpdated(tabId, changeInfo, tab)
