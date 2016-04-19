@@ -23,13 +23,16 @@ var clipboard = "";
 var searchPage ="search.html";
 
 var tabs =[];
+var popupId = "popup";
 
 start(); 
 
 function initTab(tabId)
 {
+    console.log("initTab "+ tabId);
+
     tabs[tabId] ={};
-    tabs[tabId].port ={};
+    tabs[tabId].port = null;
     tabs[tabId].history =[];
     tabs[tabId].searchText = "";
     tabs[tabId].queuedMessages =[];
@@ -37,7 +40,14 @@ function initTab(tabId)
 
 function onContentConnected (port)
 {
-    var  tabId = port.sender.tab.id;
+    var tabId = "";
+
+    if(!port.sender.tab)//its probably an extension popup
+        tabId = popupId;
+    else
+        tabId = port.sender.tab.id;
+
+    console.log("Connected " + tabId);
 
     if(!exists(tabs[tabId]))
         initTab(tabId);
@@ -48,14 +58,6 @@ function onContentConnected (port)
     {
         tabs[tabId].port.postMessage(tabs[tabId].queuedMessages.shift());
     }
-
-    /*contentPort = port;
-
-    while(queuedMessages.length>0)
-    {
-        contentPort.postMessage(queuedMessages.shift());
-    }
-    */
 }
 
 function sendMessage(event, value, tabId)
@@ -66,24 +68,19 @@ function sendMessage(event, value, tabId)
         initTab(tabId);
 
     if(tabs[tabId].port == null)
-        tabs[tabId].queuedMessages.push(message);
-    else
-        tabs[tabId].port.postMessage(message);
-    
-    /*
-    if(!contentPort)
     {
-        queuedMessages.push(message);
-        return;
+        console.log("Queueing " + tabId);
+        tabs[tabId].queuedMessages.push(message);
     }
-        
-    contentPort.postMessage(message);
-    */
+    else
+    {
+        console.log("Posting "+ tabId);
+        tabs[tabId].port.postMessage(message);
+    }
 }
 
 function onContentMessage(message, sender, sendResponse)
 {
-    //console.log(sender);
     processMessage(message.event, message.value, sender.tab);
 }
 
@@ -92,7 +89,6 @@ function processMessage(event, value, tab)
     //content
     if(event == "onCopy")
         onCopy(value);
-
     if(event == "onSelected")
         onSelected(value);  
     //app
@@ -238,10 +234,9 @@ function onOmniboxInputChanged(text, suggest)
     var omniboxMaxSuggestions = 5;
     var minScore = 0.1;
     var results = getLunrSearchResults(text);
-    console.log(text);
+
     results =  filterLunrResults(results, minScore, omniboxMaxSuggestions);
 
-    console.log(results);
     var suggestions = lunrResultsToSuggestions(results);
     if(suggestions.length == 0)
     {
@@ -352,8 +347,6 @@ function saveIndex()
 
 function saveElement(key, element, onSaved)
 {
-    //console.log("Saving :"+key);
-    //console.log(element);
     var obj= {};
     obj[key] = element;
     chrome.storage.local.set(obj, onSaved);
@@ -466,7 +459,7 @@ function onSaveUrl()
     {
         if(!urlIsSavable(tab.url))
         {
-            sendSaveError(tab.Id);
+            sendSaveError(popupId);
             return;
         }
 
@@ -476,7 +469,7 @@ function onSaveUrl()
         if(existingAtom)
         {
             addRetrive(existingAtom, retrieve);
-            sendAlreadySaved(tab.Id);
+            sendAlreadySaved(popupId);
             return;
         }
 
@@ -488,7 +481,7 @@ function onSaveUrl()
 
         saveAtom(atom);
 
-        sendSaveOk(tab.Id);
+        sendSaveOk(popupId);
     })
 }
 
@@ -521,7 +514,6 @@ function getAtomByUrl(url)
     if(results.length>0)
     {
        var atom =  getAtomByRef(results[0].ref);
-       console.log(atom);
        return atom;
     }
 
@@ -649,7 +641,6 @@ function getCurrentTab(onTap)
 function onTabCreated(tab)
 {
     initTab(tab.id);
-    console.log(tabs);
 
     if(!exists(tab.openerTabId))
         return;
@@ -657,29 +648,28 @@ function onTabCreated(tab)
     //we add the history and serach text of the tab that opened this one
     setTabSearch(tab.id, getOriginalSearchText(tab.openerTabId));
     setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
-
-    console.log(tabs);
 }
 
 function onCommitted(e)
 {
-    console.log("Committed");
-    console.log(e);
+   // console.log("Committed");
+    //    console.log(e);
 }
 
 
 function onDOMContentLoaded(e)
 {
-    console.log("Dom");
-    console.log(e);
+ //   console.log("Dom");
+ //   console.log(e);
 }
 
 function onTabUpdated(tabId, changeInfo, tab)
 {
-    console.log("onTabUpdated");
-    console.log(changeInfo);
     if(changeInfo.status != "loading")//loading event can´t connect to port yey
         return;
+
+    if(!exists(tabs[tabId]))
+        initTab(tabId);
 
     tabs[tabId].port = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
     //contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
@@ -688,7 +678,6 @@ function onTabUpdated(tabId, changeInfo, tab)
     var searchText = otherSearchEngines.getSearchText(tab.url);
     if(searchText)
     {
-        console.log("Is search engine");
         setTabSearch(tab.id, searchText);
         setTabHistory(tab.id, []);
         injectSamanthaResults(tab.id, searchText);
