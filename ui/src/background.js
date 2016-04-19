@@ -22,8 +22,6 @@ var clipboard = "";
 //var contentPort = {};
 var searchPage ="search.html";
 
-var tabsHistory ={};
-var queuedMessages=[];
 var tabs =[];
 
 start(); 
@@ -99,7 +97,7 @@ function processMessage(event, value, tab)
         onSelected(value);  
     //app
     if(event == "searchRequest")
-        onSearchRequested(value); 
+        onSearchRequested(value, tab.id); 
     //popup 
     if(event == "saveUrl")
         onSaveUrl(tab); 
@@ -117,11 +115,11 @@ function onSelected(selectionObj)
     //addEntry(entry);
 }
 
-function onSearchRequested(searchStr)
+function onSearchRequested(searchStr, tabId)
 {
     var lunrResults =  getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
-    sendMessage("updateSearchResults", uiResults);
+    sendMessage("updateSearchResults", uiResults, tabId);
 }
 
 function initNewIndex()
@@ -468,7 +466,7 @@ function onSaveUrl()
     {
         if(!urlIsSavable(tab.url))
         {
-            sendSaveError();
+            sendSaveError(tab.Id);
             return;
         }
 
@@ -478,7 +476,7 @@ function onSaveUrl()
         if(existingAtom)
         {
             addRetrive(existingAtom, retrieve);
-            sendAlreadySaved();
+            sendAlreadySaved(tab.Id);
             return;
         }
 
@@ -490,7 +488,7 @@ function onSaveUrl()
 
         saveAtom(atom);
 
-        sendSaveOk();
+        sendSaveOk(tab.Id);
     })
 }
 
@@ -530,7 +528,7 @@ function getAtomByUrl(url)
     return null;
 }
 
-function sendSaveError()
+function sendSaveError(tabId)
 {
     var status =
     {
@@ -538,10 +536,10 @@ function sendSaveError()
         message:"Ops! Can't be save this :("
 
     }
-    sendMessage("updatePopupStatus", status)
+    sendMessage("updatePopupStatus", status, tabId);
 }
 
-function sendAlreadySaved()
+function sendAlreadySaved(tabId)
 {
     var status =
     {
@@ -549,10 +547,10 @@ function sendAlreadySaved()
         message:"Already saved!"
 
     }
-    sendMessage("updatePopupStatus", status)
+    sendMessage("updatePopupStatus", status, tabId);
 }
 
-function sendSaveOk()
+function sendSaveOk(tabId)
 {
     var status =
     {
@@ -560,7 +558,7 @@ function sendSaveOk()
         message:"Saved"
 
     }
-    sendMessage("updatePopupStatus", status)
+    sendMessage("updatePopupStatus", status, tabId);
 }
 
 function createAtom(page)
@@ -580,7 +578,6 @@ function createAtom(page)
 
 function addRetrive(atom, retrieve)
 {
-    console.log(atom);
     if(atom && atom.retrieves && retrieve)
         atom.retrieves.push(retrieve);
 
@@ -624,14 +621,14 @@ function createRelation(type, hash)
 function getOriginalSearchText(tabId)
 {
     if(tabHistoryExists(tabId))
-        return tabsHistory[tabId].searchText;
+        return tabs[tabId].searchText;
     return null;
 }
 
 function getHistorySinceSearch(tabId)
 {
     if(tabHistoryExists(tabId))
-        return copy(tabsHistory[tabId].history);
+        return copy(tabs[tabId].history);
     return [];
 }
 
@@ -651,7 +648,8 @@ function getCurrentTab(onTap)
 
 function onTabCreated(tab)
 {
-    initTabHistory(tab.id);
+    initTab(tab.id);
+    console.log(tabs);
 
     if(!exists(tab.openerTabId))
         return;
@@ -659,6 +657,8 @@ function onTabCreated(tab)
     //we add the history and serach text of the tab that opened this one
     setTabSearch(tab.id, getOriginalSearchText(tab.openerTabId));
     setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
+
+    console.log(tabs);
 }
 
 function onCommitted(e)
@@ -689,9 +689,9 @@ function onTabUpdated(tabId, changeInfo, tab)
     if(searchText)
     {
         console.log("Is search engine");
-        initTabHistory(tab.id);
         setTabSearch(tab.id, searchText);
-        injectSamanthaResults(searchText);
+        setTabHistory(tab.id, []);
+        injectSamanthaResults(tab.id, searchText);
     }
     
     if(tabHistoryExists(tab.id))
@@ -700,37 +700,29 @@ function onTabUpdated(tabId, changeInfo, tab)
 
 function onTabRemoved(tabId, removeInfo)
 {
-    delete tabsHistory[tabId];
-}
-
-function initTabHistory(tabId)
-{
-    tabsHistory[tabId]={};
-    tabsHistory[tabId].searchText = "";
-    tabsHistory[tabId].history = [];
+    delete tabs[tabId];
 }
 
 function setTabSearch(tabId, searchText)
 {
-    initTabHistory(tabId);
-    tabsHistory[tabId].searchText = searchText;
+    tabs[tabId].searchText = searchText;
 }
 
 function setTabHistory(tabId, history)
 {
-    tabsHistory[tabId].history = history;
+    tabs[tabId].history = history;
 }
 
 function addUrlToHistory(tabId, url)
 {
     if(urlIsNotTheSame(tabId, url))
-        tabsHistory[tabId].history.push(url);
+        tabs[tabId].history.push(url);
 }
 
 function urlIsNotTheSame(tabId, url)
 {
-    var tabLength = tabsHistory[tabId].history.length-1;
-    if(tabsHistory[tabId].history[tabLength] == url) //url is not the same as the last register
+    var tabLength = tabs[tabId].history.length-1;
+    if(tabs[tabId].history[tabLength] == url) //url is not the same as the last register
         return false;
 
     return true;
@@ -738,14 +730,14 @@ function urlIsNotTheSame(tabId, url)
 
 function tabHistoryExists(tabId)
 {
-    if(exists(tabsHistory[tabId]))
-        return exists(tabsHistory[tabId].history);
+    if(exists(tabs[tabId]))
+        return exists(tabs[tabId].history);
     return false;
 }
 
-function injectSamanthaResults(searchText)
+function injectSamanthaResults(tabId, searchText)
 {
-    sendMessage("inject", searchText);
+    sendMessage("inject", searchText, tabId);
    // sendMessage("inject", getSearchPageUrl(searchText));
 }
 
