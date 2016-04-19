@@ -19,29 +19,60 @@ chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 var stateConfig = null;
 var index = null;
 var clipboard = "";
-var contentPort = {};
+//var contentPort = {};
 var searchPage ="search.html";
 
 var tabsHistory ={};
 var queuedMessages=[];
 var tabs =[];
 
-start();    
+start(); 
 
-function onContentConnected ( port )
+function initTab(tabId)
 {
-    console.log(port);
-    contentPort = port;
+    tabs[tabId] ={};
+    tabs[tabId].port ={};
+    tabs[tabId].history =[];
+    tabs[tabId].searchText = "";
+    tabs[tabId].queuedMessages =[];
+}
+
+function onContentConnected (port)
+{
+    var  tabId = port.sender.tab.id;
+
+    if(!exists(tabs[tabId]))
+        initTab(tabId);
+
+    tabs[tabId].port = port;
+    
+    while(tabs[tabId].queuedMessages.length>0)
+    {
+        tabs[tabId].port.postMessage(tabs[tabId].queuedMessages.shift());
+    }
+
+    /*contentPort = port;
 
     while(queuedMessages.length>0)
     {
         contentPort.postMessage(queuedMessages.shift());
     }
+    */
 }
 
-function sendMessage(event, value)
+function sendMessage(event, value, tabId)
 {
     var message = {event:event, value:value};
+
+    if(!exists(tabs[tabId]))
+        initTab(tabId);
+
+    if(tabs[tabId].port == null)
+        tabs[tabId].queuedMessages.push(message);
+    else
+        tabs[tabId].port.postMessage(message);
+    
+    /*
     if(!contentPort)
     {
         queuedMessages.push(message);
@@ -49,6 +80,7 @@ function sendMessage(event, value)
     }
         
     contentPort.postMessage(message);
+    */
 }
 
 function onContentMessage(message, sender, sendResponse)
@@ -649,7 +681,8 @@ function onTabUpdated(tabId, changeInfo, tab)
     if(changeInfo.status != "loading")//loading event can´t connect to port yey
         return;
 
-    contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
+    tabs[tabId].port = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
+    //contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
 
     //we use this to know if its a serach engine
     var searchText = otherSearchEngines.getSearchText(tab.url);
