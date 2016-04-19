@@ -12,10 +12,13 @@ export default class searchResultItem extends React.Component
     {
       super(props);
       this.onClicked = this.onClicked.bind(this);
-      console.log("Props");
-      console.log(props.result);
 
       this.urlDomain = DomainUtil.getDomain(props.result.url);
+
+      var subdomain = DomainUtil.getSubdomain(props.result.url);
+      if(subdomain)
+        this.urlDomain=subdomain+"."+this.urlDomain;
+
       this.state= {
             imageUrl: null,
             imageHeight:50,
@@ -26,7 +29,6 @@ export default class searchResultItem extends React.Component
 
       HtmlMetadata(props.result.url).then(function(metadata)
         {
-            console.log(metadata)
             var imageUrl = that.getImageUrl(metadata);
             if(imageUrl)
             {   
@@ -36,9 +38,6 @@ export default class searchResultItem extends React.Component
             {
                 that.setState({imageWidth: 0 });
             }
-            
-            console.log(metadata);
-            console.log(that.state.imageUrl);
         });
     }
 
@@ -61,8 +60,7 @@ export default class searchResultItem extends React.Component
                      }
                 }
             }
-        }
-        console.log("6");
+        };
         return null;
     }
 

@@ -16,7 +16,6 @@ export default class OtherSearchEngines
     //for urls like this: https://www.google.com.hk/search?q=something+sweet&oq=something&aqs=chrome.1.69i59j0l5.2733j0j9&sourceid=chrome&ie=UTF-8
     getSearchText(url)
     {
-        console.log(url);
         if(!url)
             return null;
 
