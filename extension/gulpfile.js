@@ -174,7 +174,7 @@ gulp.task('copyData', function() {
 
 //default
 var gulp = require('gulp');
-gulp.task('default', ['watch']);
+gulp.task('default',  ['watch']);
 
 /*
 //markup
@@ -204,5 +204,3 @@ var gulp   = require('gulp');
 gulp.task('watch', ['setWatch', 'browserSync'], function() {
   gulp.watch(config.markup.src, ['markup']);
 });
-
-
