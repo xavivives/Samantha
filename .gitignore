@@ -1,6 +1,2 @@
-ui/node_modules
-npm-debug.log
-extension/background.js
-extension/content.js
-extension/popup.js
-extension/search.js
+ui/extension/node_modules
+ui/extension/bin
