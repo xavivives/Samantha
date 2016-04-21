@@ -1,0 +1,53 @@
+{
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "html": []
+    }
+  ],
+  "description": "I'm Samantha, here to help you",
+  "name": "Samantha",
+  "omnibox": {
+    "keyword": "s"
+  },
+  "permissions": [
+    "<all_urls>",
+    "clipboardRead",
+    "clipboardWrite",
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "webNavigation"
+  ],
+  "version": "1",
+  "minimum_chrome_version": "9",
+  "manifest_version": 2,
+  "icons": {
+    "16": "helix16.png",
+    "48": "helix48.png",
+    "128": "helix128.png"
+  },
+  "browser_action": {
+    "default_icon": {
+      "16": "helix16.png",
+      "48": "helix48.png",
+      "128": "helix128.png"
+    },
+    "default_title": "Save this page",
+    "default_popup": "popup.html"
+  },
+  "chrome_url_overrides": {
+    "newtab": "search.html"
+  }
+}
