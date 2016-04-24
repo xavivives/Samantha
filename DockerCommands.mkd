@@ -4,6 +4,9 @@ docker build -t sam .
 #Runs container
 docker run sam
 
+#Remove container
+docker rmi sam
+
 #Runs container and logs python on runtime (not at the end)
 docker run -it sam
 
