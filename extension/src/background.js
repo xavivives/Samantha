@@ -1,5 +1,4 @@
 import ElasticLunr from 'elasticlunr';
-import HtmlMetadata from 'html-metadata';
 import OtherSearchEngines from './otherSearchEngines.js';
 
 var otherSearchEngines = new OtherSearchEngines();

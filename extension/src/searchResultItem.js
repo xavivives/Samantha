@@ -3,64 +3,63 @@ import Dialog from 'material-ui/lib/dialog';
 import FlatButton from 'material-ui/lib/flat-button';
 import RaisedButton from 'material-ui/lib/raised-button';
 import LazyLoad from 'react-lazy-load';
-import HtmlMetadata from 'html-metadata';
+import Metaget from 'metaget';
 import DomainUtil from 'tldjs';
 
 export default class searchResultItem extends React.Component
 {
     constructor(props)
     {
-      super(props);
-      this.onClicked = this.onClicked.bind(this);
+        super(props);
+        this.onClicked = this.onClicked.bind(this);
+        this.urlDomain = DomainUtil.getDomain(props.result.url);
 
-      this.urlDomain = DomainUtil.getDomain(props.result.url);
+        var subdomain = DomainUtil.getSubdomain(props.result.url);
+        if(subdomain)
+          this.urlDomain=subdomain+"."+this.urlDomain;
 
-      var subdomain = DomainUtil.getSubdomain(props.result.url);
-      if(subdomain)
-        this.urlDomain=subdomain+"."+this.urlDomain;
+        this.state= {
+              imageUrl: null,
+              imageHeight:50,
+              imageWidth:0
+          };
 
-      this.state= {
-            imageUrl: null,
-            imageHeight:50,
-            imageWidth:0
-        };
+        var that = this;
 
-      var that = this;
-
-      HtmlMetadata(props.result.url).then(function(metadata)
+        Metaget.fetch(props.result.url, function(error, metadata)
         {
-            var imageUrl = that.getImageUrl(metadata);
-            if(imageUrl)
-            {   
-                that.setState({imageUrl: imageUrl, imageWidth:1.62 * that.state.imageHeight});
+            if(error)
+            {
+                console.log("Fetching metadata error: "+ error);
             }
             else
             {
-                that.setState({imageWidth: 0 });
+                that.processMetadata(metadata)
             }
+
         });
+    }
+
+    processMetadata(metadata)
+    {
+        console.log(metadata);
+        var imageUrl = this.getImageUrl(metadata);
+        if(imageUrl)
+        {   
+            this.setState({imageUrl: imageUrl, imageWidth:1.62 * this.state.imageHeight});
+        }
+        else
+        {
+            this.setState({imageWidth: 0 });
+        } 
     }
 
     getImageUrl(metadata)
     {
-        if(metadata.openGraph)
-        {
-            if(metadata.openGraph.image)
-            {
-                if(metadata.openGraph.image.url)
-                {
-                    return metadata.openGraph.image.url;
-                }
-
-                if(Array.isArray(metadata.openGraph.image))
-                {
-                     if(metadata.openGraph.image.length>0)
-                     {
-                        return  metadata.openGraph.image[0];                        
-                     }
-                }
-            }
-        };
+        if(metadata["og:image"])
+            return metadata["og:image"];
+        else if(metadata["twitter:image"])
+            return metadata["twitter:image"]; 
         return null;
     }
 
