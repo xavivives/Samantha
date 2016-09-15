@@ -19,15 +19,38 @@ export default class searchResultItem extends React.Component
           this.urlDomain=subdomain+"."+this.urlDomain;
 
         this.state= {
-              imageUrl: null,
-              imageHeight:50,
-              imageWidth:0
-          };
+            imageUrl: null,
+            imageHeight:50,
+            imageWidth:0
+        };
 
         var that = this;
 
-        Metaget.fetch(props.result.url, function(error, metadata)
+        setTimeout(function(){ that.fetchMetadata(props.result.url) }, 200);    
+    }
+
+    componentWillMount()
+    {
+        this.resultStillActive = true;
+    }
+
+    componentWillUnmount()
+    {
+        this.resultStillActive = false;
+    }
+
+    fetchMetadata(url)
+    {
+        var that = this;
+
+        if(!that.resultStillActive)
+            return;
+        
+        Metaget.fetch(url, function(error, metadata)
         {
+            if(!that.resultStillActive)
+                return;
+
             if(error)
             {
                 console.log("Fetching metadata error: "+ error);
@@ -36,7 +59,6 @@ export default class searchResultItem extends React.Component
             {
                 that.processMetadata(metadata)
             }
-
         });
     }
 
@@ -65,7 +87,7 @@ export default class searchResultItem extends React.Component
 
     onClicked(result)
     {
-      this.setState({open: true});
+      //this.setState({open: true});
       this.gotoUrl(result.url);
     }
 
