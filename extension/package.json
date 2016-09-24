@@ -23,6 +23,7 @@
     "pretty-hrtime": "^1.0.2",
     "react": "^0.14.8",
     "react-dom": "^0.14.8",
+    "react-fontawesome": "^1.2.0",
     "react-lazy-load": "^3.0.10",
     "react-tap-event-plugin": "^0.2.2",
     "require-dir": "^0.3.0",
