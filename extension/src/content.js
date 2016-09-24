@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import SearchPage from './searchPage.js';
 
-document.addEventListener('copy',onCopy, true);
+//document.addEventListener('copy',onCopy, true);
 document.addEventListener('mouseup', onMouseUp);
 var connector = new Connector();
 console.log(connector);
