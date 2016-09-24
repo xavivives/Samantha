@@ -3,6 +3,18 @@ import FontAwesome from 'react-fontawesome';
 
 export default class Tag extends React.Component
 {
+
+    
+    static get defaultProps()
+    {
+        var props = 
+        {
+            hitag: ['empty']
+        }
+
+        return props;
+    }
+
     constructor(props)
     {
         super(props);
@@ -36,15 +48,15 @@ export default class Tag extends React.Component
             borderColor:'rgba(0,0,0,0.2)',
         }
 
-        var htag = ["hola","musica","flame"];
+        
         return(
             <div>
                 <div style={style}>
                 
                 
-                {htag.map(function(tag, index){
+                {this.props.hitag.map(function(tag, index, originalArray){
 
-                        if(index==htag.length-1)
+                        if(index==originalArray.length-1)
                             return <div style={{display: 'inline-block'}}> {tag}</div>
                         else
                             return <div style={{display: 'inline-block'}}> 

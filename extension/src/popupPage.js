@@ -56,20 +56,16 @@ export default class PopupPage extends React.Component
              style ={color: 'green'}
         else
             style ={color: 'gray'}
+
         
         return(
             <div style={{width: 200}}>
                 <div style={{display: 'flex', flexWrap:'wrap'}}>
 
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
-                    <Hitag></Hitag>
+                    <Hitag hitag={["hola","musica","flame"]}></Hitag>
+                    <Hitag hitag={["Rock","flow","flame", "paraigues"]}></Hitag>
+                    <Hitag hitag={["flame"]}></Hitag>
+                    <Hitag hitag={["Lydia","memory"]}></Hitag>
                 </div>
 
                 <div style={{whiteSpace: 'nowrap'}}>
