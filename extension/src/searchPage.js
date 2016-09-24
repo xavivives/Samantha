@@ -3,6 +3,7 @@ import Connector from './connector.js';
 import SearchResultItem from './searchResultItem';
 import TextField from 'material-ui/TextField';
 import LazyLoad from 'react-lazy-load';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 export default class SearchPage extends React.Component
 {
@@ -93,7 +94,7 @@ export default class SearchPage extends React.Component
 
         
       return (
-       
+        <MuiThemeProvider>
              <div style ={{display: 'flex', justifyContent: 'center'}}>
 
                 <div style ={containerStyle}>
@@ -111,6 +112,7 @@ export default class SearchPage extends React.Component
                     </div>
                 </div>
             </div>
+        </MuiThemeProvider>
       );
     }
 }
