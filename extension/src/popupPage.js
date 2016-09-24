@@ -2,7 +2,8 @@ import React from 'react';
 import Connector from './connector.js';
 import RefreshIndicator from 'material-ui/lib/refresh-indicator';
 import GetMuiTheme from 'material-ui/lib/styles/getMuiTheme';
-import theme from './theme.js';
+import Theme from './theme.js';
+import Hitag from './hitag.js';
 
 export default class PopupPage extends React.Component
 {
@@ -32,12 +33,12 @@ export default class PopupPage extends React.Component
     updatePopupStatus(status)
     {
         this.setState({status: status});
-        setTimeout(this.closePopup,2000);
+        setTimeout(this.closePopup,200000);
     }
 
     getChildContext()
     {
-        return { muiTheme: GetMuiTheme(theme)};
+        return { muiTheme: GetMuiTheme(Theme)};
     }
 
     closePopup()
@@ -57,7 +58,20 @@ export default class PopupPage extends React.Component
             style ={color: 'gray'}
         
         return(
-            <div>
+            <div style={{width: 200}}>
+                <div style={{display: 'flex', flexWrap:'wrap'}}>
+
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                    <Hitag></Hitag>
+                </div>
+
                 <div style={{whiteSpace: 'nowrap'}}>
                     <p style ={style}> {this.state.status.message} </p>
                 </div>
