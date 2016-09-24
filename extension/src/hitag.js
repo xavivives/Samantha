@@ -3,8 +3,6 @@ import FontAwesome from 'react-fontawesome';
 
 export default class Tag extends React.Component
 {
-
-    
     static get defaultProps()
     {
         var props = 

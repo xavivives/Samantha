@@ -2,7 +2,7 @@ import React from 'react';
 import Connector from './connector.js';
 import Hitag from './hitag.js';
 import TextField from 'material-ui/TextField';
-//import AutoComplete from 'material-ui/AutoComplete';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'; 
 
 export default class PopupPage extends React.Component
 {
@@ -13,21 +13,25 @@ export default class PopupPage extends React.Component
         var that = this;
         this.connector = new Connector();
         this.closePopup = this.closePopup.bind(this);
-        this.onSearchTextChanged = this.onSearchTextChanged.bind(this);
+        this.onTagInputChanged = this.onTagInputChanged.bind(this);
+        this.onTagInputKeyDown = this.onTagInputKeyDown.bind(this);
 
         this.state = {
             status:
             {
                 statusType:"normal",
                 message:"Saving..."
-            }
+            },
+            tagInput:"",
+            hitags:[]
         };
+
 
         this.connector.registerEvent("updatePopupStatus", function(status) {
             that.updatePopupStatus(status);
         });
 
-        this.connector.sendMessage("saveUrl");      
+        this.connector.sendMessage("saveUrl");   
     }
 
     updatePopupStatus(status)
@@ -41,20 +45,26 @@ export default class PopupPage extends React.Component
         window.close();
     }
 
-    onSearchTextChanged()
-    {
-
-    }
-
-    onHandleUpdateInput (value)
+    onTagInputChanged(event)
     {
         this.setState({
-            dataSource: [
-            value,
-                value + value,
-                value + value + value,
-            ],
-        });
+            tagInput: event.target.value,
+          });
+    }
+
+    onTagInputKeyDown(event)
+    {
+        if(event.keyCode==13)
+        {
+            var newHitag = event.target.value;
+            var hitags = this.state.hitags;
+            hitags.push([newHitag]);
+
+            this.setState({
+                hitags: hitags,
+                tagInput: "",
+          });
+        }
     }
 
     render()
@@ -67,26 +77,33 @@ export default class PopupPage extends React.Component
              style ={color: 'green'}
         else
             style ={color: 'gray'}
-
         
         return(
-            <div style={{width: 200}}>
-
-
-
-        
-                <div style={{display: 'flex', flexWrap:'wrap'}}>
-
-                    <Hitag hitag={["hola > ","musica" ,"flame"]}></Hitag>
-                    <Hitag hitag={["Rock","flow","flame", "paraigues"]}></Hitag>
-                    <Hitag hitag={["flame"]}></Hitag>
-                    <Hitag hitag={["Lydia","memory"]}></Hitag>
-                </div>
+            <MuiThemeProvider>
+            <div style={{width: 300}}>
 
                 <div style={{whiteSpace: 'nowrap'}}>
                     <p style ={style}> {this.state.status.message} </p>
                 </div>
+
+                <TextField
+                    hintText="Add tags..."
+                    defaultValue = {this.state.defaultSearch}
+                    onChange={this.onTagInputChanged}
+                    onKeyDown = {this.onTagInputKeyDown}
+                    fullWidth={true}
+                    value = {this.state.tagInput}
+                />
+            
+                <div style={{display: 'flex', flexWrap:'wrap'}}>
+                     {this.state.hitags.map(function(hitag, index, originalArray){
+                        return  <Hitag hitag={hitag}></Hitag>
+                        })
+                    }    
+                </div>
+                
             </div>
+            </MuiThemeProvider>
         );
     }
 }
