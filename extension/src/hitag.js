@@ -47,7 +47,6 @@ export default class Tag extends React.Component
             borderWidth:1,
             borderColor:'rgba(0,0,0,0.2)',
         }
-
         
         return(
             <div>
@@ -56,7 +55,7 @@ export default class Tag extends React.Component
                 
                 {this.props.hitag.map(function(tag, index, originalArray){
 
-                        if(index==originalArray.length-1)
+                        if(index== originalArray.length-1)
                             return <div style={{display: 'inline-block'}}> {tag}</div>
                         else
                             return <div style={{display: 'inline-block'}}> 

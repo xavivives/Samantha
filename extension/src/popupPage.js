@@ -1,9 +1,8 @@
 import React from 'react';
 import Connector from './connector.js';
-import RefreshIndicator from 'material-ui/lib/refresh-indicator';
-import GetMuiTheme from 'material-ui/lib/styles/getMuiTheme';
-import Theme from './theme.js';
 import Hitag from './hitag.js';
+import TextField from 'material-ui/TextField';
+//import AutoComplete from 'material-ui/AutoComplete';
 
 export default class PopupPage extends React.Component
 {
@@ -14,6 +13,7 @@ export default class PopupPage extends React.Component
         var that = this;
         this.connector = new Connector();
         this.closePopup = this.closePopup.bind(this);
+        this.onSearchTextChanged = this.onSearchTextChanged.bind(this);
 
         this.state = {
             status:
@@ -36,14 +36,25 @@ export default class PopupPage extends React.Component
         setTimeout(this.closePopup,200000);
     }
 
-    getChildContext()
-    {
-        return { muiTheme: GetMuiTheme(Theme)};
-    }
-
     closePopup()
     {
         window.close();
+    }
+
+    onSearchTextChanged()
+    {
+
+    }
+
+    onHandleUpdateInput (value)
+    {
+        this.setState({
+            dataSource: [
+            value,
+                value + value,
+                value + value + value,
+            ],
+        });
     }
 
     render()
@@ -60,9 +71,13 @@ export default class PopupPage extends React.Component
         
         return(
             <div style={{width: 200}}>
+
+
+
+        
                 <div style={{display: 'flex', flexWrap:'wrap'}}>
 
-                    <Hitag hitag={["hola","musica","flame"]}></Hitag>
+                    <Hitag hitag={["hola > ","musica" ,"flame"]}></Hitag>
                     <Hitag hitag={["Rock","flow","flame", "paraigues"]}></Hitag>
                     <Hitag hitag={["flame"]}></Hitag>
                     <Hitag hitag={["Lydia","memory"]}></Hitag>
@@ -75,7 +90,3 @@ export default class PopupPage extends React.Component
         );
     }
 }
-
-PopupPage.childContextTypes = {
-        muiTheme: React.PropTypes.object
-    }

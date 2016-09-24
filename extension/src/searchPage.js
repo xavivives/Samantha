@@ -1,9 +1,7 @@
 import React from 'react';
 import Connector from './connector.js';
 import SearchResultItem from './searchResultItem';
-import TextField from 'material-ui/lib/text-field';
-import GetMuiTheme from 'material-ui/lib/styles/getMuiTheme';
-import theme from './theme.js';
+import TextField from 'material-ui/TextField';
 import LazyLoad from 'react-lazy-load';
 
 export default class SearchPage extends React.Component
@@ -34,7 +32,7 @@ export default class SearchPage extends React.Component
         this.results = [];
         this.onSearchTextChanged = this.onSearchTextChanged.bind(this);
         this.updateSearchResults = this.updateSearchResults.bind(this);
-       // this.getChildContext = this.getChildContext.bind(this);
+      
 
         //set search from url parameter
         if(props.defaultSearchText)
@@ -54,11 +52,6 @@ export default class SearchPage extends React.Component
             defaultSearch:searchText,
             baseUrl: currentUrl
         };
-    }
-
-    getChildContext()
-    {
-        return { muiTheme: GetMuiTheme(theme)};
     }
 
     updateUrl(searchText)
@@ -121,7 +114,3 @@ export default class SearchPage extends React.Component
       );
     }
 }
-
-SearchPage.childContextTypes = {
-        muiTheme: React.PropTypes.object
-    }
