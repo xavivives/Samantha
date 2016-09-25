@@ -3,6 +3,9 @@ import Connector from './connector.js';
 import Hitag from './hitag.js';
 import TextField from 'material-ui/TextField';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'; 
+import Popover from 'material-ui/Popover';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/MenuItem';
 
 export default class PopupPage extends React.Component
 {
@@ -65,6 +68,8 @@ export default class PopupPage extends React.Component
                 tagInput: "",
           });
         }
+
+        console.log(this.refs['tagInput']);
     }
 
     render()
@@ -80,13 +85,15 @@ export default class PopupPage extends React.Component
         
         return(
             <MuiThemeProvider>
-            <div style={{width: 300}}>
+            <div style={{width: 600, height:600}}>
 
                 <div style={{whiteSpace: 'nowrap'}}>
                     <p style ={style}> {this.state.status.message} </p>
                 </div>
 
+                <div ref="tagInputContainer">
                 <TextField
+                    
                     hintText="Add tags..."
                     defaultValue = {this.state.defaultSearch}
                     onChange={this.onTagInputChanged}
@@ -94,6 +101,22 @@ export default class PopupPage extends React.Component
                     fullWidth={true}
                     value = {this.state.tagInput}
                 />
+                </div>
+
+                 <Popover
+                  open={true}
+                  anchorEl= {this.refs['tagInputContainer']}
+                  anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                  targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                >
+                  
+                     {this.state.hitags.map(function(hitag, index, originalArray){
+                        return  <Hitag hitag={hitag}></Hitag>
+                        })
+                    }    
+          
+                </Popover>
+
             
                 <div style={{display: 'flex', flexWrap:'wrap'}}>
                      {this.state.hitags.map(function(hitag, index, originalArray){
