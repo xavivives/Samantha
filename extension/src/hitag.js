@@ -51,24 +51,21 @@ export default class Tag extends React.Component
         {
             style.borderStyle = 'none';
         }
+
+        var hitagChain = [];
+
+        this.props.hitag.map(function(tag, index, originalArray)
+        { 
+            hitagChain.push(<div style={{display: 'inline-block'}}> {tag}</div>);
+
+            if(index!= originalArray.length-1)
+                 hitagChain.push( <FontAwesome name='angle-right' style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>); 
+                       
+        });
         
         return(
-            <div>
-                <div style={style}>
-                
-                
-                {this.props.hitag.map(function(tag, index, originalArray){
-
-                        if(index== originalArray.length-1)
-                            return <div style={{display: 'inline-block'}}> {tag}</div>
-                        else
-                            return <div style={{display: 'inline-block'}}> 
-                                    <div style={{display: 'inline-block'}}> {tag}  </div>
-                                    <FontAwesome name='angle-right' style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
-                                </div>
-                    })
-                }
-                </div>
+            <div style={style}>           
+                {hitagChain}        
             </div>
         );
     }
