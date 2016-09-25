@@ -6,6 +6,7 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
+import HitagsDisplay from './hitagsDisplay.js';
 
 export default class PopupPage extends React.Component
 {
@@ -61,15 +62,13 @@ export default class PopupPage extends React.Component
         {
             var newHitag = event.target.value;
             var hitags = this.state.hitags;
-            hitags.push([newHitag]);
+            hitags.push([newHitag,"hello", "potato"]);
 
             this.setState({
                 hitags: hitags,
                 tagInput: "",
           });
         }
-
-        console.log(this.refs['tagInput']);
     }
 
     render()
@@ -101,29 +100,21 @@ export default class PopupPage extends React.Component
                     fullWidth={true}
                     value = {this.state.tagInput}
                 />
+
                 </div>
 
-                 <Popover
-                  open={true}
-                  anchorEl= {this.refs['tagInputContainer']}
-                  anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                  targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                >
+                    <Popover
+                        open={true}
+                        anchorEl= {this.refs['tagInputContainer']}
+                        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                    >
                   
-                     {this.state.hitags.map(function(hitag, index, originalArray){
-                        return  <Hitag hitag={hitag}></Hitag>
-                        })
-                    }    
+                    <HitagsDisplay hitags = {this.state.hitags} encapsulated = {false} stack={true} />
           
                 </Popover>
 
-            
-                <div style={{display: 'flex', flexWrap:'wrap'}}>
-                     {this.state.hitags.map(function(hitag, index, originalArray){
-                        return  <Hitag hitag={hitag}></Hitag>
-                        })
-                    }    
-                </div>
+                <HitagsDisplay hitags = {this.state.hitags} encapsulated = {true} stack={false} />
                 
             </div>
             </MuiThemeProvider>

@@ -8,7 +8,7 @@ export default class Tag extends React.Component
         var props = 
         {
             hitag: ['empty'],
-            encapsulated:false
+            encapsulated:true
         }
 
         return props;
@@ -27,7 +27,6 @@ export default class Tag extends React.Component
                 message:"Saving..."
             }
         };
-      
     }
 
     render()
