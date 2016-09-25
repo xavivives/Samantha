@@ -7,7 +7,8 @@ export default class Tag extends React.Component
     {
         var props = 
         {
-            hitag: ['empty']
+            hitag: ['empty'],
+            encapsulated:false
         }
 
         return props;
@@ -44,6 +45,11 @@ export default class Tag extends React.Component
             borderStyle:'solid',
             borderWidth:1,
             borderColor:'rgba(0,0,0,0.2)',
+        }
+
+        if(!this.props.encapsulated)
+        {
+            style.borderStyle = 'none';
         }
         
         return(
