@@ -7,6 +7,7 @@ import Popover from 'material-ui/Popover';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
 import HitagsDisplay from './hitagsDisplay.js';
+import HitagsAutocomplete from './hitagsAutocomplete.js';
 
 export default class PopupPage extends React.Component
 {
@@ -91,33 +92,21 @@ export default class PopupPage extends React.Component
                 </div>
 
                 <div ref="tagInputContainer">
-                <TextField
-                    
-                    hintText="Add tags..."
-                    defaultValue = {this.state.defaultSearch}
-                    onChange={this.onTagInputChanged}
-                    onKeyDown = {this.onTagInputKeyDown}
-                    fullWidth={true}
-                    value = {this.state.tagInput}
-                />
-
+                    <TextField
+                        hintText="Add tags..."
+                        defaultValue = {this.state.defaultSearch}
+                        onChange={this.onTagInputChanged}
+                        onKeyDown = {this.onTagInputKeyDown}
+                        fullWidth={true}
+                        value = {this.state.tagInput}/>
                 </div>
 
-                    <Popover
-                        open={true}
-                        anchorEl= {this.refs['tagInputContainer']}
-                        anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                        targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                    >
-                  
-                    <HitagsDisplay hitags = {this.state.hitags} encapsulated = {false} stack={true} />
-          
-                </Popover>
-
-                <HitagsDisplay hitags = {this.state.hitags} encapsulated = {true} stack={false} />
-                
+                <HitagsAutocomplete hitags = {this.state.hitags} anchorElement={this.refs["tagInputContainer"]}/>
+         
             </div>
             </MuiThemeProvider>
         );
     }
 }
+
+//<HitagsDisplay hitags = {this.state.hitags} encapsulated = {true} stack={false} />
