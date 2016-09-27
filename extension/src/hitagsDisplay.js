@@ -1,5 +1,6 @@
 import React from 'react';
 import Hitag from './hitag.js';
+import {List, ListItem} from 'material-ui/List';
 
 export default class PopupPage extends React.Component
 {
@@ -9,7 +10,8 @@ export default class PopupPage extends React.Component
         {
             hitags: [[]],
             encapsulated:true,
-            stack:false
+            stack:false,
+            asList:false
         }
 
         return props;
@@ -32,15 +34,35 @@ export default class PopupPage extends React.Component
             style.flexDirection = 'column';
 
         var that = this;
-        return(
-            
-            <div style={style}>
-                 {that.props.hitags.map(function(hitag, index, originalArray){
-                    return  <Hitag hitag={hitag} encapsulated ={that.props.encapsulated} ></Hitag>
-                    })
-                }    
-            </div>
 
-        );
+        if(this.props.asList)
+        {
+            return(        
+                <List ref= "List">
+                     {that.props.hitags.map(function(hitag, index, originalArray){
+                        return   <ListItem>
+                                    <Hitag hitag={hitag} encapsulated ={that.props.encapsulated}/>
+                                </ListItem>
+                        })
+                    }    
+                </List>
+            );
+        }
+        else
+        {
+            return(        
+                <div style={style}>
+                     {that.props.hitags.map(function(hitag, index, originalArray){
+                        return  <Hitag hitag={hitag} encapsulated ={that.props.encapsulated} ></Hitag>
+                        })
+                    }    
+                </div>
+            );
+        }
+            
+
+        
+
+        
     }
 }

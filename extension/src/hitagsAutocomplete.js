@@ -1,8 +1,11 @@
 import React from 'react';
-import Popover from 'material-ui/Popover';
+import {List, ListItem, MakeSelectable} from 'material-ui/List';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/MenuItem';
-import HitagsDisplay from './hitagsDisplay.js';
+import SelectableList from './selectableList.js';
+import Hitag from './hitag.js';
+import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
+
 
 export default class PopupPage extends React.Component
 {
@@ -13,17 +16,12 @@ export default class PopupPage extends React.Component
 
     render()
     {
-        console.log(this.props.anchorElement);
-        return(
-            <Popover
-                open={true}
-                anchorEl= {this.props.anchorElement}
-                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                targetOrigin={{horizontal: 'left', vertical: 'top'}}>
 
-                <HitagsDisplay hitags = {this.props.hitags} encapsulated = {false} stack={true} />
-          
-            </Popover>             
+        return(
+            <HotKeys>  
+                <SelectableList asList= {true} children = {this.props.hitags} encapsulated = {false}/> 
+            </HotKeys>             
         );
     }
 }
+//
