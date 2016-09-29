@@ -40,7 +40,7 @@ export default class PopupPage extends React.Component
             return(        
                 <List ref= "List">
                      {that.props.hitags.map(function(hitag, index, originalArray){
-                        return   <ListItem>
+                        return  <ListItem>
                                     <Hitag hitag={hitag} encapsulated ={that.props.encapsulated}/>
                                 </ListItem>
                         })
