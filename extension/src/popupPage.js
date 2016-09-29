@@ -79,6 +79,8 @@ export default class PopupPage extends React.Component
         this.setState({
             tagInput: event.target.value,
         });
+
+        this.checkIfDisplayAutocomplete(event.target.value, true);
     }
 
     onTagInputKeyDown(event)
@@ -93,29 +95,31 @@ export default class PopupPage extends React.Component
                 hitags: hitags,
                 tagInput: "",
             });
+
+            this.checkIfDisplayAutocomplete("", true);
         }
-        //this.checkIfDisplayAutocomplete(event.target.value, true);
+        
     }
 
     onTagInputFocus(event)
     {   
-        console.log("focus");
-        //this.checkIfDisplayAutocomplete(event.target.value, true);
+        this.checkIfDisplayAutocomplete(event.target.value, true);
     }
 
     onTagInputBlur(event)
-    {    console.log("blur");
-        //this.checkIfDisplayAutocomplete(event.target.value, false);
+    {
+        this.checkIfDisplayAutocomplete(event.target.value, false);
     }
 
     checkIfDisplayAutocomplete (tagInputValue, tagInputIsFocused)
     {
-        var open = false
+        var open = false;
+
         if(tagInputValue != "" && tagInputIsFocused)
            open = true;
 
-       if(this.state.autocompleteOpen != open)
-            this.setState({ autocompleteOpen:open});
+       if(this.state.autocompleteIsOpened != open)
+            this.setState({ autocompleteIsOpened:open});
     }
 
     render()
@@ -131,12 +135,12 @@ export default class PopupPage extends React.Component
              messageStyle ={color: 'green'}
         else
             messageStyle ={color: 'gray'}
-        
+
         return(
             
-            <HotKeys keyMap={this.hotKeysMap} style={bodyStyle}>
+            <HotKeys keyMap={this.hotKeysMap} style= {bodyStyle}>
                 <MuiThemeProvider muiTheme={this.muiTheme}>
-                    <div style={{width: 600, height:600}}>
+                    <div style={{width: 250}}>
 
                         <div style={{whiteSpace: 'nowrap'}}>
                             <p style ={messageStyle}> {this.state.status.message} </p>
@@ -154,7 +158,7 @@ export default class PopupPage extends React.Component
                                 onBlur = {this.onTagInputBlur}/>
                         </div>
 
-                        <HitagsAutocomplete hitags = {this.state.hitags} anchorElement={this.refs["tagInputContainer"]} open={this.state.autocompleteOpen}/>
+                        <HitagsAutocomplete hitags = {this.state.hitags} anchorElement={this.refs["tagInputContainer"]} isOpened={this.state.autocompleteIsOpened}/>
                  
                     </div>
                 </MuiThemeProvider>

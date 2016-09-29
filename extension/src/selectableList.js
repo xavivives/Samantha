@@ -56,7 +56,7 @@ export default class PopupPage extends React.Component
     
     onMoveDown(e)
     {
-        if(this.state.selectedItemIndex< this.props.children.length+1)
+        if(this.state.selectedItemIndex< this.props.children.length-1)
         {
             this.setState({
                 selectedItemIndex: this.state.selectedItemIndex + 1
@@ -85,15 +85,14 @@ export default class PopupPage extends React.Component
         var that = this;
 
         return(   
-            <HotKeys  handlers={this.hotKeyshandlers}>     
+            <HotKeys  handlers={this.hotKeyshandlers} style = {{outline:'none'}}>     
                 <div ref= "List" style={style}>
-                     {that.props.children.map(function(child, index, originalArray){
-                        return <SelectableListItem
-                        index = {index}
-                        isSelected = {that.isItemSelected(index)}
-                        onItemClicked={that.onItemClicked.bind(that, index)}>
-
-                                {child}
+                         {that.props.children.map(function(child, index, originalArray){
+                            return <SelectableListItem
+                                index = {index}
+                                isSelected = {that.isItemSelected(index)}
+                                onItemClicked={that.onItemClicked.bind(that, index)}>
+                                    {child}
                             </SelectableListItem>
                         })
                     }    

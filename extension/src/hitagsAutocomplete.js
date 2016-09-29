@@ -9,6 +9,16 @@ import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 
 export default class PopupPage extends React.Component
 {
+    static get defaultProps()
+    {
+        var props = 
+        {
+           isOpened :true
+        }
+
+        return props;
+    }
+
     constructor(props)
     {
         super(props);
@@ -16,12 +26,18 @@ export default class PopupPage extends React.Component
 
     render()
     {
-
-        return(
-            <HotKeys>  
-                <SelectableList asList= {true} children = {this.props.hitags} encapsulated = {false}/> 
-            </HotKeys>             
-        );
+        if(!this.props.isOpened)
+        {
+            return null;        }
+        else
+        {
+            return(
+                <HotKeys>  
+                    <SelectableList asList= {true} children = {this.props.hitags} encapsulated = {false}/> 
+                </HotKeys>             
+            );
+        }
+            
     }
 }
 //
