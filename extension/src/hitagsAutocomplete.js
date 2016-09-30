@@ -3,7 +3,7 @@ import TextField from 'material-ui/TextField';
 import SelectableList from './selectableList.js';
 import Hitag from './hitag.js';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
-
+import HitagUtils from './hitagUtils.js';
 
 export default class PopupPage extends React.Component
 {
@@ -38,7 +38,8 @@ export default class PopupPage extends React.Component
         this.state = {
             tagInput:"",
             items:[], 
-            selectedIndex:0
+            selectedIndex:0,
+            inputHitag:[]
         };
 
         this.hotKeyshandlers = {
@@ -69,24 +70,40 @@ export default class PopupPage extends React.Component
 
     onTagInputChanged(event)
     {
-        this.setState({
-            tagInput: event.target.value,
-        });
+        var currentInput = event.target.value;
+        var currentHitag = this.state.inputHitag;
+        console.log(currentHitag);
+        if((currentInput.length > 2) && (currentInput[currentInput.length-1] == " ") && (currentInput[currentInput.length-2] == " "))
+        {
+            currentInput=currentInput.trim();
+            currentHitag.push(currentInput);
+            this.setState({
+                tagInput : "",
+                inputHitag : currentHitag
+            });
+        }
+        
+        else
+        {
+             this.setState({
+                tagInput : currentInput
+            });
+        }
 
         this.checkIfDisplayAutocomplete(event.target.value, true);
     }
 
     onTagInputKeyDown(event)
     {
-        if(event.keyCode==13)
+        if(event.keyCode == 13)
         {
-            var newHitag = event.target.value;
             var items = this.state.items;
-            items.push([newHitag,"hello", "potato"]);
+            items.push(this.state.inputHitag);
 
             this.setState({
                 items: items,
                 tagInput: "",
+                inputHitag: []
             });
 
             this.checkIfDisplayAutocomplete("", true);
@@ -129,9 +146,25 @@ export default class PopupPage extends React.Component
 
     render()
     {
+        var style ={
+            display: 'flex',
+            flexWrap:'wrap',
+            flexDirection:'row'
+        };
         return(
             <HotKeys  style = {{outline:'none'}} handlers = {this.hotKeyshandlers} >
                 <div ref="tagInputContainer">
+                <div style={style}> 
+                    <Hitag encapsulated = {false} hitag ={this.state.inputHitag}/>
+                    <input
+                        hintText="Add tags..."
+                        onChange={this.onTagInputChanged}
+                        onKeyDown = {this.onTagInputKeyDown}
+                        fullWidth={true}
+                        value = {this.state.tagInput}
+                        onFocus = {this.onTagInputFocus}
+                        onBlur = {this.onTagInputBlur}/>
+                </div>
                     <TextField
                         hintText="Add tags..."
                         onChange={this.onTagInputChanged}
