@@ -97,6 +97,10 @@ export default class PopupPage extends React.Component
     {
         if(event.keyCode == 13)
         {
+            var currentInput=this.state.tagInput;
+            var currentHitag = this.state.inputHitag;
+            currentHitag.push(currentInput.trim());
+
             var items = this.state.items;
             items.push(this.state.inputHitag);
 
@@ -129,7 +133,8 @@ export default class PopupPage extends React.Component
     {
         this.setState({
             selectedIndex:index,
-            tagInput: this.state.items[index][0]
+            inputHitag: this.state.items[index],
+            tagInput: ""
         })
     }
 
@@ -151,9 +156,17 @@ export default class PopupPage extends React.Component
             flexWrap:'wrap',
             flexDirection:'row'
         };
+
+        var children = []
+
+        this.state.items.map(function(item, index)
+        {
+            children.push(<Hitag hitag={item}/>);
+        });
+
         return(
             <HotKeys  style = {{outline:'none'}} handlers = {this.hotKeyshandlers} >
-                <div ref="tagInputContainer">
+
                 <div style={style}> 
                     <Hitag encapsulated = {false} hitag ={this.state.inputHitag}/>
                     <input
@@ -165,17 +178,8 @@ export default class PopupPage extends React.Component
                         onFocus = {this.onTagInputFocus}
                         onBlur = {this.onTagInputBlur}/>
                 </div>
-                    <TextField
-                        hintText="Add tags..."
-                        onChange={this.onTagInputChanged}
-                        onKeyDown = {this.onTagInputKeyDown}
-                        fullWidth={true}
-                        value = {this.state.tagInput}
-                        onFocus = {this.onTagInputFocus}
-                        onBlur = {this.onTagInputBlur}/>
-                </div>
 
-                <SelectableList asList= {true} children = {this.state.items} encapsulated = {false} selectedIndex = {this.state.selectedIndex} onItemSelected = {this.onListItemSelected}/> 
+                <SelectableList asList= {true} children = {children} encapsulated = {false} selectedIndex = {this.state.selectedIndex} onItemSelected = {this.onListItemSelected}/> 
             </HotKeys>             
         ); 
     }
