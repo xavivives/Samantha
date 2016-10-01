@@ -21,7 +21,6 @@ export default class SearchPage extends React.Component
 
     constructor(props)
     {
-        console.log(props);
         super(props);
 
         var that = this;
@@ -92,7 +91,6 @@ export default class SearchPage extends React.Component
         else
             containerStyle={flex:1}
 
-        
       return (
         <MuiThemeProvider>
              <div style ={{display: 'flex', justifyContent: 'center'}}>
