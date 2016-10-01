@@ -88,7 +88,7 @@ export default class Tag extends React.Component
     {
         var style ={};
         style ={
-            display:'inline-block',
+            display:'flex',
             borderRadius:3,
             paddingLeft:5, 
             paddingRight:5, 
@@ -123,7 +123,16 @@ export default class Tag extends React.Component
         if(this.props.inProgress)
         {
             tagInProgress=<input
-                style={{minWidth:10, flex:1}}
+                style={{minWidth:50,
+                    width:0,
+                    flex: 1,
+                    outline:"none",
+                    border:"none",
+                    WebkitAppearance: "none", 
+                    fontFamily: '"Helvetica Neue", "Lucida Grande", sans-serif',
+                    fontSize: "100%",
+                    padding:0}}
+
                 onChange={this.onTagInputChanged}
                 onKeyDown = {this.onTagInputKeyDown}
                 value = {this.state.tagInProgress}
@@ -131,7 +140,7 @@ export default class Tag extends React.Component
                 onBlur = {this.onTagInputBlur}/>
 
             if(this.props.hitagChildren.length>0)
-                lastSeparator = <FontAwesome name='angle-right' style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
+                lastSeparator = <FontAwesome name='angle-right'style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
         }
         
         return(

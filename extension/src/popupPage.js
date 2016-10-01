@@ -82,7 +82,7 @@ export default class PopupPage extends React.Component
             
             <HotKeys keyMap={this.hotKeysMap} style= {bodyStyle}>
                 <MuiThemeProvider muiTheme={this.muiTheme}>
-                    <div style={{width: 250}}>
+                    <div style={{minWidth: 350}}>
 
                         <div style={{whiteSpace: 'nowrap'}}>
                             <p style ={messageStyle}> {this.state.status.message} </p>
