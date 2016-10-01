@@ -72,15 +72,25 @@ export default class PopupPage extends React.Component
     {
         var currentInput = event.target.value;
         var currentHitag = this.state.inputHitag;
-        console.log(currentHitag);
-        if((currentInput.length > 2) && (currentInput[currentInput.length-1] == " ") && (currentInput[currentInput.length-2] == " "))
+
+        console.log(currentInput.length);
+        console.log(currentInput);
+
+        if((currentInput.length>0) && (currentInput[0]==" "))
         {
-            currentInput=currentInput.trim();
-            currentHitag.push(currentInput);
-            this.setState({
-                tagInput : "",
-                inputHitag : currentHitag
-            });
+            console.log("in");
+            return;
+        }
+
+        if((currentInput.length >= 2) && (currentInput[currentInput.length-1] == " ") && (currentInput[currentInput.length-2] == " "))
+        {
+           console.log("there");
+           currentInput=currentInput.trim();
+           currentHitag.push(currentInput);
+           this.setState({
+               tagInput : "",
+               inputHitag : currentHitag
+           });
         }
         
         else
@@ -153,7 +163,7 @@ export default class PopupPage extends React.Component
     {
         var style ={
             display: 'flex',
-            flexWrap:'wrap',
+            flexWrap:'nowrap',
             flexDirection:'row'
         };
 
@@ -168,8 +178,9 @@ export default class PopupPage extends React.Component
             <HotKeys  style = {{outline:'none'}} handlers = {this.hotKeyshandlers} >
 
                 <div style={style}> 
-                    <Hitag encapsulated = {false} hitag ={this.state.inputHitag}/>
+                    <Hitag style={{flex:1}} encapsulated = {false} hitag ={this.state.inputHitag}/>
                     <input
+                        style={{minWidth:10, flex:1}}
                         hintText="Add tags..."
                         onChange={this.onTagInputChanged}
                         onKeyDown = {this.onTagInputKeyDown}
