@@ -116,6 +116,8 @@ export default class PopupPage extends React.Component
         if(currentHitag.length > 0)
             hitags.push(currentHitag);
 
+        this.props.connector.sendMessage("setHitagToContent", currentHitag);
+
         this.setState({
             hitags: hitags,
             inputHitag: []

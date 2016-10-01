@@ -37,35 +37,40 @@ export default class HitagUtils
        return hitag.join(" > ");   
     }
 
-    static createTag(tagName, hitag)
+    
+
+    static getHitagChildren(hitag, rootHitag, forceCreation)
     {
-        var current= getHitagRoot();
+        var current= rootHitag;
 
         for(var i=0; i<hitag.length; i++)
         {
             if(current.children[i].tagName==hitag[i])
             {
                 current = current.children[i];
-
-                if(i==hitag.length-1)
-                {
-                    if(current.children[tagName])
-                    {
-                        console.log("tag exists");
-                    }
-                    else
-                    {
-                        current.children.push(getNewTag(tagName));
-                        console.log("tag added");
-                    } 
-                }
             }
             else
             {
-                console.log("Tag was new, adding");
-                current.children.push(getNewTag(hitag[i]));
+                if(forceCreation)
+                {
+                    console.log("Creating tag: "+ hitag[i]);
+                    current.children.push(getNewTag(hitag[i]));
+                    current = children[hitag[i]];
+                }
+                else
+                {
+                    console.log("Hitag doesn't exists");
+                    return [];
+                }
+            }
+
+            if(i==hitag.length-1)
+            {
+                return current.children;
             }
         }
+        console.log("How did you got here?");
+        return [];
     }
 
     static getNewTag(tagName)
@@ -74,6 +79,12 @@ export default class HitagUtils
             tagName:tagName,
             children:[]
         }
+    }
+
+    static saveHitag(hitag, rootHitag)
+    {
+        var forceCreation = true;
+        HitagUtils.getHitagChildren(hitag, rootHitag, forceCreation);
     }
 
 }

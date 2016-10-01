@@ -25,6 +25,8 @@ var searchPage ="search.html";
 var tabs =[];
 var popupId = "popup";
 
+var rootHitag = [];
+
 start(); 
 
 function initTab(tabId)
@@ -98,8 +100,11 @@ function processMessage(event, value, tab)
     //popup 
     if(event == "saveUrl")
         onSaveUrl(tab); 
+
     if(event== "getSuggestedHitags")
         onGetSuggestedHitags(value);
+    if(event== "setHitagToContent")
+        onSetHitagToContent(value);
 }
 
 function onCopy(str)
@@ -766,7 +771,12 @@ function copy(obj)
 
 function onGetSuggestedHitags(inProgressHitag)
 {
-    console.log("suggesting");
-    HitagUtils.createTag(inProgressHitag, hitag);
-    sendMessage("updateHitagSuggestions", searchText, tabId);
+    var suggestedHitags = HitagUtils.getHitagChildren(inProgressHitag.hitag, rootHitag);
+    sendMessage("updateHitagSuggestions", suggestedHitags, popupId);
+}
+
+function onSetHitagToContent(hitag)
+{
+    console.log(hitag);
+    HitagUtils.saveHitag(hitag, rootHitag);
 }
