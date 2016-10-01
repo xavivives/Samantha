@@ -51,8 +51,7 @@ export default class PopupPage extends React.Component
             that.updatePopupStatus(status);
         });
 
-        this.connector.sendMessage("saveUrl");  
-                
+        this.connector.sendMessage("saveUrl"); 
     }
 
     updatePopupStatus(status)
@@ -88,7 +87,7 @@ export default class PopupPage extends React.Component
                             <p style ={messageStyle}> {this.state.status.message} </p>
                         </div>
 
-                        <HitagsAutocomplete hitags = {this.state.hitags} anchorElement={this.refs["tagInputContainer"]} isOpened={true}/>
+                        <HitagsAutocomplete connector={this.connector} hitags = {this.state.hitags} isOpened={true}/>
                  
                     </div>
                 </MuiThemeProvider>

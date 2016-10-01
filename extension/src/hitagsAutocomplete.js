@@ -4,6 +4,7 @@ import SelectableList from './selectableList.js';
 import Hitag from './hitag.js';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import HitagUtils from './hitagUtils.js';
+import Connector from './connector.js';
 
 export default class PopupPage extends React.Component
 {
@@ -11,7 +12,9 @@ export default class PopupPage extends React.Component
     {
         var props = 
         {
-           isOpened :true
+            connector:null,
+            isOpened :true,
+            hitagSuggestions:[]
         }
 
         return props;
@@ -20,9 +23,11 @@ export default class PopupPage extends React.Component
     constructor(props)
     {
         super(props);
+        this.connector = new Connector();
 
         this.onNewTag = this.onNewTag.bind(this);
         this.onEnter = this.onEnter.bind(this);
+        this.onTagInputChanged = this.onTagInputChanged.bind(this);
         this.onTagInputFocus = this.onTagInputFocus.bind(this);
         this.onTagInputBlur = this.onTagInputBlur.bind(this);
         this.checkIfDisplayAutocomplete = this.checkIfDisplayAutocomplete.bind(this);
@@ -35,9 +40,10 @@ export default class PopupPage extends React.Component
         this.onMoveDown = this.onMoveDown.bind(this);
 
         this.state = {
-            items:[], 
+            hitags:[], 
             selectedIndex:0,
-            inputHitag:[]
+            inputHitag:[],
+            hitagSuggestions:[]
         };
 
         this.hotKeyshandlers = {
@@ -47,6 +53,19 @@ export default class PopupPage extends React.Component
           'moveLeft': this.onMoveUp,
           'moveRight':this.onMoveDown,
         };
+
+        var that = this;
+
+        this.props.connector.registerEvent("updateHitagSuggestions", function(suggestedHitags) {
+            that.updatePopupStatus(status);
+        });  
+    }
+
+    updateHitagSuggestions(hitagSuggestions)
+    {
+        console.log("Got suggestions");
+        console.log(hitagSuggestions);
+        this.setState({hitagSuggestions: hitagSuggestions});
     }
 
     onAction(e)
@@ -62,7 +81,7 @@ export default class PopupPage extends React.Component
     
     onMoveDown(e)
     {
-        if(this.state.selectedIndex< this.state.items.length-1)
+        if(this.state.selectedIndex< this.state.hitags.length-1)
             this.selectItem(this.state.selectedIndex + 1)
     }
 
@@ -77,18 +96,28 @@ export default class PopupPage extends React.Component
         this.checkIfDisplayAutocomplete(event.target.value, true);
     }
 
+    onTagInputChanged(inputTag)
+    {
+        var inProgressHitag={
+            hitag:this.state.inputHitag,
+            inProgressHitag:inputTag
+        }
+
+        this.props.connector.sendMessage("getSuggestedHitags", inProgressHitag); 
+    }
+
     onEnter(newTag)
     {
         var currentHitag = this.state.inputHitag;
         if(newTag!="")
             currentHitag.push(newTag);
 
-        var items = this.state.items;
+        var hitags = this.state.hitags;
         if(currentHitag.length > 0)
-            items.push(currentHitag);
+            hitags.push(currentHitag);
 
         this.setState({
-            items: items,
+            hitags: hitags,
             inputHitag: []
         });
 
@@ -114,7 +143,7 @@ export default class PopupPage extends React.Component
     {
         this.setState({
             selectedIndex:index,
-            inputHitag: this.state.items[index],
+            inputHitag: this.state.hitags[index],
         })
     }
 
@@ -131,22 +160,30 @@ export default class PopupPage extends React.Component
 
     render()
     {
+        console.log(this.props.hitagSuggestions);
+
         var style ={
             display: 'flex',
             flexWrap:'nowrap',
             flexDirection:'row'
         };
 
-        var children = []
+        var children = [];
 
-        this.state.items.map(function(item, index)
+        this.state.hitags.map(function(item, index)
         {
             children.push(<Hitag hitagChildren={item}/>);
         });
 
         return(
             <HotKeys  style = {{outline:'none'}} handlers = {this.hotKeyshandlers} >
-                <Hitag inProgress={true} onNewTag={this.onNewTag.bind(this)} onEnter = {this.onEnter} style={{flex:1}} encapsulated = {false} hitagChildren ={this.state.inputHitag}/>
+                <Hitag inProgress={true}
+                    onNewTag={this.onNewTag.bind(this)}
+                    onEnter = {this.onEnter}
+                    onNewTagChanged = {this.onTagInputChanged}
+                    style={{flex:1}}
+                    encapsulated = {false}
+                    hitagChildren ={this.state.inputHitag}/>
                 <SelectableList asList= {true} children = {children} encapsulated = {false} selectedIndex = {this.state.selectedIndex} onItemSelected = {this.onListItemSelected}/> 
             </HotKeys>             
         ); 

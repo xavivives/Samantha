@@ -1,5 +1,6 @@
 import ElasticLunr from 'elasticlunr';
 import OtherSearchEngines from './otherSearchEngines.js';
+import HitagUtils from './hitagUtils.js';
 
 var otherSearchEngines = new OtherSearchEngines();
 
@@ -85,6 +86,7 @@ function onContentMessage(message, sender, sendResponse)
 
 function processMessage(event, value, tab)
 {
+    console.log(event);
     //content
     if(event == "onCopy")
         onCopy(value);
@@ -96,6 +98,8 @@ function processMessage(event, value, tab)
     //popup 
     if(event == "saveUrl")
         onSaveUrl(tab); 
+    if(event== "getSuggestedHitags")
+        onGetSuggestedHitags(value);
 }
 
 function onCopy(str)
@@ -758,4 +762,11 @@ function exists(obj)
 function copy(obj)
 {
     return JSON.parse(JSON.stringify(obj));
+}
+
+function onGetSuggestedHitags(inProgressHitag)
+{
+    console.log("suggesting");
+    HitagUtils.createTag(inProgressHitag, hitag);
+    sendMessage("updateHitagSuggestions", searchText, tabId);
 }

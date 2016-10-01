@@ -11,7 +11,8 @@ export default class Tag extends React.Component
             encapsulated:true,
             inProgress:false,
             onNewTag:this.onNewTagDefault,
-            onEnter:this.onEnterDefault
+            onEnter:this.onEnterDefault,
+            onNewTagChanged:this.onNewTagChangedDefault,
         }
 
         return props;
@@ -24,14 +25,20 @@ export default class Tag extends React.Component
         var that = this;
 
         this.state = {
-            tagInProgress:"sfasdfasdf",
+            tagInProgress:"...new tag",
         };
 
         this.onTagInputChanged = this.onTagInputChanged.bind(this);
         this.onTagInputKeyDown = this.onTagInputKeyDown.bind(this);
         this.onNewTagDefault = this.onNewTagDefault.bind(this);
         this.onEnterDefault = this.onEnterDefault.bind(this);
+        this.onNewTagChangedDefault = this.onNewTagChangedDefault.bind(this);
     }
+
+    onNewTagChangedDefault(tagInput)
+    {
+        console.log("Override onTagInputChanged");
+    }  
 
     onTagInputChanged(event)
     {
@@ -44,7 +51,6 @@ export default class Tag extends React.Component
 
         if((currentInput.length >= 2) && (currentInput[currentInput.length-1] == " ") && (currentInput[currentInput.length-2] == " "))
         {
-           console.log("there");
            currentInput=currentInput.trim();
 
            this.props.onNewTag(currentInput);
@@ -56,7 +62,8 @@ export default class Tag extends React.Component
         
         else
         {
-             this.setState({
+            this.props.onNewTagChanged(currentInput);
+            this.setState({
                 tagInProgress: currentInput
             });
         }
