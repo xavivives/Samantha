@@ -21,13 +21,12 @@ export default class PopupPage extends React.Component
     {
         super(props);
 
-        this.onTagInputChanged = this.onTagInputChanged.bind(this);
-        this.onTagInputKeyDown = this.onTagInputKeyDown.bind(this);
+        this.onNewTag = this.onNewTag.bind(this);
+        this.onEnter = this.onEnter.bind(this);
         this.onTagInputFocus = this.onTagInputFocus.bind(this);
         this.onTagInputBlur = this.onTagInputBlur.bind(this);
         this.checkIfDisplayAutocomplete = this.checkIfDisplayAutocomplete.bind(this);
-        
-        this.onTagInputChanged = this.onTagInputChanged.bind(this);
+
         this.onListItemSelected = this.onListItemSelected.bind(this);
         this.selectItem = this.selectItem.bind(this);
 
@@ -36,7 +35,6 @@ export default class PopupPage extends React.Component
         this.onMoveDown = this.onMoveDown.bind(this);
 
         this.state = {
-            tagInput:"",
             items:[], 
             selectedIndex:0,
             inputHitag:[]
@@ -68,60 +66,33 @@ export default class PopupPage extends React.Component
             this.selectItem(this.state.selectedIndex + 1)
     }
 
-    onTagInputChanged(event)
+    onNewTag(newTag)
     {
-        var currentInput = event.target.value;
         var currentHitag = this.state.inputHitag;
-
-        console.log(currentInput.length);
-        console.log(currentInput);
-
-        if((currentInput.length>0) && (currentInput[0]==" "))
-        {
-            console.log("in");
-            return;
-        }
-
-        if((currentInput.length >= 2) && (currentInput[currentInput.length-1] == " ") && (currentInput[currentInput.length-2] == " "))
-        {
-           console.log("there");
-           currentInput=currentInput.trim();
-           currentHitag.push(currentInput);
-           this.setState({
-               tagInput : "",
-               inputHitag : currentHitag
-           });
-        }
-        
-        else
-        {
-             this.setState({
-                tagInput : currentInput
-            });
-        }
+        currentHitag.push(newTag);
+        this.setState({
+            inputHitag : currentHitag
+        });
 
         this.checkIfDisplayAutocomplete(event.target.value, true);
     }
 
-    onTagInputKeyDown(event)
+    onEnter(newTag)
     {
-        if(event.keyCode == 13)
-        {
-            var currentInput=this.state.tagInput;
-            var currentHitag = this.state.inputHitag;
-            currentHitag.push(currentInput.trim());
+        var currentHitag = this.state.inputHitag;
+        if(newTag!="")
+            currentHitag.push(newTag);
 
-            var items = this.state.items;
-            items.push(this.state.inputHitag);
+        var items = this.state.items;
+        if(currentHitag.length > 0)
+            items.push(currentHitag);
 
-            this.setState({
-                items: items,
-                tagInput: "",
-                inputHitag: []
-            });
+        this.setState({
+            items: items,
+            inputHitag: []
+        });
 
-            this.checkIfDisplayAutocomplete("", true);
-        }
+        this.checkIfDisplayAutocomplete("", true);
     }
 
     onTagInputFocus(event)
@@ -144,7 +115,6 @@ export default class PopupPage extends React.Component
         this.setState({
             selectedIndex:index,
             inputHitag: this.state.items[index],
-            tagInput: ""
         })
     }
 
@@ -171,25 +141,12 @@ export default class PopupPage extends React.Component
 
         this.state.items.map(function(item, index)
         {
-            children.push(<Hitag hitag={item}/>);
+            children.push(<Hitag hitagChildren={item}/>);
         });
 
         return(
             <HotKeys  style = {{outline:'none'}} handlers = {this.hotKeyshandlers} >
-
-                <div style={style}> 
-                    <Hitag style={{flex:1}} encapsulated = {false} hitag ={this.state.inputHitag}/>
-                    <input
-                        style={{minWidth:10, flex:1}}
-                        hintText="Add tags..."
-                        onChange={this.onTagInputChanged}
-                        onKeyDown = {this.onTagInputKeyDown}
-                        fullWidth={true}
-                        value = {this.state.tagInput}
-                        onFocus = {this.onTagInputFocus}
-                        onBlur = {this.onTagInputBlur}/>
-                </div>
-
+                <Hitag inProgress={true} onNewTag={this.onNewTag.bind(this)} onEnter = {this.onEnter} style={{flex:1}} encapsulated = {false} hitagChildren ={this.state.inputHitag}/>
                 <SelectableList asList= {true} children = {children} encapsulated = {false} selectedIndex = {this.state.selectedIndex} onItemSelected = {this.onListItemSelected}/> 
             </HotKeys>             
         ); 
