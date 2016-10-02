@@ -36,26 +36,24 @@ export default class HitagUtils
     {
        return hitag.join(" > ");   
     }
-
     
-
     static getHitagChildren(hitag, rootHitag, forceCreation)
     {
-        var current= rootHitag;
+        var currentNode= rootHitag;
 
         for(var i=0; i<hitag.length; i++)
         {
-            if(current.children[i].tagName==hitag[i])
+            if(currentNode.children[i] && currentNode.children[i].tagName==hitag[i])
             {
-                current = current.children[i];
+                currentNode = currentNode.children[i];
             }
             else
             {
                 if(forceCreation)
                 {
                     console.log("Creating tag: "+ hitag[i]);
-                    current.children.push(getNewTag(hitag[i]));
-                    current = children[hitag[i]];
+                    currentNode.children.push(HitagUtils.getNewTagNode(hitag[i]));
+                    currentNode = currentNode.children[currentNode.children.length-1];
                 }
                 else
                 {
@@ -66,14 +64,14 @@ export default class HitagUtils
 
             if(i==hitag.length-1)
             {
-                return current.children;
+                return currentNode.children;
             }
         }
         console.log("How did you got here?");
         return [];
     }
 
-    static getNewTag(tagName)
+    static getNewTagNode(tagName)
     {
         return {
             tagName:tagName,
@@ -85,7 +83,33 @@ export default class HitagUtils
     {
         var forceCreation = true;
         HitagUtils.getHitagChildren(hitag, rootHitag, forceCreation);
+        HitagUtils.logHitag(rootHitag);
     }
 
+    static logHitag(hitagNode, level)
+    {
+        if(!level)
+            level = 0;
+
+        var currentNode = hitagNode;
+
+        console.log(HitagUtils.getCharacters(level, "  ") + hitagNode.tagName);
+
+        level++;
+
+        for(var i=0; i<hitagNode.children.length; i++)
+        {
+            HitagUtils.logHitag(hitagNode.children[i], level)
+        }
+    }
+
+    static getCharacters(number, character)
+    {
+        var str= "";
+        for(var i=0; i<number; i++)
+            str = str + character;
+
+        return str;
+    }
 }
         

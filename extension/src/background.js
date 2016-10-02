@@ -25,8 +25,7 @@ var searchPage ="search.html";
 var tabs =[];
 var popupId = "popup";
 
-var rootHitag = [];
-
+var rootHitag = {children:[]};
 start(); 
 
 function initTab(tabId)
@@ -779,4 +778,9 @@ function onSetHitagToContent(hitag)
 {
     console.log(hitag);
     HitagUtils.saveHitag(hitag, rootHitag);
+}
+
+function logRootHitagNode()
+{
+    HitagUtils.log(rootHitag);
 }
