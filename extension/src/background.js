@@ -25,7 +25,7 @@ var searchPage ="search.html";
 var tabs =[];
 var popupId = "popup";
 
-var rootHitag = {children:[]};
+var rootHitag =HitagUtils.getNewTagNode("root");
 start(); 
 
 function initTab(tabId)
@@ -70,12 +70,12 @@ function sendMessage(event, value, tabId)
 
     if(tabs[tabId].port == null)
     {
-        console.log("Queueing " + tabId);
+        console.log("Queueing " + tabId + ": "+ message.event);
         tabs[tabId].queuedMessages.push(message);
     }
     else
     {
-        console.log("Posting "+ tabId);
+        console.log("Posting to "+ tabId + ": "+ message.event);
         tabs[tabId].port.postMessage(message);
     }
 }
@@ -87,7 +87,6 @@ function onContentMessage(message, sender, sendResponse)
 
 function processMessage(event, value, tab)
 {
-    console.log(event);
     //content
     if(event == "onCopy")
         onCopy(value);
@@ -770,7 +769,15 @@ function copy(obj)
 
 function onGetSuggestedHitags(inProgressHitag)
 {
-    var suggestedHitags = HitagUtils.getHitagChildren(inProgressHitag.hitag, rootHitag);
+    var hitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, rootHitag);
+    var suggestedHitags=[];
+    if(hitagNode)
+    {
+        hitagNode.children.map(function(child, index)
+        {
+            suggestedHitags.push(child.tagName);
+        });
+    }
     sendMessage("updateHitagSuggestions", suggestedHitags, popupId);
 }
 

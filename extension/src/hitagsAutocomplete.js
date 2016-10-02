@@ -23,7 +23,6 @@ export default class PopupPage extends React.Component
     constructor(props)
     {
         super(props);
-        this.connector = new Connector();
 
         this.onNewTag = this.onNewTag.bind(this);
         this.onEnter = this.onEnter.bind(this);
@@ -57,7 +56,7 @@ export default class PopupPage extends React.Component
         var that = this;
 
         this.props.connector.registerEvent("updateHitagSuggestions", function(suggestedHitags) {
-            that.updatePopupStatus(status);
+            that.updateHitagSuggestions(suggestedHitags);
         });  
     }
 
@@ -162,8 +161,6 @@ export default class PopupPage extends React.Component
 
     render()
     {
-        console.log(this.props.hitagSuggestions);
-
         var style ={
             display: 'flex',
             flexWrap:'nowrap',
@@ -191,4 +188,3 @@ export default class PopupPage extends React.Component
         ); 
     }
 }
-//

@@ -52,8 +52,7 @@ export default class HitagUtils
                     tagNameExists = true;
                     break;
                 }
-            }
-            
+            }            
 
             if(!tagNameExists && forceCreation)
             {
