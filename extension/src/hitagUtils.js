@@ -37,38 +37,42 @@ export default class HitagUtils
        return hitag.join(" > ");   
     }
     
-    static getHitagChildren(hitag, rootHitag, forceCreation)
+    static getHitagNode(hitag, rootHitag, forceCreation)
     {
         var currentNode= rootHitag;
 
         for(var i=0; i<hitag.length; i++)
         {
-            if(currentNode.children[i] && currentNode.children[i].tagName==hitag[i])
+            var tagNameExists = false;
+            for(var k=0; k<currentNode.children.length; k++)
             {
-                currentNode = currentNode.children[i];
-            }
-            else
-            {
-                if(forceCreation)
+                if(currentNode.children[k].tagName==hitag[i])
                 {
-                    console.log("Creating tag: "+ hitag[i]);
-                    currentNode.children.push(HitagUtils.getNewTagNode(hitag[i]));
-                    currentNode = currentNode.children[currentNode.children.length-1];
-                }
-                else
-                {
-                    console.log("Hitag doesn't exists");
-                    return [];
+                    currentNode = currentNode.children[k];
+                    tagNameExists = true;
+                    break;
                 }
             }
+            
 
-            if(i==hitag.length-1)
+            if(!tagNameExists && forceCreation)
             {
-                return currentNode.children;
+                console.log("Creating tag: "+ hitag[i]);
+                currentNode.children.push(HitagUtils.getNewTagNode(hitag[i]));
+                currentNode = currentNode.children[currentNode.children.length-1];
+                tagNameExists = true;
             }
+            
+
+            if(tagNameExists && i==hitag.length-1)
+            {
+                return currentNode;
+            }
+            
         }
+
         console.log("How did you got here?");
-        return [];
+        return null;
     }
 
     static getNewTagNode(tagName)
@@ -82,7 +86,7 @@ export default class HitagUtils
     static saveHitag(hitag, rootHitag)
     {
         var forceCreation = true;
-        HitagUtils.getHitagChildren(hitag, rootHitag, forceCreation);
+        HitagUtils.getHitagNode(hitag, rootHitag, forceCreation);
         HitagUtils.logHitag(rootHitag);
     }
 
