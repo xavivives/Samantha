@@ -25,7 +25,7 @@ var searchPage ="search.html";
 var tabs =[];
 var popupId = "popup";
 
-var rootHitag =HitagUtils.getNewTagNode("root");
+var hitagsIndex =HitagUtils.getNewTagNode("root");
 start(); 
 
 function initTab(tabId)
@@ -97,12 +97,12 @@ function processMessage(event, value, tab)
         onSearchRequested(value, tab.id); 
     //popup 
     if(event == "saveUrl")
-        onSaveUrl(tab); 
+        onSaveUrl(tab);
 
     if(event== "getSuggestedHitags")
         onGetSuggestedHitags(value);
     if(event== "setHitagToContent")
-        onSetHitagToContent(value);
+        onAddHitag(value);
 }
 
 function onCopy(str)
@@ -488,6 +488,39 @@ function onSaveUrl()
     })
 }
 
+function onAddHitag(hitag)
+{
+    getCurrentTab(function(tab)
+    {
+        var existingAtom = getAtomByUrl(tab.url);
+
+        if(existingAtom)
+        {
+            addHitagToAtom(existingAtom, hitag);
+            HitagUtils.saveHitagNode(hitag, hitagsIndex);
+            return;
+        }
+        else
+        {
+            console.log("Trying to save hitag to unexisting content");
+        }
+    })
+}
+
+function addHitagToAtom(atom, hitag)
+{
+    console.log("addHitagToAtom");
+    if(!atom.relations)
+        atom.relations = {};
+
+    if(!atom.relations.hitags)
+        atom.relations.hitags = HitagUtils.getNewTagNode("root");
+
+    console.log(atom);
+
+    HitagUtils.saveHitagNode(hitag, atom.relations.hitags);
+}
+
 function saveAtom(atom)
 {
     var entry = createEntryFromAtom(atom);
@@ -769,7 +802,7 @@ function copy(obj)
 
 function onGetSuggestedHitags(inProgressHitag)
 {
-    var hitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, rootHitag);
+    var hitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, hitagsIndex);
     var suggestedHitags=[];
     if(hitagNode)
     {
@@ -781,13 +814,8 @@ function onGetSuggestedHitags(inProgressHitag)
     sendMessage("updateHitagSuggestions", suggestedHitags, popupId);
 }
 
-function onSetHitagToContent(hitag)
-{
-    console.log(hitag);
-    HitagUtils.saveHitag(hitag, rootHitag);
-}
 
 function logRootHitagNode()
 {
-    HitagUtils.log(rootHitag);
+    HitagUtils.log(hitagsIndex);
 }

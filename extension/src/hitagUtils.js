@@ -39,6 +39,8 @@ export default class HitagUtils
     
     static getHitagNode(hitag, rootHitag, forceCreation)
     {
+        console.log(hitag);
+        console.log(rootHitag);
         var currentNode= rootHitag;
 
         for(var i=0; i<hitag.length; i++)
@@ -82,7 +84,7 @@ export default class HitagUtils
         }
     }
 
-    static saveHitag(hitag, rootHitag)
+    static saveHitagNode(hitag, rootHitag)
     {
         var forceCreation = true;
         HitagUtils.getHitagNode(hitag, rootHitag, forceCreation);
