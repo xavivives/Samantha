@@ -7,7 +7,7 @@ export default class Tag extends React.Component
     {
         var props = 
         {
-            hitagChildren: ['empty'],
+            hitag: ['empty'],
             encapsulated:true,
             inProgress:false,
             onNewTag:this.onNewTagDefault,
@@ -115,8 +115,8 @@ export default class Tag extends React.Component
         var hitagChain = [];
 
         var separator = <FontAwesome name='angle-right' style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
-
-        this.props.hitagChildren.map(function(tag, index, originalArray)
+        
+        this.props.hitag.map(function(tag, index, originalArray)
         { 
             hitagChain.push(<div style={{display: 'inline-block'}}> {tag}</div>);
 
@@ -146,7 +146,7 @@ export default class Tag extends React.Component
                 onFocus = {this.onTagInputFocus}
                 onBlur = {this.onTagInputBlur}/>
 
-            if(this.props.hitagChildren.length>0)
+            if(this.props.hitag.length>0)
                 lastSeparator = <FontAwesome name='angle-right'style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
         }
         

@@ -473,6 +473,7 @@ function onSaveUrl()
         {
             addRetrive(existingAtom, retrieve);
             sendAlreadySaved(popupId);
+            updatePopupAtom(existingAtom);
             return;
         }
 
@@ -484,8 +485,15 @@ function onSaveUrl()
 
         saveAtom(atom);
 
+        updatePopupAtom(atom);
+
         sendSaveOk(popupId);
     })
+}
+
+function updatePopupAtom(atom)
+{
+    sendMessage("updatePopupAtom", atom, popupId);
 }
 
 function onAddHitag(hitag)
@@ -498,6 +506,7 @@ function onAddHitag(hitag)
         {
             addHitagToAtom(existingAtom, hitag);
             HitagUtils.saveHitagNode(hitag, hitagsIndex);
+            updatePopupAtom(existingAtom);
             return;
         }
         else

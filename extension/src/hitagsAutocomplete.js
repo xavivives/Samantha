@@ -62,8 +62,6 @@ export default class PopupPage extends React.Component
 
     updateHitagSuggestions(hitagSuggestions)
     {
-        console.log("Got suggestions");
-        console.log(hitagSuggestions);
         this.setState({hitagSuggestions: hitagSuggestions});
     }
 
@@ -171,7 +169,7 @@ export default class PopupPage extends React.Component
 
         this.state.hitags.map(function(item, index)
         {
-            children.push(<Hitag hitagChildren={item}/>);
+            children.push(<Hitag hitag={item}/>);
         });
 
         return(
@@ -182,7 +180,7 @@ export default class PopupPage extends React.Component
                     onNewTagChanged = {this.onTagInputChanged}
                     style={{flex:1}}
                     encapsulated = {false}
-                    hitagChildren ={this.state.inputHitag}/>
+                    hitag ={this.state.inputHitag}/>
                 <SelectableList asList= {true} children = {children} encapsulated = {false} selectedIndex = {this.state.selectedIndex} onItemSelected = {this.onListItemSelected}/> 
             </HotKeys>             
         ); 

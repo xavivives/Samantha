@@ -11,6 +11,7 @@ import HitagsAutocomplete from './hitagsAutocomplete.js';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {cyan500} from 'material-ui/styles/colors';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
+import HitagUtils from './hitagUtils.js';
 
 export default class PopupPage extends React.Component
 {
@@ -26,8 +27,10 @@ export default class PopupPage extends React.Component
             status:
             {
                 statusType:"normal",
-                message:"Saving..."
+                message:"Saving...",
             },
+            atom:{},
+            atomHitags:[]
         };
 
         this.muiTheme = getMuiTheme({
@@ -51,6 +54,10 @@ export default class PopupPage extends React.Component
             that.updatePopupStatus(status);
         });
 
+        this.connector.registerEvent("updatePopupAtom", function(atom) {
+            that.updatePopupAtom(atom);
+        });
+
         this.connector.sendMessage("saveUrl"); 
     }
 
@@ -58,6 +65,17 @@ export default class PopupPage extends React.Component
     {
         this.setState({status: status});
         setTimeout(this.closePopup,200000);
+    }
+
+    updatePopupAtom(atom)
+    {
+        var atomHitags=[];
+        if(atom.relations && atom.relations.hitags)
+            HitagUtils.hitagNodeToHitagList(atom.relations.hitags, atomHitags);
+
+        console.log(atomHitags);
+        
+        this.setState({atom: atom, atomHitags:atomHitags});     
     }
 
     closePopup()
@@ -87,8 +105,8 @@ export default class PopupPage extends React.Component
                             <p style ={messageStyle}> {this.state.status.message} </p>
                         </div>
 
-                        <HitagsAutocomplete connector={this.connector} hitags = {this.state.hitags} isOpened={true}/>
-                 
+                        <HitagsAutocomplete connector={this.connector} isOpened={true}/>
+                        <HitagsDisplay hitags= {this.state.atomHitags} encapsulated={true}/>
                     </div>
                 </MuiThemeProvider>
             </HotKeys>
