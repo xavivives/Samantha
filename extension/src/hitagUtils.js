@@ -39,8 +39,6 @@ export default class HitagUtils
     
     static getHitagNode(hitag, rootHitag, forceCreation)
     {
-        console.log(hitag);
-        console.log(rootHitag);
         var currentNode= rootHitag;
 
         for(var i=0; i<hitag.length; i++)
@@ -88,7 +86,6 @@ export default class HitagUtils
     {
         var forceCreation = true;
         HitagUtils.getHitagNode(hitag, rootHitag, forceCreation);
-        HitagUtils.logHitag(rootHitag);
     }
 
     static logHitag(hitagNode, level)
@@ -116,5 +113,35 @@ export default class HitagUtils
 
         return str;
     }
+
+    //Todo: Make it not suck
+    static hitagNodeToHitagList(hitagNode, list, level, currentHitag)
+    {   
+        if(!level)
+            level = 0;
+
+        if(level == 0)
+            currentHitag = [];
+
+        currentHitag = currentHitag.slice(0,level);
+        currentHitag[level]= hitagNode.tagName;
+
+        if(hitagNode.children.length == 0)
+        {
+            var hitagClone=currentHitag.slice(0);
+            hitagClone.shift(); // This is to remove 'root' tag. Needs redesign.
+            list.push(hitagClone);
+        }
+        else
+        {
+            for(var i=0; i<hitagNode.children.length; i++)
+            {
+                level = level+1;
+                HitagUtils.hitagNodeToHitagList(hitagNode.children[i], list, level, currentHitag);
+            }
+        }
+        
+        return list;    
+    }            
 }
         
