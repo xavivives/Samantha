@@ -811,15 +811,25 @@ function copy(obj)
 
 function onGetSuggestedHitags(inProgressHitag)
 {
-    var hitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, hitagsIndex);
+    var currentHitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, hitagsIndex);
+
+    if(!currentHitagNode)
+        return null;
+
+    console.log(currentHitagNode);
+    var matchingTags = HitagUtils.getMatchingChildren(currentHitagNode, inProgressHitag.inProgressHitag);
+
+    console.log(matchingTags);
     var suggestedHitags=[];
-    if(hitagNode)
+    
+    matchingTags.map(function(tagName, index)
     {
-        hitagNode.children.map(function(child, index)
-        {
-            suggestedHitags.push(child.tagName);
-        });
-    }
+        var suggestion = inProgressHitag.hitag.slice(0);
+        suggestion.push(tagName);
+        suggestedHitags.push(suggestion);
+    });
+    
+
     sendMessage("updateHitagSuggestions", suggestedHitags, popupId);
 }
 

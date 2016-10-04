@@ -39,7 +39,7 @@ export default class HitagUtils
     
     static getHitagNode(hitag, rootHitag, forceCreation)
     {
-        var currentNode= rootHitag;
+        var currentNode = rootHitag;
 
         for(var i=0; i<hitag.length; i++)
         {
@@ -70,8 +70,7 @@ export default class HitagUtils
             
         }
 
-        console.log("How did you got here?");
-        return null;
+        return currentNode;
     }
 
     static getNewTagNode(tagName)
@@ -142,6 +141,18 @@ export default class HitagUtils
         }
         
         return list;    
-    }            
+    }
+
+    static getMatchingChildren(hitagNode, str)
+    {
+        var matchingAtStart = [];
+        for(var i=0; i<hitagNode.children.length; i++)
+        {
+            console.log()
+            if(hitagNode.children[i].tagName.indexOf(str)==0)
+                matchingAtStart.push(hitagNode.children[i].tagName);
+        }
+        return matchingAtStart;
+    }    
 }
         
