@@ -94,21 +94,22 @@ export default class PopupPage extends React.Component
         var currentHitag = this.state.inputHitag;
         currentHitag.push(newTag);
         this.setState({
-            inputHitag : currentHitag
+            inputHitag : currentHitag,
+            inputTag:""
         });
 
+        var inProgressHitag = HitagUtils.getInProgressHitagObject(currentHitag, "");
+
+        this.props.connector.sendMessage("getSuggestedHitags", inProgressHitag);
         this.checkIfDisplayAutocomplete(event.target.value, true);
     }
 
     onTagInputChanged(inputTag)
     {
-        var inProgressHitag=
-        {
-            hitag:this.state.inputHitag,
-            inProgressHitag:inputTag
-        }
+        var inProgressHitag = HitagUtils.getInProgressHitagObject(this.state.inputHitag, inputTag);
 
-        this.props.connector.sendMessage("getSuggestedHitags", inProgressHitag); 
+        this.props.connector.sendMessage("getSuggestedHitags", inProgressHitag);
+        this.setState({inputTag : inputTag});
     }
 
     onEnter(newTag)
@@ -117,17 +118,15 @@ export default class PopupPage extends React.Component
         if(newTag!="")
             currentHitag.push(newTag);
 
-        /*var suggestedHitags = this.state.suggestedHitags;
-        if(currentHitag.length > 0)
-            suggestedHitags.push(currentHitag);
-        */
-
         this.props.connector.sendMessage("setHitagToContent", currentHitag);
 
         this.setState({
-            inputHitag: []
+            inputHitag: [],
+            inputTag:""
         });
 
+        var inProgressHitag = HitagUtils.getInProgressHitagObject([], "");
+        this.props.connector.sendMessage("getSuggestedHitags", inProgressHitag);
         this.checkIfDisplayAutocomplete("", true);
     }
 
@@ -148,9 +147,11 @@ export default class PopupPage extends React.Component
 
     selectItem(index)
     {
+        console.log("selectItem");
         this.setState({
             selectedIndex:index,
             inputHitag: this.state.suggestedHitags[index],
+            inputTag:""
         })
     }
 
@@ -201,10 +202,11 @@ export default class PopupPage extends React.Component
                     inProgress={true}
                     onNewTag={this.onNewTag.bind(this)}
                     onEnter = {this.onEnter}
-                    onNewTagChanged = {this.onTagInputChanged}
+                    onTagInputChanged = {this.onTagInputChanged}
                     style={{flex:1}}
                     encapsulated = {false}
-                    hitag ={this.state.inputHitag}/>
+                    hitag ={this.state.inputHitag}
+                    inputTag={this.state.inputTag}/>
 
                 <Paper style={style} zDepth={1} style={autocompleteStyle}>
                     <SelectableList ref="autocomplete"

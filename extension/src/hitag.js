@@ -8,11 +8,12 @@ export default class Tag extends React.Component
         var props = 
         {
             hitag: ['empty'],
+            inputTag:"",
             encapsulated:true,
             inProgress:false,
             onNewTag:this.onNewTagDefault,
             onEnter:this.onEnterDefault,
-            onNewTagChanged:this.onNewTagChangedDefault,
+            onTagInputChanged:this.onTagInputChangedDefault,
         }
 
         return props;
@@ -24,23 +25,19 @@ export default class Tag extends React.Component
 
         var that = this;
 
-        this.state = {
-            tagInProgress:"...new tag",
-        };
-
-        this.onTagInputChanged = this.onTagInputChanged.bind(this);
+        this.onTagInputChangedLocal = this.onTagInputChangedLocal.bind(this);
         this.onTagInputKeyDown = this.onTagInputKeyDown.bind(this);
+        this.onTagInputChangedDefault = this.onTagInputChangedDefault.bind(this);
         this.onNewTagDefault = this.onNewTagDefault.bind(this);
         this.onEnterDefault = this.onEnterDefault.bind(this);
-        this.onNewTagChangedDefault = this.onNewTagChangedDefault.bind(this);
     }
 
-    onNewTagChangedDefault(tagInput)
+    onTagInputChangedDefault(inputTag)
     {
         console.log("Override onTagInputChanged");
     }  
 
-    onTagInputChanged(event)
+    onTagInputChangedLocal(event)
     {
         var currentInput = event.target.value;
 
@@ -51,33 +48,18 @@ export default class Tag extends React.Component
 
         if((currentInput.length >= 2) && (currentInput[currentInput.length-1] == " ") && (currentInput[currentInput.length-2] == " "))
         {
-           currentInput=currentInput.trim();
+           this.props.onNewTag(currentInput.trim());
+           return;
+        }        
 
-           this.props.onNewTag(currentInput);
-
-           this.setState({
-               tagInProgress: "",
-           });
-        }
-        
-        else
-        {
-            this.props.onNewTagChanged(currentInput);
-            this.setState({
-                tagInProgress: currentInput
-            });
-        }
+        this.props.onTagInputChanged(currentInput);
     }
 
     onTagInputKeyDown(event)
     {
         if(event.keyCode == 13)
         {
-            this.props.onEnter(this.state.tagInProgress);
-
-             this.setState({
-               tagInProgress: "",
-           });
+            this.props.onEnter(this.props.inputTag);
         }
     }
 
@@ -140,16 +122,16 @@ export default class Tag extends React.Component
                     fontSize: "100%",
                     padding:0}}
 
-                onChange={this.onTagInputChanged}
+                onChange={this.onTagInputChangedLocal}
                 onKeyDown = {this.onTagInputKeyDown}
-                value = {this.state.tagInProgress}
+                value = {this.props.inputTag}
                 onFocus = {this.onTagInputFocus}
                 onBlur = {this.onTagInputBlur}/>
 
             if(this.props.hitag.length>0)
                 lastSeparator = <FontAwesome name='angle-right'style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
         }
-        
+
         return(
             <div style={style}>           
                 {hitagChain}

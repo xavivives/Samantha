@@ -153,6 +153,14 @@ export default class HitagUtils
                 matchingAtStart.push(hitagNode.children[i].tagName);
         }
         return matchingAtStart;
-    }    
+    } 
+
+    static getInProgressHitagObject(hitag, inputTag)
+    {
+        return {
+            hitag:hitag,
+            inputTag:inputTag
+        }
+    } 
 }
         

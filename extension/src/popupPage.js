@@ -111,5 +111,3 @@ export default class PopupPage extends React.Component
         );
     }
 }
-
-//<HitagsDisplay hitags = {this.state.hitags} encapsulated = {true} stack={false} />

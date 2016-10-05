@@ -816,10 +816,7 @@ function onGetSuggestedHitags(inProgressHitag)
     if(!currentHitagNode)
         return null;
 
-    console.log(currentHitagNode);
-    var matchingTags = HitagUtils.getMatchingChildren(currentHitagNode, inProgressHitag.inProgressHitag);
-
-    console.log(matchingTags);
+    var matchingTags = HitagUtils.getMatchingChildren(currentHitagNode, inProgressHitag.inputTag);
     var suggestedHitags=[];
     
     matchingTags.map(function(tagName, index)
@@ -832,7 +829,6 @@ function onGetSuggestedHitags(inProgressHitag)
 
     sendMessage("updateHitagSuggestions", suggestedHitags, popupId);
 }
-
 
 function logRootHitagNode()
 {
