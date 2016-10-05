@@ -1,10 +1,13 @@
 import React from 'react';
+import ReactDom from 'react-dom';
+import DomUtils from './domUtils.js';
 import TextField from 'material-ui/TextField';
 import SelectableList from './selectableList.js';
 import Hitag from './hitag.js';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import HitagUtils from './hitagUtils.js';
 import Connector from './connector.js';
+import Paper from 'material-ui/Paper';
 
 export default class PopupPage extends React.Component
 {
@@ -41,6 +44,7 @@ export default class PopupPage extends React.Component
             suggestedHitags:[], 
             selectedIndex:0,
             inputHitag:[],
+            suggestionBoxPosition:{top:0,left:0}
         };
 
         this.hotKeyshandlers = {
@@ -60,8 +64,12 @@ export default class PopupPage extends React.Component
 
     updateHitagSuggestions(suggestedHitags)
     {
-        console.log(suggestedHitags);
-        this.setState({suggestedHitags: suggestedHitags});
+        var rect = DomUtils.getElementRect(this.refs["inputHitag"],"tagInProgress");
+        this.setState(
+            {
+                suggestedHitags: suggestedHitags,
+                suggestionBoxPosition:{ top: rect.top + rect.height, left:rect.left}
+            });
     }
 
     onAction(e)
@@ -159,17 +167,31 @@ export default class PopupPage extends React.Component
 
     render()
     {
-        var style ={
+        var style =
+        {
             display: 'flex',
             flexWrap:'nowrap',
             flexDirection:'row'
         };
 
+        var autocompleteStyle = 
+        {
+            zIndex: 1,
+            position: 'fixed',
+            top: this.state.suggestionBoxPosition.top,
+            left:  this.state.suggestionBoxPosition.left,
+            maxHeight:150,
+            overflowY:"scroll"
+        }
+
         var suggestedHitagsElements = [];
 
         this.state.suggestedHitags.map(function(item, index)
         {
-            suggestedHitagsElements.push(<Hitag hitag={item}/>);
+            suggestedHitagsElements.push(
+                <Hitag ref={index}
+                    encapsulated = {false}
+                    hitag={item}/>);
         });
 
         return(
@@ -184,12 +206,14 @@ export default class PopupPage extends React.Component
                     encapsulated = {false}
                     hitag ={this.state.inputHitag}/>
 
-                <SelectableList ref="autocomplete"
-                    asList= {true} 
-                    children = {suggestedHitagsElements}
-                    encapsulated = {false}
-                    selectedIndex = {this.state.selectedIndex}
-                    onItemSelected = {this.onListItemSelected}/> 
+                <Paper style={style} zDepth={1} style={autocompleteStyle}>
+                    <SelectableList ref="autocomplete"
+                        asList= {true} 
+                        children = {suggestedHitagsElements}
+                        encapsulated = {false}
+                        selectedIndex = {this.state.selectedIndex}
+                        onItemSelected = {this.onListItemSelected}/> 
+                </Paper>
             </HotKeys>             
         ); 
     }

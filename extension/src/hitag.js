@@ -115,7 +115,7 @@ export default class Tag extends React.Component
         var hitagChain = [];
 
         var separator = <FontAwesome name='angle-right' style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
-        
+
         this.props.hitag.map(function(tag, index, originalArray)
         { 
             hitagChain.push(<div style={{display: 'inline-block'}}> {tag}</div>);
@@ -129,7 +129,7 @@ export default class Tag extends React.Component
         var lastSeparator = null;
         if(this.props.inProgress)
         {
-            tagInProgress=<input
+            tagInProgress=<input ref= "tagInProgress"
                 style={{minWidth:50,
                     width:0,
                     flex: 1,
