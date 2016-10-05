@@ -42,7 +42,7 @@ export default class PopupPage extends React.Component
 
         this.state = {
             suggestedHitags:[], 
-            selectedIndex:0,
+            selectedIndex:-1,
             inputHitag:[],
             suggestionBoxPosition:{top:0,left:0}
         };
@@ -95,7 +95,8 @@ export default class PopupPage extends React.Component
         currentHitag.push(newTag);
         this.setState({
             inputHitag : currentHitag,
-            inputTag:""
+            inputTag:"",
+            selectedIndex:-1
         });
 
         var inProgressHitag = HitagUtils.getInProgressHitagObject(currentHitag, "");
@@ -122,7 +123,8 @@ export default class PopupPage extends React.Component
 
         this.setState({
             inputHitag: [],
-            inputTag:""
+            inputTag:"",
+            selectedIndex:-1
         });
 
         var inProgressHitag = HitagUtils.getInProgressHitagObject([], "");
@@ -150,8 +152,7 @@ export default class PopupPage extends React.Component
         console.log("selectItem");
         this.setState({
             selectedIndex:index,
-            inputHitag: this.state.suggestedHitags[index],
-            inputTag:""
+            inputTag: HitagUtils.getLastTag(this.state.suggestedHitags[index])
         })
     }
 
@@ -192,7 +193,7 @@ export default class PopupPage extends React.Component
             suggestedHitagsElements.push(
                 <Hitag ref={index}
                     encapsulated = {false}
-                    hitag={item}/>);
+                    hitag={[HitagUtils.getLastTag(item)]}/>);
         });
 
         return(
@@ -208,7 +209,7 @@ export default class PopupPage extends React.Component
                     hitag ={this.state.inputHitag}
                     inputTag={this.state.inputTag}/>
 
-                <Paper style={style} zDepth={1} style={autocompleteStyle}>
+                <Paper style={style} zDepth={3} style={autocompleteStyle}>
                     <SelectableList ref="autocomplete"
                         asList= {true} 
                         children = {suggestedHitagsElements}

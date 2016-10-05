@@ -161,6 +161,11 @@ export default class HitagUtils
             hitag:hitag,
             inputTag:inputTag
         }
-    } 
+    }
+
+    static getLastTag(hitag)
+    {
+        return hitag[hitag.length-1]
+    }
 }
         
