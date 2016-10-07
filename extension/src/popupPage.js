@@ -12,6 +12,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {cyan500} from 'material-ui/styles/colors';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import HitagUtils from './hitagUtils.js';
+import FontAwesome from 'react-fontawesome';
 
 export default class PopupPage extends React.Component
 {
@@ -58,7 +59,9 @@ export default class PopupPage extends React.Component
             that.updatePopupAtom(atom);
         });
 
-        this.connector.sendMessage("saveUrl"); 
+        this.connector.sendMessage("saveUrl");
+
+         this.onHelpClicked = this.onHelpClicked.bind(this);
     }
 
     updatePopupStatus(status)
@@ -79,6 +82,11 @@ export default class PopupPage extends React.Component
     closePopup()
     {
         window.close();
+    }
+
+    onHelpClicked()
+    {
+        this.connector.sendMessage("showHelp");
     }
 
     render()
@@ -105,6 +113,7 @@ export default class PopupPage extends React.Component
 
                         <HitagsAutocomplete connector={this.connector} isOpened={true}/>
                         <HitagsDisplay hitags= {this.state.atomHitags} encapsulated={true}/>
+                        <FontAwesome onClick = {this.onHelpClicked} size= {"2x"} name='question-circle' style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
                     </div>
                 </MuiThemeProvider>
             </HotKeys>

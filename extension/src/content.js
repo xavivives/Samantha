@@ -11,8 +11,9 @@ import DomUtils from './domUtils.js';
 document.addEventListener('mouseup', onMouseUp);
 var connector = new Connector();
 console.log(connector);
+
 connector.registerEvent("inject", onInject);
-showHelpPage();
+connector.registerEvent("showHelp", showHelp);
 
 function onCopy(e)
 { 
@@ -93,7 +94,7 @@ function getClipboardText() {
     return clipboardText;
 }
 
-function showHelpPage()
+function showHelp()
 {
     DomUtils.inject(HelpPage);
 }

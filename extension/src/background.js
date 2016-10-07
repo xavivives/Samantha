@@ -15,7 +15,7 @@ chrome.tabs.onRemoved.addListener(onTabRemoved);
 chrome.webNavigation.onCommitted.addListener(onCommitted);
 chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 
-
+var firstTime = true;
 var stateConfig = null;
 var index = null;
 var clipboard = "";
@@ -96,9 +96,10 @@ function processMessage(event, value, tab)
     if(event == "searchRequest")
         onSearchRequested(value, tab.id); 
     //popup 
+    if(event == "showHelp")
+        onShowHelp(tab);
     if(event == "saveUrl")
         onSaveUrl(tab);
-
     if(event== "getSuggestedHitags")
         onGetSuggestedHitags(value);
     if(event== "setHitagToContent")
@@ -833,4 +834,12 @@ function onGetSuggestedHitags(inProgressHitag)
 function logRootHitagNode()
 {
     HitagUtils.log(hitagsIndex);
+}
+
+function onShowHelp()
+{
+    getCurrentTab(function(tab)
+    {
+        sendMessage("showHelp", null, tab.id);
+    });
 }
