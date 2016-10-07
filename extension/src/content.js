@@ -1,14 +1,18 @@
 import Connector from './connector.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import injectTapEventPlugin from 'react-tap-event-plugin';
+
 import SearchPage from './searchPage.js';
+import HelpPage from './helpPage.js'
+import DomUtils from './domUtils.js';
+
 
 //document.addEventListener('copy',onCopy, true);
 document.addEventListener('mouseup', onMouseUp);
 var connector = new Connector();
 console.log(connector);
 connector.registerEvent("inject", onInject);
+showHelpPage();
 
 function onCopy(e)
 { 
@@ -43,20 +47,8 @@ function sendCurrentSelection()
 
 function onInject(searchText)
 {
-    injectTapEventPlugin();
-    var googleResultsDiv = document.getElementById('ires');
-    var firstResult = googleResultsDiv.children[0];
-    var newSearchContainer = document.createElement('div');
-    googleResultsDiv.insertBefore(newSearchContainer,firstResult);
-
-    var props ={showSearchInput:false, defaultSearchText:searchText}
-    var reactElement = React.createElement(SearchPage, props);
-
-   ReactDOM.render(reactElement, newSearchContainer, onReplaced);
-}
-
-function onReplaced()
-{
+   var props ={showSearchInput:false, defaultSearchText:searchText}
+   DomUtils.inject( SearchPage, props, "ires");
 }
 
 function getCurrentSelection()
@@ -99,4 +91,9 @@ function getClipboardText() {
 
     // return the text
     return clipboardText;
+}
+
+function showHelpPage()
+{
+    DomUtils.inject(HelpPage);
 }
