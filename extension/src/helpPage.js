@@ -21,26 +21,30 @@ export default class HelpPage extends React.Component
             dialogIsOpened:true
         };
 
-        this.content =
-        {
-            saveTitle:"Save bookmark",
-            saveContent1: "See this icon? Click it.",
-            saveContent2: "Now your bookmark it's saved",
-
-            tagTitle:"Organize it",
-            tagContent1:"You can categorize your content by adding tags",
-            tagContent2:"Type your tag and hit enter",
-
-            hitagTitle:"Organize it... better!",
-            hitagContent1:"You can mimic a folder structure by using hierarchical tags. This only means 'tags inside other tags'",
-            hitagContent2:"To do so, type your tag and then double tab 'space'. Now you can type a new tag that will exist inside the previous one.",
-
-            accessTitle:"Access your bookmarks",
-            accesssContent:"You can access the bookmarks you saved in different ways",
-            accessContent:"- Open a new tab. Use the search field there.",
-            accessContent:"- On the URL field type 's' + 'tab'. Now you can type you search and hit enter",
-            accessContent:"- Just use Google. If a relevant search is found it will show up on your Google results page."
+        this.pStyle={
+            fontSize: "80%",
+            marginTop: 5,
+            marginBottom: 5
         }
+        //<img src={'chrome-extension://kgepkchafobndnjkmnahfpkpkpjdncdg/logo_screenshot.png'} />
+
+        this.content =
+            <div>
+                <h5>Save bookmark</h5>
+                <p style = {this.pStyle} >See the little orange icon on the top-right of your browser? Click it.</p>
+                <p style = {this.pStyle} >Now your bookmark it's saved!</p>
+                <h5>Organize it</h5>
+                <p style = {this.pStyle}>You can categorize your content by adding tags</p>
+                <p style = {this.pStyle}>Type your tag and hit enter</p>
+                <h5>Organize it... better!</h5>
+                <p style = {this.pStyle}>You can mimic a folder structure by using hierarchical tags. This only means 'tags inside other tags'</p>
+                <p style = {this.pStyle}>To do so, type your tag and then double tab 'space'. Now you can type a new tag that will exist inside the previous one.</p>
+                <h5>Access your bookmarks</h5>
+                 <p style = {this.pStyle}>After saving your bookmarks you can access them in different ways:</p>
+                <p style = {this.pStyle}> - Open a new tab. Use the search field there.</p>
+                <p style = {this.pStyle}> - On the URL field type 's' + 'tab'. Now you can type you search and hit enter</p>
+                <p style = {this.pStyle}> - Just use Google. If a relevant search is found it will show up on your Google results page.</p>
+            </div>
 
         this.muiTheme = getMuiTheme({
         });
@@ -55,14 +59,9 @@ export default class HelpPage extends React.Component
     {
         const actions = [
               <FlatButton
-                label="Cancel"
+                label="Got it!"
                 primary={true}
-                onTouchTap={this.onDialogClose}
-              />,
-              <FlatButton
-                label="Submit"
-                primary={true}
-                keyboardFocused={true}
+                keyboardFocused={false}
                 onTouchTap={this.onDialogClose}
               />,
             ];
@@ -73,13 +72,12 @@ export default class HelpPage extends React.Component
 
                <div>
                <Dialog
-                 title="Dialog With Actions"
+                 title="Samantha Help"
                  actions={actions}
                  modal={false}
                  open={this.state.dialogIsOpened}
                  onRequestClose={this.onDialogClose}>
-
-                 The actions in this window were passed in as an array of React objects.
+                 {this.content}
                </Dialog>
              </div>
            </MuiThemeProvider>

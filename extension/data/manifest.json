@@ -18,6 +18,7 @@
   ],
   "description": "I'm Samantha, here to help you",
   "name": "Samantha",
+  "version":"1.2",
   "omnibox": {
     "keyword": "s"
   },
@@ -30,7 +31,6 @@
     "tabs",
     "webNavigation"
   ],
-  "version": "1",
   "minimum_chrome_version": "9",
   "manifest_version": 2,
   "icons": {
@@ -49,5 +49,7 @@
   },
   "chrome_url_overrides": {
     "newtab": "search.html"
-  }
+  },
+    "web_accessible_resources": ["logo_screenshot.png"]
+
 }
