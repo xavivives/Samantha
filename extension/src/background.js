@@ -15,7 +15,8 @@ chrome.tabs.onRemoved.addListener(onTabRemoved);
 chrome.webNavigation.onCommitted.addListener(onCommitted);
 chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 
-var firstTime = true;
+var firstTime = false;
+var helpIsShown = false;
 var stateConfig = null;
 var index = null;
 var clipboard = "";
@@ -91,7 +92,9 @@ function processMessage(event, value, tab)
     if(event == "onCopy")
         onCopy(value);
     if(event == "onSelected")
-        onSelected(value);  
+        onSelected(value); 
+    if(event == "onHelpShown")
+        onHelpShown();  
     //app
     if(event == "searchRequest")
         onSearchRequested(value, tab.id); 
@@ -405,17 +408,18 @@ function onStateConfigLoaded(config)
     //reIndex();
 }
 
-function initStateConfig(config)
+function initStateConfig(storedConfig)
 {
-    if(config && config.currentUId)
+    if(storedConfig)
     {
-        stateConfig = config;
+        stateConfig = storedConfig;
     }
-    else
-    {
-        stateConfig = {};
+    if(!stateConfig)
+        stateConfig={};
+    if(!stateConfig.currentUId)
         stateConfig.currentUId = 0;
-    }
+    if(!stateConfig.helpShownTimes)
+        stateConfig.helpShownTimes = 0;
 }
 
 function prepareSuggestion(str)
@@ -842,4 +846,10 @@ function onShowHelp()
     {
         sendMessage("showHelp", null, tab.id);
     });
+}
+
+function onHelpShown()
+{
+    stateConfig.helpShownTimes++;
+    saveStateConfig();
 }

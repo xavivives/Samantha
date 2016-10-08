@@ -11,7 +11,7 @@ export default class DomUtils
         return rects[0];
     }
 
-    static inject(reactElement, props, elementToFindId)
+    static inject(reactElement, props, elementToFindId, onRendered)
     {
         injectTapEventPlugin();
         var elementFound = {};
@@ -26,8 +26,7 @@ export default class DomUtils
 
         var reactElement = React.createElement(reactElement, props);
 
-        ReactDOM.render(reactElement, container);
+        ReactDOM.render(reactElement, container, onRendered);
     }
-
 }
         

@@ -1,7 +1,6 @@
 import Connector from './connector.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
-
 import SearchPage from './searchPage.js';
 import HelpPage from './helpPage.js'
 import DomUtils from './domUtils.js';
@@ -22,7 +21,7 @@ function onCopy(e)
 
 function sendCurrentClipboard()
 {
-    Connector.sendMessage("onCopy", getClipboardText());
+    connector.sendMessage("onCopy", getClipboardText());
 }
 
 function onMouseUp(e)
@@ -39,11 +38,11 @@ function sendCurrentSelection()
 
     var selectionObj =
     {
-        "url": Connector.getCurrentTabUrl(),
+        "url": connector.getCurrentTabUrl(),
         "selectedText" : currentSelection
     }
 
-    Connector.sendMessage("onSelected", selectionObj);   
+    connector.sendMessage("onSelected", selectionObj);   
 }
 
 function onInject(searchText)
@@ -96,5 +95,8 @@ function getClipboardText() {
 
 function showHelp()
 {
-    DomUtils.inject(HelpPage);
+    DomUtils.inject(HelpPage, null, null, function()
+        {
+            connector.sendMessage("onHelpShown");   
+        });
 }
