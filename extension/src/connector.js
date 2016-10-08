@@ -36,13 +36,20 @@ export default class Connector
 
     processMessage(message)
     {
+        console.log("processsing");
+        console.log(message);
         var event = message.event;
         var value = message.value; 
 
+        console.log(this.registredEvents);
+
         for (var i = 0 ; i < this.registredEvents.length ; i++)
         {
+            console.log(i);
             if(this.registredEvents[i].eventName == event)
             {
+                //console.log(this.registredEvents[i]);
+                console.log("caññog");
                 this.registredEvents[i].functionCallback(value);
             }
         } 

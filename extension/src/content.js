@@ -95,7 +95,9 @@ function getClipboardText() {
 
 function showHelp()
 {
-    DomUtils.inject(HelpPage, null, null, function()
+    var props = { initiallyOpen:true}
+
+    DomUtils.inject(HelpPage, props, null, function()
         {
             connector.sendMessage("onHelpShown");   
         });

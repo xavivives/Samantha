@@ -9,6 +9,16 @@ import Dialog from 'material-ui/Dialog';
 
 export default class HelpPage extends React.Component
 {
+    static get defaultProps()
+    {
+        var props = 
+        {
+           initiallyOpen:false
+        }
+
+        return props;
+    }
+
     constructor(props)
     {
         super(props);
@@ -17,9 +27,11 @@ export default class HelpPage extends React.Component
         this.connector = new Connector();
         this.onDialogClose = this.onDialogClose.bind(this);
 
-         this.state = {
-            dialogIsOpened:true
-        };
+
+        this.state = { isOpen: false};
+
+        if(props.initiallyOpen)
+            this.state = { isOpen: true};
 
         this.pStyle={
             fontSize: "80%",
@@ -52,7 +64,12 @@ export default class HelpPage extends React.Component
 
     onDialogClose()
     {
-        this.setState({dialogIsOpened:false});
+        this.setState({isOpen:false});
+    }
+
+    openDialog()
+    {
+         this.setState({isOpen:true});
     }
 
     render()
@@ -75,7 +92,7 @@ export default class HelpPage extends React.Component
                  title="Samantha Help"
                  actions={actions}
                  modal={false}
-                 open={this.state.dialogIsOpened}
+                 open={this.state.isOpen}
                  onRequestClose={this.onDialogClose}>
                  {this.content}
                </Dialog>

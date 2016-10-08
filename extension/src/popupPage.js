@@ -61,7 +61,7 @@ export default class PopupPage extends React.Component
 
         this.connector.sendMessage("saveUrl");
 
-         this.onHelpClicked = this.onHelpClicked.bind(this);
+        this.onHelpClicked = this.onHelpClicked.bind(this);
     }
 
     updatePopupStatus(status)

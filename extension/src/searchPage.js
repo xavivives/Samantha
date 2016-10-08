@@ -4,6 +4,7 @@ import SearchResultItem from './searchResultItem';
 import TextField from 'material-ui/TextField';
 import LazyLoad from 'react-lazy-load';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import HelpPage from './helpPage.js'
 
 export default class SearchPage extends React.Component
 {
@@ -29,11 +30,15 @@ export default class SearchPage extends React.Component
             that.updateSearchResults(results);
         });
 
+        this.connector.registerEvent("showHelp", function(something) {
+            that.showHelpDialog();
+        });
+
         this.results = [];
         this.onSearchTextChanged = this.onSearchTextChanged.bind(this);
         this.updateSearchResults = this.updateSearchResults.bind(this);
       
-
+        console.log(this.connector);
         //set search from url parameter
         if(props.defaultSearchText)
         {
@@ -50,8 +55,15 @@ export default class SearchPage extends React.Component
         this.state = {
             results: [],
             defaultSearch:searchText,
-            baseUrl: currentUrl
+            baseUrl: currentUrl,
+            helpDialogIsOpened:false
         };
+    }
+
+    showHelpDialog()
+    {
+        console.log("HEELO");
+        this.refs["helpDialog"].openDialog();
     }
 
     updateUrl(searchText)
@@ -65,6 +77,7 @@ export default class SearchPage extends React.Component
 
     updateSearchResults(results)
     {
+        console.log("serach");
         this.setState({results: results});
     }
 
@@ -94,7 +107,7 @@ export default class SearchPage extends React.Component
       return (
         <MuiThemeProvider>
              <div style ={{display: 'flex', justifyContent: 'center'}}>
-
+                <HelpPage ref={"helpDialog"}/>
                 <div style ={containerStyle}>
                     <div style ={searchInputStyle}>
                        <TextField

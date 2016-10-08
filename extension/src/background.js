@@ -60,6 +60,10 @@ function onContentConnected (port)
     {
         tabs[tabId].port.postMessage(tabs[tabId].queuedMessages.shift());
     }
+
+    console.log(stateConfig.helpShownTimes);
+    if(stateConfig.helpShownTimes == 0)
+        onShowHelp();
 }
 
 function sendMessage(event, value, tabId)
@@ -126,6 +130,8 @@ function onSearchRequested(searchStr, tabId)
     var lunrResults =  getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
     sendMessage("updateSearchResults", uiResults, tabId);
+    console.log("tabid");
+    console.log(tabId);
 }
 
 function initNewIndex()
@@ -412,7 +418,7 @@ function initStateConfig(storedConfig)
 {
     if(storedConfig)
     {
-        stateConfig = storedConfig;
+        //stateConfig = storedConfig;
     }
     if(!stateConfig)
         stateConfig={};
