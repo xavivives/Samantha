@@ -22,11 +22,7 @@ export default class HelpPage extends React.Component
     constructor(props)
     {
         super(props);
-
-        var that = this;
-        this.connector = new Connector();
         this.onDialogClose = this.onDialogClose.bind(this);
-
 
         this.state = { isOpen: false};
 

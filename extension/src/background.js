@@ -689,6 +689,11 @@ function getCurrentTab(onTap)
 {
     chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
         var activeTab = arrayOfTabs[0];
+        if(!activeTab)
+        {
+            console.log("Trying to get current tab and can't");
+            return;
+        }
         var activeTabId = activeTab.id; 
         onTap(activeTab);
     });

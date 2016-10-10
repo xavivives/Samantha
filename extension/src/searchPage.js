@@ -25,7 +25,7 @@ export default class SearchPage extends React.Component
         super(props);
 
         var that = this;
-        this.connector = new Connector();
+        this.connector = new Connector("search");
         this.connector.registerEvent("updateSearchResults", function(results) {
             that.updateSearchResults(results);
         });
@@ -38,11 +38,11 @@ export default class SearchPage extends React.Component
         this.onSearchTextChanged = this.onSearchTextChanged.bind(this);
         this.updateSearchResults = this.updateSearchResults.bind(this);
       
-        console.log(this.connector);
         //set search from url parameter
         if(props.defaultSearchText)
         {
             this.connector.sendMessage("searchRequest", props.defaultSearchText);
+
         }
         else
         {
@@ -62,7 +62,6 @@ export default class SearchPage extends React.Component
 
     showHelpDialog()
     {
-        console.log("HEELO");
         this.refs["helpDialog"].openDialog();
     }
 
@@ -77,7 +76,6 @@ export default class SearchPage extends React.Component
 
     updateSearchResults(results)
     {
-        console.log("serach");
         this.setState({results: results});
     }
 
