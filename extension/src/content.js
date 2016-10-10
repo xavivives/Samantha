@@ -2,7 +2,7 @@ import Connector from './connector.js';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import SearchPage from './searchPage.js';
-import HelpPage from './helpPage.js'
+import HelpContent from './helpContent.js'
 import DomUtils from './domUtils.js';
 
 
@@ -97,7 +97,7 @@ function showHelp()
 {
     var props = { initiallyOpen:true}
 
-    DomUtils.inject(HelpPage, props, null, function()
+    DomUtils.inject(HelpContent, props, null, function()
         {
             connector.sendMessage("onHelpShown");   
         });

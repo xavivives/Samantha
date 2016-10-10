@@ -4,7 +4,7 @@ import SearchResultItem from './searchResultItem';
 import TextField from 'material-ui/TextField';
 import LazyLoad from 'react-lazy-load';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import HelpPage from './helpPage.js'
+import HelpContent from './helpContent.js'
 
 export default class SearchPage extends React.Component
 {
@@ -105,7 +105,7 @@ export default class SearchPage extends React.Component
       return (
         <MuiThemeProvider>
              <div style ={{display: 'flex', justifyContent: 'center'}}>
-                <HelpPage ref={"helpDialog"}/>
+                <HelpContent ref={"helpDialog"}/>
                 <div style ={containerStyle}>
                     <div style ={searchInputStyle}>
                        <TextField

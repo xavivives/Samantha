@@ -7,7 +7,7 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from 'material-ui/Dialog';
 
-export default class HelpPage extends React.Component
+export default class HelpContent extends React.Component
 {
     static get defaultProps()
     {
