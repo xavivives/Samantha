@@ -63,6 +63,7 @@ export default class SearchPage extends React.Component
     showHelpDialog()
     {
         this.refs["helpDialog"].openDialog();
+        this.connector.sendMessage("onHelpShown");  
     }
 
     updateUrl(searchText)
