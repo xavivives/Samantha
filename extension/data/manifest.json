@@ -18,7 +18,7 @@
   ],
   "description": "I'm Samantha, here to help you",
   "name": "Samantha",
-  "version":"1.2",
+  "version":"1.3",
   "omnibox": {
     "keyword": "s"
   },
