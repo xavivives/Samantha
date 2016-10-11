@@ -87,6 +87,7 @@ export default class PopupPage extends React.Component
     onHelpClicked()
     {
         this.connector.sendMessage("showHelp");
+        this.closePopup();
     }
 
     render()
