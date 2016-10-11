@@ -50,6 +50,6 @@
   "chrome_url_overrides": {
     "newtab": "search.html"
   },
-    "web_accessible_resources": ["logo_screenshot.png"]
+    "web_accessible_resources": ["logo_screenshot.png, font-awesome.min.css"]
 
 }
