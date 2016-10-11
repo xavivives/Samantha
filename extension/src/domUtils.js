@@ -1,5 +1,4 @@
 import ReactDOM from 'react-dom';
-import injectTapEventPlugin from 'react-tap-event-plugin';
 import React from 'react';
 
 export default class DomUtils
@@ -13,7 +12,6 @@ export default class DomUtils
 
     static inject(reactElement, props, elementToFindId, onRendered)
     {
-        injectTapEventPlugin();
         var elementFound = {};
         if(elementToFindId)
             elementFound = document.getElementById(elementToFindId);
@@ -22,11 +20,13 @@ export default class DomUtils
 
         var firstResult = elementFound.children[0];
         var container = document.createElement('div');
+
         elementFound.insertBefore(container,firstResult);
 
         var reactElement = React.createElement(reactElement, props);
 
         ReactDOM.render(reactElement, container, onRendered);
     }
+
 }
         
