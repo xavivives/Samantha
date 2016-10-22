@@ -183,7 +183,7 @@ export default class PopupPage extends React.Component
             top: this.state.suggestionBoxPosition.top,
             left:  this.state.suggestionBoxPosition.left,
             maxHeight:150,
-            overflowY:"scroll"
+            overflowY:"auto"
         }
 
         var suggestedHitagsElements = [];
