@@ -109,8 +109,16 @@ export default class Tag extends React.Component
 
         var tagInProgress = null;
         var lastSeparator = null;
+        var placeHolder = "Add new tag";
+
         if(this.props.inProgress)
         {
+            if(this.props.hitag.length>0)
+            {
+                lastSeparator = <FontAwesome name='angle-right'style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
+                placeHolder = "New child tag";
+            }
+
             tagInProgress=<input ref= "tagInProgress"
                 style={{minWidth:50,
                     width:0,
@@ -125,12 +133,11 @@ export default class Tag extends React.Component
                 onChange={this.onTagInputChangedLocal}
                 onKeyDown = {this.onTagInputKeyDown}
                 value = {this.props.inputTag}
+                placeholder = {placeHolder}
                 onFocus = {this.onTagInputFocus}
                 onBlur = {this.onTagInputBlur}/>
 
-            if(this.props.hitag.length>0)
-                lastSeparator = <FontAwesome name='angle-right'style={{paddingLeft:3, paddingRight:3, opacity:0.4 }}/>
-        }
+                    }
 
         return(
             <div style={style}>           
