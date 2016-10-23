@@ -145,15 +145,16 @@ export default class PopupPage extends React.Component
     onListItemSelected(index)
     {
         this.selectItem(index);
+
     }
 
     selectItem(index)
     {
-        console.log("selectItem");
         this.setState({
             selectedIndex:index,
             inputTag: HitagUtils.getLastTag(this.state.suggestedHitags[index])
-        })
+        });
+        this.refs["inputHitag"].setCaretAtTheEnd();
     }
 
     checkIfDisplayAutocomplete (tagInputValue, tagInputIsFocused)

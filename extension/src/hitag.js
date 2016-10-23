@@ -1,5 +1,6 @@
 import React from 'react';
 import FontAwesome from 'react-fontawesome';
+import ReactDOM from 'react-dom';
 
 export default class Tag extends React.Component
 {
@@ -30,6 +31,7 @@ export default class Tag extends React.Component
         this.onTagInputChangedDefault = this.onTagInputChangedDefault.bind(this);
         this.onNewTagDefault = this.onNewTagDefault.bind(this);
         this.onEnterDefault = this.onEnterDefault.bind(this);
+        this.setCaretAtTheEnd = this.setCaretAtTheEnd.bind(this);
     }
 
     onTagInputChangedDefault(inputTag)
@@ -71,6 +73,24 @@ export default class Tag extends React.Component
     onEnterDefault()
     {
         console.log("override props.onEnter");
+    }
+
+    setCaretAtTheEnd(caretPos)
+    {
+        var elem = ReactDOM.findDOMNode(this.refs["tagInProgress"]);
+
+        if(elem != null) {
+            if(elem.selectionStart) {
+                elem.focus();
+                console.log(elem.value.length-1);
+                elem.setSelectionRange(0, elem.value.length-1);
+            }
+            else
+            {
+                elem.focus();
+            }
+            
+        }
     }
 
     render()
