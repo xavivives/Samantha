@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDom from 'react-dom';
+import ReactDOM from 'react-dom';
 import DomUtils from './domUtils.js';
 import TextField from 'material-ui/TextField';
 import SelectableList from './selectableList.js';
@@ -8,6 +8,7 @@ import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import HitagUtils from './hitagUtils.js';
 import Connector from './connector.js';
 import Paper from 'material-ui/Paper';
+
 
 export default class PopupPage extends React.Component
 {
@@ -50,9 +51,9 @@ export default class PopupPage extends React.Component
         this.hotKeyshandlers = {
           'action': this.onAction,
           'moveUp': this.onMoveUp,
-          'moveDown':this.onMoveDown,
-          'moveLeft': this.onMoveUp,
-          'moveRight':this.onMoveDown,
+          'moveDown':this.onMoveDown
+          //'moveLeft': this.onMoveUp,
+          //'moveRight':this.onMoveDown,
         };
 
         var that = this;
@@ -154,7 +155,13 @@ export default class PopupPage extends React.Component
             selectedIndex:index,
             inputTag: HitagUtils.getLastTag(this.state.suggestedHitags[index])
         });
-        this.refs["inputHitag"].setCaretAtTheEnd();
+
+        var selectedItem = this.refs["selectableList"].getSelectedItemNode();
+        var paper = ReactDOM.findDOMNode(this.refs["paper"]);
+        if(selectedItem)
+            paper.scrollTop = selectedItem.offsetTop;
+
+        setTimeout(this.refs["inputHitag"].setCaretAtTheEnd,1);
     }
 
     checkIfDisplayAutocomplete (tagInputValue, tagInputIsFocused)
@@ -210,8 +217,8 @@ export default class PopupPage extends React.Component
                     hitag ={this.state.inputHitag}
                     inputTag={this.state.inputTag}/>
 
-                <Paper style={style} zDepth={3} style={autocompleteStyle}>
-                    <SelectableList ref="autocomplete"
+                <Paper ref = "paper" style={style} zDepth={3} style={autocompleteStyle}>
+                    <SelectableList ref="selectableList"
                         asList= {true} 
                         children = {suggestedHitagsElements}
                         encapsulated = {false}

@@ -80,16 +80,8 @@ export default class Tag extends React.Component
         var elem = ReactDOM.findDOMNode(this.refs["tagInProgress"]);
 
         if(elem != null) {
-            if(elem.selectionStart) {
-                elem.focus();
-                console.log(elem.value.length-1);
-                elem.setSelectionRange(0, elem.value.length-1);
-            }
-            else
-            {
-                elem.focus();
-            }
-            
+            elem.focus();
+            elem.setSelectionRange(elem.value.length, elem.value.length);            
         }
     }
 

@@ -1,5 +1,6 @@
 import React from 'react';
 
+
 export default class PopupPage extends React.Component
 {
     static get defaultProps()
@@ -76,7 +77,7 @@ export default class PopupPage extends React.Component
             {
                 if(this.state.isHovering)
                 {
-                    style.backgroundColor="red";
+                    style.backgroundColor="rgb(240, 240, 240)";
                 }
                 else
                 {
@@ -90,7 +91,8 @@ export default class PopupPage extends React.Component
         }
 
         return(        
-            <div style={style}
+            <div ref="item"
+                style={style}
                 onClick = {this.onClick}
                 onMouseEnter = {this.onMouseEnter}
                 onMouseLeave = {this.onMouseLeave}

@@ -1,6 +1,7 @@
 import React from 'react';
 import Hitag from './hitag.js';
 import SelectableListItem from './selectableListItem.js';
+import ReactDOM from 'react-dom';
 
 export default class PopupPage extends React.Component
 {
@@ -44,6 +45,11 @@ export default class PopupPage extends React.Component
        this.props.onItemSelected(index);
     }
 
+    getSelectedItemNode()
+    {
+        return ReactDOM.findDOMNode(this.refs["item"+this.props.selectedIndex]);
+    }
+
     render()
     {
         var style ={
@@ -52,10 +58,11 @@ export default class PopupPage extends React.Component
         };
         var that = this;
 
-        return(   
+        return(
+
             <div ref= "List" style={style}>
                      {that.props.children.map(function(child, index, originalArray){
-                        return <SelectableListItem
+                        return <SelectableListItem ref={"item"+index}
                             index = {index}
                             isSelected = {that.isItemSelected(index)}
                             onItemClicked={that.onItemClicked.bind(that, index)}>
