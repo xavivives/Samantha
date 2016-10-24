@@ -2,6 +2,7 @@ import ElasticLunr from 'elasticlunr';
 import OtherSearchEngines from './otherSearchEngines.js';
 import HitagUtils from './hitagUtils.js';
 import ChromeStorage from './chromeStorage.js';
+import SearchEngine from './searchEngine.js';
 
 var otherSearchEngines = new OtherSearchEngines();
 
@@ -19,13 +20,13 @@ chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 var firstTime = false;
 var helpIsShown = false;
 var stateConfig = null;
-var index = null;
 var clipboard = "";
 //var contentPort = {};
 var searchPage ="search.html";
 
 var tabs =[];
 var popupId = "popup";
+var searchEngine = null;
 
 var hitagsIndex =HitagUtils.getNewTagNode("root");
 start(); 
@@ -128,107 +129,15 @@ function onSelected(selectionObj)
 
 function onSearchRequested(searchStr, tabId)
 {
-    var lunrResults =  getLunrSearchResults(searchStr);
+    var lunrResults =  searchEngine.getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
     sendMessage("updateSearchResults", uiResults, tabId);
     console.log("tabid");
     console.log(tabId);
 }
 
-function initNewIndex()
-{
-    index = ElasticLunr(function () {
-        this.setRef('id');
-        this.addField('url');
-        this.addField('urlTitle');
-        this.addField('searchWordsSum');
-    });
-    //removes stemmers and no words
-    index.pipeline.reset();
-}
 
-function getLunrSearchResults(textToSearch)
-{
-    var config =
-    {
-        fields:
-        {
-            url:
-            {
-                boost: 1,
-                bool: "OR"
-            },
-            urlTitle:
-            {
-                boost: 1,
-                bool: "OR"
-            },
-            searchWordsSum:
-            {
-                boost: 2,
-                bool: "OR"
-            }
-        },
-        bool: "OR",
-        expand: true
-    }
 
-    var results = index.search(textToSearch, config);
-
-    return results;
-}
-
-function createEntryFromAtom(atom)
-{
-     var entry = 
-    {
-        "id" : getNewUId(),
-        "url" : atom.page.url,
-        "urlTitle" : atom.page.title,
-        "searchWordsSum":atom.searchWordsSum
-    }
-
-    return entry;
-}
-
-function getLunrUrlSearchResults(urlToSearch)
-{
-    var config =
-    {
-        fields:
-        {
-            url:
-            {
-                boost: 1,
-                bool: "OR"
-            }
-        },
-        bool: "OR",
-        expand: true
-    }
-
-    var results = index.search(urlToSearch, config);
-
-    return results;
-}
-
-function filterLunrResults(results, minScore, maxResults)
-{
-    var filteredResults = [];
-    var resultsNumber = results.length;
-
-    if(maxResults<results.length)
-        resultsNumber = maxResults;
-
-    for (var i = 0; i < resultsNumber; i++)
-    { 
-        if(results[i].score < minScore)//results are sorted by score
-            return filteredResults;
-
-        filteredResults.push(results[i]);
-    }
-    return filteredResults;
-}
 
 function goToUrl(url)
 {
@@ -247,9 +156,9 @@ function onOmniboxInputChanged(text, suggest)
 {
     var omniboxMaxSuggestions = 5;
     var minScore = 0.1;
-    var results = getLunrSearchResults(text);
+    var results = searchEngine.getLunrSearchResults(text);
 
-    results =  filterLunrResults(results, minScore, omniboxMaxSuggestions);
+    results =  searchEngine.filterLunrResults(results, minScore, omniboxMaxSuggestions);
 
     var suggestions = lunrResultsToSuggestions(results);
     if(suggestions.length == 0)
@@ -283,7 +192,7 @@ function lunrResultsToSuggestions(results)
 
 function lunrResultToSuggestion(result)
 {
-    var entry = index.documentStore.getDoc(result.ref);
+    var entry = searchEngine.getDocumentByRef(result.ref);
     var scoreStr = (Math.round(result.score * 100) / 100).toString();
 
     var suggestion =
@@ -292,11 +201,6 @@ function lunrResultToSuggestion(result)
         description: scoreStr + ": " + prepareSuggestion(entry.content)
     }
     return suggestion;
-}
-
-function getAtomByRef(ref)
-{
-    return index.documentStore.getDoc(ref);
 }
 
 function setOmniboxSuggestion(str, url)
@@ -315,11 +219,6 @@ function onOmniboxEnter(str)
 }
 
 //SEARCH
-
-function addSearchEntry(entry)
-{
-    index.addDoc(entry);
-}
 
 function createEntryFromSelection(url, content)
 {
@@ -340,23 +239,6 @@ function getNewUId()
     return stateConfig.currentUId.toString();
 }
 
-function reIndex()
-{
-    function onEntryRetrived(entry)
-    {   
-        if(entry)
-            addSearchEntry(entry);
-    }
-
-    for (var i = 0; i<stateConfig.currentUId; i++)
-        ChromeStorage.loadElement(i.toString(), onEntryRetrived);       
-}
-
-function saveIndex()
-{
-    ChromeStorage.saveElement("index", index.toJSON());
-}
-
 //CONFIG
 
 function start()
@@ -375,16 +257,12 @@ function onStateConfigLoaded(config)
 {
     function onIndexLoaded(loadedIndex)
     {
-        //if(false)
-        if(loadedIndex)
-            index = ElasticLunr.Index.load(loadedIndex);
-        else
-            initNewIndex();
+        searchEngine = new SearchEngine(loadedIndex);
     }
     
     initStateConfig(config);
     ChromeStorage.loadElement("index", onIndexLoaded);
-    //reIndex();
+    //searchEngine.reIndex(stateConfig.currentUId);
 }
 
 function initStateConfig(storedConfig)
@@ -411,7 +289,7 @@ function prepareSuggestion(str)
 //SAMANTHA SEARCH PAGE
 function lunrResultToUiResult(result)
 {
-    var entry = index.documentStore.getDoc(result.ref);
+    var entry = searchEngine.getDocumentByRef(result.ref);
 
     var uiResult =
     {
@@ -489,6 +367,7 @@ function onAddHitag(hitag)
         if(existingAtom)
         {
             addHitagToAtom(existingAtom, hitag);
+
             HitagUtils.saveHitagNode(hitag, hitagsIndex);
             updatePopupAtom(existingAtom);
             return;
@@ -515,11 +394,11 @@ function addHitagToAtom(atom, hitag)
 
 function saveAtom(atom)
 {
-    var entry = createEntryFromAtom(atom);
-    addSearchEntry(entry);
+    var entry = searchEngine.createEntryFromAtom(atom, getNewUId());
+    searchEngine.addSearchEntry(entry);
     ChromeStorage.saveElement(entry.id, atom);
 
-    saveIndex();
+    searchEngine.saveIndex();
     saveStateConfig();
 }
 
@@ -534,14 +413,14 @@ function urlIsSavable(url)
 
 function getAtomByUrl(url)
 {
-    var results = getLunrUrlSearchResults(url);
+    var results = searchEngine.getLunrUrlSearchResults(url);
 
     if(results.length>1)
         console.warn("Some how there are multipe atoms for url:" + url);
 
     if(results.length>0)
     {
-       var atom =  getAtomByRef(results[0].ref);
+       var atom =  searchEngine.getDocumentByRef(results[0].ref);
        return atom;
     }
 
