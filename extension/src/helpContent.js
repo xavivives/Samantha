@@ -46,7 +46,7 @@ export default class HelpContent extends React.Component
                 <p style = {this.pStyle}>Type your tag and hit enter</p>
                 <h5>Organize it... better!</h5>
                 <p style = {this.pStyle}>You can mimic a folder structure by using hierarchical tags. This only means 'tags inside other tags'</p>
-                <p style = {this.pStyle}>To do so, type your tag and then double tab 'space'. Now you can type a new tag that will exist inside the previous one.</p>
+                <p style = {this.pStyle}>To do so, type your tag and then double tap 'space'. Now you can type a new tag that will exist inside the previous one.</p>
                 <h5>Access your bookmarks</h5>
                  <p style = {this.pStyle}>After saving your bookmarks you can access them in different ways:</p>
                 <p style = {this.pStyle}> - Open a new tab. Use the search field there.</p>
