@@ -146,7 +146,6 @@ export default class PopupPage extends React.Component
     onListItemSelected(index)
     {
         this.selectItem(index);
-
     }
 
     selectItem(index)

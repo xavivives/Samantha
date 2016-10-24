@@ -54,13 +54,22 @@ export default class HitagUtils
                 }
             }            
 
-            if(!tagNameExists && forceCreation)
+            if(!tagNameExists)
             {
-                console.log("Creating tag: "+ hitag[i]);
-                currentNode.children.push(HitagUtils.getNewTagNode(hitag[i]));
-                currentNode = currentNode.children[currentNode.children.length-1];
-                tagNameExists = true;
+                
+                if(forceCreation)
+                {
+                    console.log("Creating tag: "+ hitag[i]);
+                    currentNode.children.push(HitagUtils.getNewTagNode(hitag[i]));
+                    currentNode = currentNode.children[currentNode.children.length-1];
+                    tagNameExists = true;
+                }
+                else
+                {
+                    return null;
+                }
             }
+
             
 
             if(tagNameExists && i==hitag.length-1)
