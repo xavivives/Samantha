@@ -1,6 +1,7 @@
 import ElasticLunr from 'elasticlunr';
 import OtherSearchEngines from './otherSearchEngines.js';
 import HitagUtils from './hitagUtils.js';
+import ChromeStorage from './chromeStorage.js';
 
 var otherSearchEngines = new OtherSearchEngines();
 
@@ -348,41 +349,13 @@ function reIndex()
     }
 
     for (var i = 0; i<stateConfig.currentUId; i++)
-        loadElement(i.toString(), onEntryRetrived);       
+        ChromeStorage.loadElement(i.toString(), onEntryRetrived);       
 }
-
-//STORAGE
 
 function saveIndex()
 {
-    saveElement("index", index.toJSON());
+    ChromeStorage.saveElement("index", index.toJSON());
 }
-
-function saveElement(key, element, onSaved)
-{
-    var obj= {};
-    obj[key] = element;
-    chrome.storage.local.set(obj, onSaved);
-}
-
-function loadElement(key, onLoaded)
-{
-    function onElementLoaded(obj)
-    {
-        if(obj[key])
-            onLoaded(obj[key]);
-        else
-            onLoaded(null);
-    }
-
-    chrome.storage.local.get(key, onElementLoaded);
-}
-
-//delete me
-/*function getEntry(id, onEntryRetrivedCallback)
-{
-    chrome.storage.local.get(id, onEntryRetrivedCallback);
-}*/
 
 //CONFIG
 
@@ -390,12 +363,12 @@ function start()
 {
     //chrome.storage.local.clear();
     console.log("start");
-    loadElement("stateConfig", onStateConfigLoaded );
+    ChromeStorage.loadElement("stateConfig", onStateConfigLoaded );
 }
 
 function saveStateConfig()
 {
-    saveElement("stateConfig", stateConfig);
+    ChromeStorage.saveElement("stateConfig", stateConfig);
 }
 
 function onStateConfigLoaded(config)
@@ -410,7 +383,7 @@ function onStateConfigLoaded(config)
     }
     
     initStateConfig(config);
-    loadElement("index", onIndexLoaded);
+    ChromeStorage.loadElement("index", onIndexLoaded);
     //reIndex();
 }
 
@@ -529,7 +502,6 @@ function onAddHitag(hitag)
 
 function addHitagToAtom(atom, hitag)
 {
-    console.log("addHitagToAtom");
     if(!atom.relations)
         atom.relations = {};
 
@@ -545,7 +517,7 @@ function saveAtom(atom)
 {
     var entry = createEntryFromAtom(atom);
     addSearchEntry(entry);
-    saveElement(entry.id, atom);
+    ChromeStorage.saveElement(entry.id, atom);
 
     saveIndex();
     saveStateConfig();
