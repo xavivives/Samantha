@@ -13,6 +13,7 @@ export default class Tag extends React.Component
             encapsulated:true,
             inProgress:false,
             onNewTag:this.onNewTagDefault,
+            onDeleteTag:this.onDeleteTagDefault,
             onEnter:this.onEnterDefault,
             onTagInputChanged:this.onTagInputChangedDefault,
         }
@@ -30,6 +31,7 @@ export default class Tag extends React.Component
         this.onTagInputKeyDown = this.onTagInputKeyDown.bind(this);
         this.onTagInputChangedDefault = this.onTagInputChangedDefault.bind(this);
         this.onNewTagDefault = this.onNewTagDefault.bind(this);
+        this.onDeleteTagDefault = this.onDeleteTagDefault.bind(this);
         this.onEnterDefault = this.onEnterDefault.bind(this);
         this.setCaretAtTheEnd = this.setCaretAtTheEnd.bind(this);
     }
@@ -37,6 +39,11 @@ export default class Tag extends React.Component
     onTagInputChangedDefault(inputTag)
     {
         console.log("Override onTagInputChanged");
+    }  
+
+    onDeleteTagDefault(inputTag)
+    {
+        console.log("Override onDeleteTag");
     }  
 
     onTagInputChangedLocal(event)
@@ -62,6 +69,14 @@ export default class Tag extends React.Component
         if(event.keyCode == 13)
         {
             this.props.onEnter(this.props.inputTag);
+        }
+
+        if(event.keyCode == 8 || event.keyCode == 46)
+        {
+            var currentInput = event.target.value;
+            if(currentInput.length == 0)
+                this.props.onDeleteTag();
+
         }
     }
 

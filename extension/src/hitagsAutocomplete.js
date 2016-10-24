@@ -29,6 +29,7 @@ export default class PopupPage extends React.Component
 
         this.onNewTag = this.onNewTag.bind(this);
         this.onEnter = this.onEnter.bind(this);
+        this.onDeleteTag = this.onDeleteTag.bind(this);
         this.onTagInputChanged = this.onTagInputChanged.bind(this);
         this.onTagInputFocus = this.onTagInputFocus.bind(this);
         this.onTagInputBlur = this.onTagInputBlur.bind(this);
@@ -133,6 +134,21 @@ export default class PopupPage extends React.Component
         this.checkIfDisplayAutocomplete("", true);
     }
 
+    onDeleteTag()
+    {
+        var currentHitag = this.state.inputHitag;
+        currentHitag.pop();
+        
+        this.setState({
+            inputHitag: currentHitag,
+            selectedIndex:-1
+        });
+
+      
+        this.props.connector.sendMessage("getSuggestedHitags", inProgressHitag);
+        this.checkIfDisplayAutocomplete("", true);
+    }
+
     onTagInputFocus(event)
     {   
         this.checkIfDisplayAutocomplete(event.target.value, true);
@@ -211,6 +227,7 @@ export default class PopupPage extends React.Component
                     onNewTag={this.onNewTag.bind(this)}
                     onEnter = {this.onEnter}
                     onTagInputChanged = {this.onTagInputChanged}
+                    onDeleteTag = {this.onDeleteTag}
                     style={{flex:1}}
                     encapsulated = {false}
                     hitag ={this.state.inputHitag}
