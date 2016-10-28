@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 export default class PopupPage extends React.Component
 {
     static get defaultProps()

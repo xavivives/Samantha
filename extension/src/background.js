@@ -120,24 +120,12 @@ function onCopy(str)
     clipboard = str;
 }
 
-function onSelected(selectionObj)
-{
-    return; 
-    //var entry = createEntryFromSelection(selectionObj.url, selectionObj.selectedText);
-    //addEntry(entry);
-}
-
 function onSearchRequested(searchStr, tabId)
 {
     var lunrResults =  searchEngine.getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
     sendMessage("updateSearchResults", uiResults, tabId);
-    console.log("tabid");
-    console.log(tabId);
 }
-
-
-
 
 function goToUrl(url)
 {
@@ -219,19 +207,6 @@ function onOmniboxEnter(str)
 }
 
 //SEARCH
-
-function createEntryFromSelection(url, content)
-{
-    /*var entry = 
-    {
-        "id" : getNewUId(),
-        "url" : url,
-        "content" : content
-    }
-
-    return entry;
-    */
-}
 
 function getNewUId()
 {

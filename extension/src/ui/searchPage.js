@@ -1,5 +1,5 @@
 import React from 'react';
-import Connector from './connector.js';
+import Connector from './../connector.js';
 import SearchResultItem from './searchResultItem';
 import TextField from 'material-ui/TextField';
 import LazyLoad from 'react-lazy-load';

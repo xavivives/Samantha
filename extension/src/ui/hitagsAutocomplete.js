@@ -6,7 +6,7 @@ import SelectableList from './selectableList.js';
 import Hitag from './hitag.js';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import HitagUtils from './hitagUtils.js';
-import Connector from './connector.js';
+import Connector from './../connector.js';
 import Paper from 'material-ui/Paper';
 
 

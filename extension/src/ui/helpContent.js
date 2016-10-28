@@ -1,5 +1,5 @@
 import React from 'react';
-import Connector from './connector.js';
+import Connector from './../connector.js';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'; 
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import HitagUtils from './hitagUtils.js';

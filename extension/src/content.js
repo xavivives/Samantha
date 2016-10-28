@@ -1,10 +1,7 @@
 import Connector from './connector.js';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import SearchPage from './searchPage.js';
-import HelpContent from './helpContent.js'
+import SearchPage from './ui/searchPage.js';
+import HelpContent from './ui/helpContent.js'
 import DomUtils from './domUtils.js';
-
 
 //document.addEventListener('copy',onCopy, true);
 document.addEventListener('mouseup', onMouseUp);
