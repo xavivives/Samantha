@@ -7,6 +7,9 @@ import UserState from './userState.js';
 import Utils from './utils.js';
 import TabsController from './tabsController.js';
 
+import Atom from './atom.js';
+
+
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
@@ -198,11 +201,12 @@ function onSaveUrl()
         }
 
         var retrieve = createRetrieve(tabs.getOriginalSearchText(tab.id), tabs.getHistorySinceSearch(tab.id));
+        
         var existingAtom = getAtomByUrl(tab.url);
-
+        
         if(existingAtom)
         {
-            addRetrive(existingAtom, retrieve);
+            existingAtom.addRetrieve(retrieve);
             sendAlreadySaved(tabs.popupId);
             updatePopupAtom(existingAtom);
             return;
@@ -210,9 +214,9 @@ function onSaveUrl()
 
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
-        
-        var atom = createAtom(page);
-        addRetrive(atom, retrieve);
+        console.log(retrieve);
+        var atom = new Atom(page);
+        atom.addRetrieve( retrieve);
 
         saveAtom(atom);
 
@@ -232,6 +236,7 @@ function onAddHitag(hitag)
     tabs.getCurrentTab(function(tab)
     {
         var existingAtom = getAtomByUrl(tab.url);
+        console.log(existingAtom);
 
         if(existingAtom)
         {
@@ -250,9 +255,6 @@ function onAddHitag(hitag)
 
 function addHitagToAtom(atom, hitag)
 {
-    if(!atom.relations)
-        atom.relations = {};
-
     if(!atom.relations.hitags)
         atom.relations.hitags = HitagUtils.getNewTagNode("root");
 
@@ -278,7 +280,9 @@ function getAtomByUrl(url)
 
     if(results.length>0)
     {
-       var atom =  searchEngine.getDocumentByRef(results[0].ref);
+       var atomData =  searchEngine.getDocumentByRef(results[0].ref);
+       var atom = Utils.cast(atomData, Atom);
+       console.log(atom);
        return atom;
     }
 
@@ -318,8 +322,12 @@ function sendSaveOk(tabId)
     tabs.sendMessage("updatePopupStatus", status, tabId);
 }
 
-function createAtom(page)
+function _createAtom(page)
 {
+
+    var a = new Atom();
+    console.log(a);
+    console.log(JSON.stringify(a));
     var atom =
     {
         v:0,
@@ -333,7 +341,7 @@ function createAtom(page)
     return atom;
 }
 
-function addRetrive(atom, retrieve)
+function _addRetrieve(atom, retrieve)
 {
     if(atom && atom.retrieves && retrieve)
         atom.retrieves.push(retrieve);

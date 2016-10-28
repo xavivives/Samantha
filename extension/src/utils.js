@@ -13,4 +13,12 @@ export default class utils
     {
         return JSON.parse(JSON.stringify(obj));
     }
+
+    static cast(rawObj, constructor)
+    {
+        var obj = new constructor();
+        for(var i in rawObj)
+            obj[i] = rawObj[i];
+        return obj;
+    }
 }
