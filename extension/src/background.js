@@ -8,7 +8,7 @@ import Utils from './utils.js';
 import TabsController from './tabsController.js';
 
 //chrome.runtime.onConnect.addListener(onContentConnected);
-chrome.runtime.onMessage.addListener(onContentMessage);
+//chrome.runtime.onMessage.addListener(onContentMessage);
 //chrome.tabs.onUpdated.addListener(onTabUpdated);
 //chrome.tabs.onCreated.addListener(onTabCreated);
 //chrome.tabs.onRemoved.addListener(onTabRemoved);
@@ -22,18 +22,15 @@ chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 
 var userState = null;
 var clipboard = "";
-//var contentPort = {};
 var searchPage ="search.html";
+var tabs = null;
 
-var _tabs =[];
-var tabs = new TabsController();
-//var tabs.popupId = "popup";
 var searchEngine = null;
 
 var hitagsIndex =HitagUtils.getNewTagNode("root");
 start(); 
 
-function onContentMessage(message, sender, sendResponse)
+function _onContentMessage(message, sender, sendResponse)
 {
     processMessage(message.event, message.value, sender.tab);
 }
@@ -161,6 +158,7 @@ function start()
     console.log("start");
     userState = new UserState();
     userState.load(onUserStateLoaded);
+    tabs = new TabsController(processMessage);
    // ChromeStorage.loadElement("stateConfig", onUserStateLoaded );
 }
 

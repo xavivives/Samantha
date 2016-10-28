@@ -3,23 +3,31 @@ import UrlUtils from './urlUtils.js';
 
 export default class tabsController
 {
-    constructor()
+    constructor(onMessage)
     {
         this.onTabUpdated = this.onTabUpdated.bind(this);
         this.onTabCreated = this.onTabCreated.bind(this);
         this.onTabRemoved = this.onTabRemoved.bind(this);
         this.onContentConnected = this.onContentConnected.bind(this);
-        //this.onContentMessage = this.onContentMessage.bind(this);
+        this.onContentMessage = this.onContentMessage.bind(this);
         this.onCommitted = this.onCommitted.bind(this);
 
         this.tabs= [];
         this.popupId = "popup";
+        this.onMessage = onMessage;
+
         chrome.tabs.onUpdated.addListener(this.onTabUpdated);
         chrome.tabs.onCreated.addListener(this.onTabCreated);
         chrome.tabs.onRemoved.addListener(this.onTabRemoved);
         chrome.runtime.onConnect.addListener(this.onContentConnected);
-        //chrome.runtime.onMessage.addListener(this.onContentMessage);
+        chrome.runtime.onMessage.addListener(this.onContentMessage);
         chrome.webNavigation.onCommitted.addListener(this.onCommitted);
+    }
+
+    onContentMessage(message, sender, sendResponse)
+    {
+        console.log(sender);
+        this.onMessage(message.event, message.value, sender.tab);
     }
 
     onTabUpdated(tabId, changeInfo, tab)
