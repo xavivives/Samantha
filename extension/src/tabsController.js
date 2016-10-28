@@ -47,11 +47,16 @@ export default class tabsController
         {
             this.resetTabHisoryAndSearch(tabId);
             this.setTabSearch(tabId, searchText);
-//            injectSamanthaResults(tab.id, searchText);
+            injectSamanthaResults(tab.id, searchText);
         }
         
         if(this.tabHistoryExists(tab.id))
             this.addUrlToHistory(tab.id, tab.url);
+    }
+
+    injectSamanthaResults(tabId, searchText)
+    {
+        this.sendMessage("inject", searchText, tabId);
     }
 
     initTab(tabId)

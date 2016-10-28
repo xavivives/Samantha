@@ -384,11 +384,6 @@ function onDOMContentLoaded(e)
 {
 }
 
-function injectSamanthaResults(tabId, searchText)
-{
-    tabs.sendMessage("inject", searchText, tabId);
-}
-
 function onGetSuggestedHitags(inProgressHitag)
 {
     var currentHitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, hitagsIndex);
