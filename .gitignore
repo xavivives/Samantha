@@ -3,3 +3,5 @@ extension/bin/
 npm-debug.log
 ipfs/data/
 server/node_modules/
+extension/SamanthaExtension.sublime-project
+extension/SamanthaExtension.sublime-workspace
