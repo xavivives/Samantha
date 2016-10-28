@@ -33,61 +33,6 @@ var searchEngine = null;
 var hitagsIndex =HitagUtils.getNewTagNode("root");
 start(); 
 
-function initTab(tabId)
-{
-    console.log("initTab "+ tabId);
-
-    tabs[tabId] ={};
-    tabs[tabId].port = null;
-    tabs[tabId].history =[];
-    tabs[tabId].searchText = "";
-    tabs[tabId].queuedMessages =[];
-}
-
-function _onContentConnected (port)
-{
-    var tabId = "";
-
-    if(!port.sender.tab)//its probably an extension popup
-        tabId = tabs.popupId;
-    else
-        tabId = port.sender.tab.id;
-
-    console.log("Connected " + tabId);
-
-    if(!tabs.tabExists(tabId))
-        tabs.initTab(tabId);
-
-    tabs[tabId].port = port;
-    
-    while(tabs[tabId].queuedMessages.length>0)
-    {
-        tabs[tabId].port.postMessage(tabs[tabId].queuedMessages.shift());
-    }
-
-    if(userState.getHelpShownTimes() == 0)
-        onShowHelp();
-}
-
-function _sendMessage(event, value, tabId)
-{
-    var message = {event:event, value:value};
-
-    if(!tabs.tabExists(tabId))
-        tabs.initTab(tabId);
-
-    if(tabs[tabId].port == null)
-    {
-        console.log("Queueing " + tabId + ": "+ message.event);
-        tabs[tabId].queuedMessages.push(message);
-    }
-    else
-    {
-        console.log("Posting to "+ tabId + ": "+ message.event);
-        tabs[tabId].port.postMessage(message);
-    }
-}
-
 function onContentMessage(message, sender, sendResponse)
 {
     processMessage(message.event, message.value, sender.tab);
@@ -337,8 +282,6 @@ function addHitagToAtom(atom, hitag)
     if(!atom.relations.hitags)
         atom.relations.hitags = HitagUtils.getNewTagNode("root");
 
-    console.log(atom);
-
     HitagUtils.saveHitagNode(hitag, atom.relations.hitags);
 }
 
@@ -458,162 +401,18 @@ function createRelation(type, hash)
     return relation;
 }
 
-function _getOriginalSearchText(tabId)
-{
-    if(tabHistoryExists(tabId))
-        return tabs[tabId].searchText;
-    return null;
-}
-
-function _getHistorySinceSearch(tabId)
-{
-    if(tabHistoryExists(tabId))
-        return Utils.copyObj(tabs[tabId].history);
-    return [];
-}
-
 function getCurrentTime()
 {
     return new Date().toJSON();
 }
 
-function _getCurrentTab(onTap)
-{
-    chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
-        var activeTab = arrayOfTabs[0];
-        if(!activeTab)
-        {
-            console.log("Trying to get current tab and can't");
-            return;
-        }
-        var activeTabId = activeTab.id; 
-        onTap(activeTab);
-    });
-}
-
-function _onTabCreated(tab)
-{
-    tabs.initTab(tab.id);
-
-    if(!Utils.objExist(tab.openerTabId))
-        return;
-
-    //we add the history and serach text of the tab that opened this one
-    setTabSearch(tab.id, getOriginalSearchText(tab.openerTabId));
-    setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
-}
-
-function _onCommitted(e)
-{
-    if(doesTransitionTypeResetSearch(e.transitionType))
-    {
-        resetTabHisoryAndSearch(e.tabId);
-    }
-}
-
-function _resetTabHisoryAndSearch(tabId)
-{
-    if(!tabs.tabExists(tabId))
-        return;
-    
-    setTabSearch(tabId, "");
-    setTabHistory(tabId, []);
-}
-
-function _doesTransitionTypeResetSearch(transitionType)
-{
-    if(transitionType == "link")
-        return false;
-    if(transitionType == "manual_subframe") //back and forth button
-        return false;
-    if(transitionType == "reload") //back and forth button
-        return false;
-    return true;
-}
-
 function onDOMContentLoaded(e)
 {
-    //console.log("Dom");
-    //console.log(e);
-}
-
-function _onTabUpdated(tabId, changeInfo, tab)
-{
-    if(changeInfo.status != "loading")//loading event can´t connect to port yey
-        return;
-
-    if(!tabs.tabExists(tabId))
-        tabs.initTab(tabId);
-
-    tabs[tabId].port = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
-    //contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
-
-    //we use this to know if its a serach engine
-    var searchText = UrlUtils.getSearchText(tab.url);
-    if(searchText)
-    {
-        resetTabHisoryAndSearch(tabId);
-        setTabSearch(tabId, searchText);
-        injectSamanthaResults(tab.id, searchText);
-    }
-    
-    if(tabHistoryExists(tab.id))
-        addUrlToHistory(tab.id, tab.url);
-}
-
-function _onTabRemoved(tabId, removeInfo)
-{
-    delete tabs[tabId];
-}
-
-function _setTabSearch(tabId, searchText)
-{
-    tabs[tabId].searchText = searchText;
-}
-
-function _setTabHistory(tabId, history)
-{
-    tabs[tabId].history = history;
-}
-
-function _addUrlToHistory(tabId, url)
-{
-    if(urlIsNotTheSame(tabId, url))
-        tabs[tabId].history.push(url);
-}
-
-function _urlIsNotTheSame(tabId, url)
-{
-    var tabLength = tabs[tabId].history.length-1;
-    if(tabs[tabId].history[tabLength] == url) //url is not the same as the last register
-        return false;
-
-    return true;
-}
-
-function _tabHistoryExists(tabId)
-{
-    if(tabs.tabExists(tabId))
-        return Utils.objExist(tabs[tabId].history);
-    return false;
 }
 
 function injectSamanthaResults(tabId, searchText)
 {
     tabs.sendMessage("inject", searchText, tabId);
-}
-
-function _objExist(obj)
-{
-    if (typeof obj != "undefined")
-        return true;
-
-    return false;
-}
-
-function _copy(obj)
-{
-    return JSON.parse(JSON.stringify(obj));
 }
 
 function onGetSuggestedHitags(inProgressHitag)

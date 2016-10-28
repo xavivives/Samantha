@@ -3,7 +3,6 @@ import UrlUtils from './urlUtils.js';
 
 export default class tabsController
 {
-
     constructor()
     {
         this.onTabUpdated = this.onTabUpdated.bind(this);
