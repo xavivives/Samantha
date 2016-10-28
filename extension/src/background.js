@@ -7,32 +7,28 @@ import UserState from './userState.js';
 import Utils from './utils.js';
 import TabsController from './tabsController.js';
 
-//chrome.runtime.onConnect.addListener(onContentConnected);
-//chrome.runtime.onMessage.addListener(onContentMessage);
-//chrome.tabs.onUpdated.addListener(onTabUpdated);
-//chrome.tabs.onCreated.addListener(onTabCreated);
-//chrome.tabs.onRemoved.addListener(onTabRemoved);
-//chrome.webNavigation.onCommitted.addListener(onCommitted);
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
-
-
 chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 
 var userState = null;
 var clipboard = "";
 var searchPage ="search.html";
 var tabs = null;
-
 var searchEngine = null;
-
-var hitagsIndex =HitagUtils.getNewTagNode("root");
+var urlToGo = "";
+var hitagsIndex = HitagUtils.getNewTagNode("root");
 start(); 
 
-function _onContentMessage(message, sender, sendResponse)
+function start()
 {
-    processMessage(message.event, message.value, sender.tab);
+    //chrome.storage.local.clear();
+    console.log("start");
+    userState = new UserState();
+    userState.load(onUserStateLoaded);
+    tabs = new TabsController(processMessage);
+   // ChromeStorage.loadElement("stateConfig", onUserStateLoaded );
 }
 
 function processMessage(event, value, tab)
@@ -70,11 +66,6 @@ function onSearchRequested(searchStr, tabId)
     tabs.sendMessage("updateSearchResults", uiResults, tabId);
 }
 
-function goToUrl(url)
-{
-    chrome.tabs.update(null, {url:url});
-}
-
 //OMNIBOX
 
 function getSearchPageUrl(searchStr)
@@ -82,7 +73,6 @@ function getSearchPageUrl(searchStr)
     return searchPage+"?search="+searchStr;
 }
 
-var urlToGo = "";
 function onOmniboxInputChanged(text, suggest)
 {
     var omniboxMaxSuggestions = 5;
@@ -144,24 +134,10 @@ function setOmniboxSuggestion(str, url)
 function onOmniboxEnter(str)
 {
     if(urlToGo)
-        goToUrl(urlToGo);
+        UrlUtils.goToUrl(urlToGo);
     else
-        goToUrl(str);
+        UrlUtils.goToUrl(str);
 }
-
-
-//CONFIG
-
-function start()
-{
-    //chrome.storage.local.clear();
-    console.log("start");
-    userState = new UserState();
-    userState.load(onUserStateLoaded);
-    tabs = new TabsController(processMessage);
-   // ChromeStorage.loadElement("stateConfig", onUserStateLoaded );
-}
-
 
 function onUserStateLoaded()
 {
@@ -169,7 +145,7 @@ function onUserStateLoaded()
     {
         searchEngine = new SearchEngine(loadedIndex);
     });
-        //searchEngine.reIndex(stateConfig.currentUId);
+    //searchEngine.reIndex(stateConfig.currentUId);
 }
 
 function prepareSuggestion(str)

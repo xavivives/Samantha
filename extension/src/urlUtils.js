@@ -57,4 +57,9 @@ export default class urlUtils
         return true;
     }
 
+    static goToUrl(url)
+    {
+        chrome.tabs.update(null, {url:url});
+    }
+
 }
