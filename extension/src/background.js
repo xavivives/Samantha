@@ -4,16 +4,20 @@ import HitagUtils from './ui/hitagUtils.js';
 import ChromeStorage from './chromeStorage.js';
 import SearchEngine from './searchEngine.js';
 import UserState from './userState.js';
+import Utils from './utils.js';
+import TabsController from './tabsController.js';
 
-chrome.runtime.onConnect.addListener(onContentConnected);
+//chrome.runtime.onConnect.addListener(onContentConnected);
 chrome.runtime.onMessage.addListener(onContentMessage);
+//chrome.tabs.onUpdated.addListener(onTabUpdated);
+//chrome.tabs.onCreated.addListener(onTabCreated);
+//chrome.tabs.onRemoved.addListener(onTabRemoved);
+//chrome.webNavigation.onCommitted.addListener(onCommitted);
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
 chrome.browserAction.onClicked.addListener(onBrowserActionClicked);
-chrome.tabs.onUpdated.addListener(onTabUpdated);
-chrome.tabs.onCreated.addListener(onTabCreated);
-chrome.tabs.onRemoved.addListener(onTabRemoved);
-chrome.webNavigation.onCommitted.addListener(onCommitted);
+
+
 chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 
 var userState = null;
@@ -21,8 +25,9 @@ var clipboard = "";
 //var contentPort = {};
 var searchPage ="search.html";
 
-var tabs =[];
-var popupId = "popup";
+var _tabs =[];
+var tabs = new TabsController();
+//var tabs.popupId = "popup";
 var searchEngine = null;
 
 var hitagsIndex =HitagUtils.getNewTagNode("root");
@@ -39,19 +44,19 @@ function initTab(tabId)
     tabs[tabId].queuedMessages =[];
 }
 
-function onContentConnected (port)
+function _onContentConnected (port)
 {
     var tabId = "";
 
     if(!port.sender.tab)//its probably an extension popup
-        tabId = popupId;
+        tabId = tabs.popupId;
     else
         tabId = port.sender.tab.id;
 
     console.log("Connected " + tabId);
 
-    if(!exists(tabs[tabId]))
-        initTab(tabId);
+    if(!tabs.tabExists(tabId))
+        tabs.initTab(tabId);
 
     tabs[tabId].port = port;
     
@@ -64,12 +69,12 @@ function onContentConnected (port)
         onShowHelp();
 }
 
-function sendMessage(event, value, tabId)
+function _sendMessage(event, value, tabId)
 {
     var message = {event:event, value:value};
 
-    if(!exists(tabs[tabId]))
-        initTab(tabId);
+    if(!tabs.tabExists(tabId))
+        tabs.initTab(tabId);
 
     if(tabs[tabId].port == null)
     {
@@ -120,7 +125,7 @@ function onSearchRequested(searchStr, tabId)
 {
     var lunrResults =  searchEngine.getLunrSearchResults(searchStr);
     var uiResults = lunrResultsToUiResults(lunrResults);
-    sendMessage("updateSearchResults", uiResults, tabId);
+    tabs.sendMessage("updateSearchResults", uiResults, tabId);
 }
 
 function goToUrl(url)
@@ -260,26 +265,26 @@ function lunrResultsToUiResults(results)
 
 function onBrowserActionClicked(tab)
 {
-    //If no popup.html exists this will be triggered
+    //If no popup.html Utils.objExist this will be triggered
 }
 
 function onSaveUrl()
 {
-    getCurrentTab(function(tab)
+    tabs.getCurrentTab(function(tab)
     {
         if(!UrlUtils.urlIsSavable(tab.url))
         {
-            sendSaveError(popupId);
+            sendSaveError(tabs.popupId);
             return;
         }
 
-        var retrieve = createRetrieve(getOriginalSearchText(tab.id), getHistorySinceSearch(tab.id));
+        var retrieve = createRetrieve(tabs.getOriginalSearchText(tab.id), tabs.getHistorySinceSearch(tab.id));
         var existingAtom = getAtomByUrl(tab.url);
 
         if(existingAtom)
         {
             addRetrive(existingAtom, retrieve);
-            sendAlreadySaved(popupId);
+            sendAlreadySaved(tabs.popupId);
             updatePopupAtom(existingAtom);
             return;
         }
@@ -294,18 +299,18 @@ function onSaveUrl()
 
         updatePopupAtom(atom);
 
-        sendSaveOk(popupId);
+        sendSaveOk(tabs.popupId);
     })
 }
 
 function updatePopupAtom(atom)
 {
-    sendMessage("updatePopupAtom", atom, popupId);
+    tabs.sendMessage("updatePopupAtom", atom, tabs.popupId);
 }
 
 function onAddHitag(hitag)
 {
-    getCurrentTab(function(tab)
+    tabs.getCurrentTab(function(tab)
     {
         var existingAtom = getAtomByUrl(tab.url);
 
@@ -371,7 +376,7 @@ function sendSaveError(tabId)
         message:"Ops! Can't be save this :("
 
     }
-    sendMessage("updatePopupStatus", status, tabId);
+    tabs.sendMessage("updatePopupStatus", status, tabId);
 }
 
 function sendAlreadySaved(tabId)
@@ -382,7 +387,7 @@ function sendAlreadySaved(tabId)
         message:"Already saved!"
 
     }
-    sendMessage("updatePopupStatus", status, tabId);
+    tabs.sendMessage("updatePopupStatus", status, tabId);
 }
 
 function sendSaveOk(tabId)
@@ -393,7 +398,7 @@ function sendSaveOk(tabId)
         message:"Saved"
 
     }
-    sendMessage("updatePopupStatus", status, tabId);
+    tabs.sendMessage("updatePopupStatus", status, tabId);
 }
 
 function createAtom(page)
@@ -453,17 +458,17 @@ function createRelation(type, hash)
     return relation;
 }
 
-function getOriginalSearchText(tabId)
+function _getOriginalSearchText(tabId)
 {
     if(tabHistoryExists(tabId))
         return tabs[tabId].searchText;
     return null;
 }
 
-function getHistorySinceSearch(tabId)
+function _getHistorySinceSearch(tabId)
 {
     if(tabHistoryExists(tabId))
-        return copy(tabs[tabId].history);
+        return Utils.copyObj(tabs[tabId].history);
     return [];
 }
 
@@ -472,7 +477,7 @@ function getCurrentTime()
     return new Date().toJSON();
 }
 
-function getCurrentTab(onTap)
+function _getCurrentTab(onTap)
 {
     chrome.tabs.query({active: true, currentWindow: true}, function(arrayOfTabs) {
         var activeTab = arrayOfTabs[0];
@@ -486,11 +491,11 @@ function getCurrentTab(onTap)
     });
 }
 
-function onTabCreated(tab)
+function _onTabCreated(tab)
 {
-    initTab(tab.id);
+    tabs.initTab(tab.id);
 
-    if(!exists(tab.openerTabId))
+    if(!Utils.objExist(tab.openerTabId))
         return;
 
     //we add the history and serach text of the tab that opened this one
@@ -498,7 +503,7 @@ function onTabCreated(tab)
     setTabHistory(tab.id, getHistorySinceSearch(tab.openerTabId));
 }
 
-function onCommitted(e)
+function _onCommitted(e)
 {
     if(doesTransitionTypeResetSearch(e.transitionType))
     {
@@ -506,16 +511,16 @@ function onCommitted(e)
     }
 }
 
-function resetTabHisoryAndSearch(tabId)
+function _resetTabHisoryAndSearch(tabId)
 {
-    if(!exists(tabs[tabId]))
+    if(!tabs.tabExists(tabId))
         return;
     
     setTabSearch(tabId, "");
     setTabHistory(tabId, []);
 }
 
-function doesTransitionTypeResetSearch(transitionType)
+function _doesTransitionTypeResetSearch(transitionType)
 {
     if(transitionType == "link")
         return false;
@@ -532,13 +537,13 @@ function onDOMContentLoaded(e)
     //console.log(e);
 }
 
-function onTabUpdated(tabId, changeInfo, tab)
+function _onTabUpdated(tabId, changeInfo, tab)
 {
     if(changeInfo.status != "loading")//loading event can´t connect to port yey
         return;
 
-    if(!exists(tabs[tabId]))
-        initTab(tabId);
+    if(!tabs.tabExists(tabId))
+        tabs.initTab(tabId);
 
     tabs[tabId].port = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
     //contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
@@ -556,28 +561,28 @@ function onTabUpdated(tabId, changeInfo, tab)
         addUrlToHistory(tab.id, tab.url);
 }
 
-function onTabRemoved(tabId, removeInfo)
+function _onTabRemoved(tabId, removeInfo)
 {
     delete tabs[tabId];
 }
 
-function setTabSearch(tabId, searchText)
+function _setTabSearch(tabId, searchText)
 {
     tabs[tabId].searchText = searchText;
 }
 
-function setTabHistory(tabId, history)
+function _setTabHistory(tabId, history)
 {
     tabs[tabId].history = history;
 }
 
-function addUrlToHistory(tabId, url)
+function _addUrlToHistory(tabId, url)
 {
     if(urlIsNotTheSame(tabId, url))
         tabs[tabId].history.push(url);
 }
 
-function urlIsNotTheSame(tabId, url)
+function _urlIsNotTheSame(tabId, url)
 {
     var tabLength = tabs[tabId].history.length-1;
     if(tabs[tabId].history[tabLength] == url) //url is not the same as the last register
@@ -586,19 +591,19 @@ function urlIsNotTheSame(tabId, url)
     return true;
 }
 
-function tabHistoryExists(tabId)
+function _tabHistoryExists(tabId)
 {
-    if(exists(tabs[tabId]))
-        return exists(tabs[tabId].history);
+    if(tabs.tabExists(tabId))
+        return Utils.objExist(tabs[tabId].history);
     return false;
 }
 
 function injectSamanthaResults(tabId, searchText)
 {
-    sendMessage("inject", searchText, tabId);
+    tabs.sendMessage("inject", searchText, tabId);
 }
 
-function exists(obj)
+function _objExist(obj)
 {
     if (typeof obj != "undefined")
         return true;
@@ -606,7 +611,7 @@ function exists(obj)
     return false;
 }
 
-function copy(obj)
+function _copy(obj)
 {
     return JSON.parse(JSON.stringify(obj));
 }
@@ -629,7 +634,7 @@ function onGetSuggestedHitags(inProgressHitag)
     });
     
 
-    sendMessage("updateHitagSuggestions", suggestedHitags, popupId);
+    tabs.sendMessage("updateHitagSuggestions", suggestedHitags, tabs.popupId);
 }
 
 function logRootHitagNode()
@@ -639,9 +644,9 @@ function logRootHitagNode()
 
 function onShowHelp()
 {
-    getCurrentTab(function(tab)
+    tabs.getCurrentTab(function(tab)
     {
-        sendMessage("showHelp", null, tab.id);
+        tabs.sendMessage("showHelp", null, tab.id);
     });
 }
 
