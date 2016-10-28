@@ -1,10 +1,9 @@
 import ElasticLunr from 'elasticlunr';
-import OtherSearchEngines from './otherSearchEngines.js';
-import HitagUtils from './hitagUtils.js';
+import UrlUtils from './urlUtils.js';
+import HitagUtils from './ui/hitagUtils.js';
 import ChromeStorage from './chromeStorage.js';
 import SearchEngine from './searchEngine.js';
-
-var otherSearchEngines = new OtherSearchEngines();
+import UserState from './userState.js';
 
 chrome.runtime.onConnect.addListener(onContentConnected);
 chrome.runtime.onMessage.addListener(onContentMessage);
@@ -17,9 +16,7 @@ chrome.tabs.onRemoved.addListener(onTabRemoved);
 chrome.webNavigation.onCommitted.addListener(onCommitted);
 chrome.webNavigation.onDOMContentLoaded.addListener(onDOMContentLoaded);
 
-var firstTime = false;
-var helpIsShown = false;
-var stateConfig = null;
+var userState = null;
 var clipboard = "";
 //var contentPort = {};
 var searchPage ="search.html";
@@ -63,8 +60,7 @@ function onContentConnected (port)
         tabs[tabId].port.postMessage(tabs[tabId].queuedMessages.shift());
     }
 
-    console.log(stateConfig.helpShownTimes);
-    if(stateConfig.helpShownTimes == 0)
+    if(userState.getHelpShownTimes() == 0)
         onShowHelp();
 }
 
@@ -206,13 +202,6 @@ function onOmniboxEnter(str)
         goToUrl(str);
 }
 
-//SEARCH
-
-function getNewUId()
-{
-    stateConfig.currentUId ++;
-    return stateConfig.currentUId.toString();
-}
 
 //CONFIG
 
@@ -220,38 +209,19 @@ function start()
 {
     //chrome.storage.local.clear();
     console.log("start");
-    ChromeStorage.loadElement("stateConfig", onStateConfigLoaded );
+    userState = new UserState();
+    userState.load(onUserStateLoaded);
+   // ChromeStorage.loadElement("stateConfig", onUserStateLoaded );
 }
 
-function saveStateConfig()
-{
-    ChromeStorage.saveElement("stateConfig", stateConfig);
-}
 
-function onStateConfigLoaded(config)
+function onUserStateLoaded()
 {
-    function onIndexLoaded(loadedIndex)
+    ChromeStorage.loadElement("index", function(loadedIndex)
     {
         searchEngine = new SearchEngine(loadedIndex);
-    }
-    
-    initStateConfig(config);
-    ChromeStorage.loadElement("index", onIndexLoaded);
-    //searchEngine.reIndex(stateConfig.currentUId);
-}
-
-function initStateConfig(storedConfig)
-{
-    if(storedConfig)
-    {
-        //stateConfig = storedConfig;
-    }
-    if(!stateConfig)
-        stateConfig={};
-    if(!stateConfig.currentUId)
-        stateConfig.currentUId = 0;
-    if(!stateConfig.helpShownTimes)
-        stateConfig.helpShownTimes = 0;
+    });
+        //searchEngine.reIndex(stateConfig.currentUId);
 }
 
 function prepareSuggestion(str)
@@ -297,7 +267,7 @@ function onSaveUrl()
 {
     getCurrentTab(function(tab)
     {
-        if(!urlIsSavable(tab.url))
+        if(!UrlUtils.urlIsSavable(tab.url))
         {
             sendSaveError(popupId);
             return;
@@ -369,21 +339,12 @@ function addHitagToAtom(atom, hitag)
 
 function saveAtom(atom)
 {
-    var entry = searchEngine.createEntryFromAtom(atom, getNewUId());
+    var entry = searchEngine.createEntryFromAtom(atom, userState.getNewUId());
     searchEngine.addSearchEntry(entry);
     ChromeStorage.saveElement(entry.id, atom);
 
     searchEngine.saveIndex();
-    saveStateConfig();
-}
-
-function urlIsSavable(url)
-{
-    if(url == null)
-        return false;
-    if(url.indexOf("chrome://") == 0)
-        return false;
-    return true;
+    userState.save();
 }
 
 function getAtomByUrl(url)
@@ -583,7 +544,7 @@ function onTabUpdated(tabId, changeInfo, tab)
     //contentPort = null;//Here, new port hasn´t connected yet. We set it to null so if we sent a message it will be queued instead of failing
 
     //we use this to know if its a serach engine
-    var searchText = otherSearchEngines.getSearchText(tab.url);
+    var searchText = UrlUtils.getSearchText(tab.url);
     if(searchText)
     {
         resetTabHisoryAndSearch(tabId);
@@ -635,7 +596,6 @@ function tabHistoryExists(tabId)
 function injectSamanthaResults(tabId, searchText)
 {
     sendMessage("inject", searchText, tabId);
-   // sendMessage("inject", getSearchPageUrl(searchText));
 }
 
 function exists(obj)
@@ -687,6 +647,6 @@ function onShowHelp()
 
 function onHelpShown()
 {
-    stateConfig.helpShownTimes++;
-    saveStateConfig();
+    userState.onHelpShown();
+    userState.save();
 }
