@@ -8,7 +8,7 @@ import Utils from './utils.js';
 import TabsController from './tabsController.js';
 
 import Atom from './atom.js';
-
+import Hash from './hash.js';
 
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
@@ -31,6 +31,7 @@ function start()
     userState = new UserState();
     userState.load(onUserStateLoaded);
     tabs = new TabsController(processMessage);
+    
    // ChromeStorage.loadElement("stateConfig", onUserStateLoaded );
 }
 
@@ -200,7 +201,7 @@ function onSaveUrl()
             return;
         }
 
-        var retrieve = createRetrieve(tabs.getOriginalSearchText(tab.id), tabs.getHistorySinceSearch(tab.id));
+        /*var retrieve = createRetrieve(tabs.getOriginalSearchText(tab.id), tabs.getHistorySinceSearch(tab.id));
         
         var existingAtom = getAtomByUrl(tab.url);
         
@@ -211,19 +212,44 @@ function onSaveUrl()
             updatePopupAtom(existingAtom);
             return;
         }
+        */
 
-        var page = createPage(tab.url, tab.title, tab.favIconUrl);
-        var content = null;
+        //var page = createPage(tab.url, tab.title, tab.favIconUrl);
+        //var content = null;
 
-        var atom = new Atom(page);
-        atom.addRetrieve( retrieve);
+        
+        //atom.addRetrieve( retrieve);
 
-        saveAtom(atom);
+        
 
-        updatePopupAtom(atom);
+        getAtom(tab.url, saveAtom);
+        //updatePopupAtom(atom);
 
         sendSaveOk(tabs.popupId);
     })
+}
+
+function getAtom(content, onAtomReady)
+{
+    Hash.sha256(content).then(function(hash)
+    {
+        ChromeStorage.loadElement(hash, function(existingAtomData)
+        {
+            if(existingAtomData)
+            {
+                console.log("existing");
+                var atom = new Atom(existingAtomData);
+                onAtomReady(hash, atom);
+            }
+            else
+            {
+                console.log("new");
+                var atom = new Atom();
+                atom.addContentLink(hash);
+                onAtomReady(hash, atom);
+            }
+        });
+    }); 
 }
 
 function updatePopupAtom(atom)
@@ -262,14 +288,19 @@ function _addHitagToAtom(atom, hitag)
     HitagUtils.saveHitagNode(hitag, atom.relations.hitags);
 }
 
-function saveAtom(atom)
+function saveAtom(hash, atom)
 {
-    var entry = searchEngine.createEntryFromAtom(atom, userState.getNewUId());
+    var entry = searchEngine.createEntryFromAtom(atom, hash);
     searchEngine.addSearchEntry(entry);
-    ChromeStorage.saveElement(entry.id, atom);
+    ChromeStorage.saveElement(hash, atom, onSaved);
 
     searchEngine.saveIndex();
-    userState.save();
+    //userState.save();
+}
+
+function onSaved()
+{
+    console.log("saved");
 }
 
 function getAtomByUrl(url)

@@ -72,9 +72,9 @@ export default class SearchEngine
          var entry = 
         {
             "id" : uID,
-            "url" : atom.page.url,
-            "urlTitle" : atom.page.title,
-            "searchWordsSum":atom.searchWordsSum
+            "url" : atom.getContentData(),
+            "urlTitle" : atom.getContentData(),
+            "searchWordsSum":atom.getContentData()
         }
 
         return entry;
