@@ -1,12 +1,14 @@
+import DomUtils from './../domUtils.js';
+import HitagUtils from './../hitagUtils.js';
+import Connector from './../connector.js';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
-import DomUtils from './domUtils.js';
 import TextField from 'material-ui/TextField';
 import SelectableList from './selectableList.js';
 import Hitag from './hitag.js';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
-import HitagUtils from './hitagUtils.js';
-import Connector from './../connector.js';
+
 import Paper from 'material-ui/Paper';
 
 

@@ -1,4 +1,4 @@
-import HitagUtils from './ui/hitagUtils.js';
+import HitagUtils from './hitagUtils.js';
 import Utils from './utils.js';
 
 export default class atom
@@ -6,7 +6,7 @@ export default class atom
     constructor(atomData)
     {
         this.atom = {};
-        if(atomData)
+        if(this.atomData)
             this.atom = atomData;
         //this.v=0;
         //this.page = page;
@@ -40,15 +40,16 @@ export default class atom
         return "null";
     }
 
-
-    addRetrieve(retrieve)
+    addName(name)
     {
-        if(!this.retrieves)
-            this.retrieves = [];
-        this.retrieves.push(retrieve);
+        this.atom.name = name;
+    }
 
-        //if(retrieve.history.length>=2 && retrieve.searchText)
-            //this.searchWordsSum += " " + retrieve.searchText;
+    getName()
+    {
+        if(this.atom.name)
+            return  this.atom.name;
+        return "no name"; 
     }
 
     addHitag(hitag)
@@ -57,6 +58,16 @@ export default class atom
             this.relations.hitags = HitagUtils.getNewTagNode("root");
         
         HitagUtils.AddHitagToTree(hitag, this.relations.hitags);
+    }
+
+    serialize ()
+    {
+        return JSON.stringify(this.atom);
+    }
+
+    getObj ()
+    {
+        return this.atom;
     }
 
 

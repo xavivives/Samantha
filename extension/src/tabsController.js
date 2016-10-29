@@ -210,7 +210,6 @@ export default class tabsController
         }
     }
 
-
     doesTransitionTypeResetSearch(transitionType)
     {
         if(transitionType == "link")
@@ -220,6 +219,6 @@ export default class tabsController
         if(transitionType == "reload") //back and forth button
             return false;
         return true;
-}
+    }
 
 }

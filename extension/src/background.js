@@ -1,6 +1,6 @@
 import ElasticLunr from 'elasticlunr';
 import UrlUtils from './urlUtils.js';
-import HitagUtils from './ui/hitagUtils.js';
+import HitagUtils from './hitagUtils.js';
 import ChromeStorage from './chromeStorage.js';
 import SearchEngine from './searchEngine.js';
 import UserState from './userState.js';
@@ -201,31 +201,19 @@ function onSaveUrl()
             return;
         }
 
-        /*var retrieve = createRetrieve(tabs.getOriginalSearchText(tab.id), tabs.getHistorySinceSearch(tab.id));
-        
-        var existingAtom = getAtomByUrl(tab.url);
-        
-        if(existingAtom)
-        {
-            existingAtom.addRetrieve(retrieve);
-            sendAlreadySaved(tabs.popupId);
-            updatePopupAtom(existingAtom);
-            return;
-        }
-        */
-
         //var page = createPage(tab.url, tab.title, tab.favIconUrl);
-        //var content = null;
+       
+        getAtom(tab.url, function(hash, atom, isExisting)
+            {
+                if(isExisting)
+                    sendAlreadySaved(tabs.popupId);
+                else
+                    sendSaveOk(tabs.popupId);
 
-        
-        //atom.addRetrieve( retrieve);
-
-        
-
-        getAtom(tab.url, saveAtom);
-        //updatePopupAtom(atom);
-
-        sendSaveOk(tabs.popupId);
+                atom.addName(tab.title);
+                saveAtom(hash, atom);
+                updatePopupAtom(atom);
+            }); 
     })
 }
 
@@ -235,26 +223,35 @@ function getAtom(content, onAtomReady)
     {
         ChromeStorage.loadElement(hash, function(existingAtomData)
         {
+            var isExistingAtom = false;
             if(existingAtomData)
             {
-                console.log("existing");
+                isExistingAtom = true;
                 var atom = new Atom(existingAtomData);
-                onAtomReady(hash, atom);
+                onAtomReady(hash, atom, isExistingAtom);
             }
             else
             {
-                console.log("new");
+                isExistingAtom = false;
                 var atom = new Atom();
                 atom.addContentLink(hash);
-                onAtomReady(hash, atom);
+                onAtomReady(hash, atom, isExistingAtom);
             }
         });
     }); 
 }
 
+function saveAtom(hash, atom)
+{
+    var entry = searchEngine.createEntryFromAtom(atom, hash);
+    searchEngine.addSearchEntry(entry);
+    ChromeStorage.saveElement(hash, atom.getObj());
+    searchEngine.saveIndex();
+}
+
 function updatePopupAtom(atom)
 {
-    tabs.sendMessage("updatePopupAtom", atom, tabs.popupId);
+    tabs.sendMessage("updatePopupAtom", atom.getObj(), tabs.popupId);
 }
 
 function onAddHitag(hitag)
@@ -288,20 +285,6 @@ function _addHitagToAtom(atom, hitag)
     HitagUtils.saveHitagNode(hitag, atom.relations.hitags);
 }
 
-function saveAtom(hash, atom)
-{
-    var entry = searchEngine.createEntryFromAtom(atom, hash);
-    searchEngine.addSearchEntry(entry);
-    ChromeStorage.saveElement(hash, atom, onSaved);
-
-    searchEngine.saveIndex();
-    //userState.save();
-}
-
-function onSaved()
-{
-    console.log("saved");
-}
 
 function getAtomByUrl(url)
 {

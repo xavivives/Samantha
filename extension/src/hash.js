@@ -1,7 +1,17 @@
 export default class Hash
 {
+    static sha256(str)
+    {
+        // We transform the string into an arraybuffer.
+        var buffer = new TextEncoder("utf-8").encode(str);
+        return crypto.subtle.digest("SHA-256", buffer).then(function (hash)
+        {
+            return Hash.hex(hash);
+        });
+    }
 
-    static hex(buffer) {
+    static hex(buffer)
+    {
         var hexCodes = [];
         var view = new DataView(buffer);
         for (var i = 0; i < view.byteLength; i += 4) {
@@ -18,15 +28,6 @@ export default class Hash
         // Join all the hex strings into one
         return hexCodes.join("");
     }
-
-    static sha256(str) {
-        // We transform the string into an arraybuffer.
-        var buffer = new TextEncoder("utf-8").encode(str);
-        return crypto.subtle.digest("SHA-256", buffer).then(function (hash) {
-            return Hash.hex(hash);
-        });
-    }
-
 
 }
         

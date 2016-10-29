@@ -1,5 +1,7 @@
-import React from 'react';
 import Connector from './../connector.js';
+import HitagUtils from './../hitagUtils.js';
+
+import React from 'react';
 //import Hitag from './hitag.js';
 import TextField from 'material-ui/TextField';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'; 
@@ -11,8 +13,9 @@ import HitagsAutocomplete from './hitagsAutocomplete.js';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import {cyan500} from 'material-ui/styles/colors';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
-import HitagUtils from './hitagUtils.js';
 import FontAwesome from 'react-fontawesome';
+
+
 
 export default class PopupPage extends React.Component
 {
@@ -72,6 +75,7 @@ export default class PopupPage extends React.Component
 
     updatePopupAtom(atom)
     {
+        console.log(atom);
         var atomHitags=[];
         if(atom.relations && atom.relations.hitags)
             HitagUtils.hitagNodeToHitagList(atom.relations.hitags, atomHitags);
@@ -109,7 +113,8 @@ export default class PopupPage extends React.Component
                     <div style={{minWidth: 350, minHeight: 350}}>
 
                         <div style={{whiteSpace: 'nowrap'}}>
-                            <p style ={messageStyle}> {this.state.status.message} </p>
+                            <p style ={{color:"gray"}}> {this.state.atom.name} </p>
+                            <p style ={messageStyle}> {this.state.status.message} </p>                         
                         </div>
 
                         <HitagsAutocomplete connector={this.connector} isOpened={true}/>
