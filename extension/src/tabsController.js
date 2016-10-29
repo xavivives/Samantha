@@ -26,7 +26,6 @@ export default class tabsController
 
     onContentMessage(message, sender, sendResponse)
     {
-        console.log(sender);
         this.onMessage(message.event, message.value, sender.tab);
     }
 
@@ -61,8 +60,6 @@ export default class tabsController
 
     initTab(tabId)
     {
-        console.log("initTab "+ tabId);
-
         this.tabs[tabId] ={};
         this.tabs[tabId].port = null;
         this.tabs[tabId].history =[];
@@ -181,12 +178,12 @@ export default class tabsController
 
         if(this.tabs[tabId].port == null)
         {
-            console.log("Queueing " + tabId + ": "+ message.event);
+            //console.log("Queueing " + tabId + ": "+ message.event);
             this.tabs[tabId].queuedMessages.push(message);
         }
         else
         {
-            console.log("Posting to "+ tabId + ": "+ message.event);
+           // console.log("Posting to "+ tabId + ": "+ message.event);
             this.tabs[tabId].port.postMessage(message);
         }
     }

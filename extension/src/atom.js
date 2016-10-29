@@ -22,7 +22,9 @@ export default class atom
 
     addHitag(hitag)
     {
-        if(!atom.relations.hitags)
+        if(!this.relations.hitags)
             this.relations.hitags = HitagUtils.getNewTagNode("root");
+        
+        HitagUtils.AddHitagToTree(hitag, this.relations.hitags);
     }
 }

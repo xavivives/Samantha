@@ -37,7 +37,7 @@ export default class HitagUtils
        return hitag.join(" > ");   
     }
     
-    static getHitagNode(hitag, rootHitag, forceCreation)
+    static getHitagTree(hitag, rootHitag, forceCreation)
     {
         var currentNode = rootHitag;
 
@@ -56,7 +56,6 @@ export default class HitagUtils
 
             if(!tagNameExists)
             {
-                
                 if(forceCreation)
                 {
                     console.log("Creating tag: "+ hitag[i]);
@@ -68,15 +67,12 @@ export default class HitagUtils
                 {
                     return null;
                 }
-            }
-
-            
+            }  
 
             if(tagNameExists && i==hitag.length-1)
             {
                 return currentNode;
-            }
-            
+            }          
         }
 
         return currentNode;
@@ -93,7 +89,15 @@ export default class HitagUtils
     static saveHitagNode(hitag, rootHitag)
     {
         var forceCreation = true;
-        HitagUtils.getHitagNode(hitag, rootHitag, forceCreation);
+        HitagUtils.getHitagTree(hitag, rootHitag, forceCreation);
+    }
+
+
+    static AddHitagToTree(hitag, tree)
+    {
+        var forceCreation = true;
+        var newTree = HitagUtils.getHitagTree(hitag, tree, forceCreation);
+        return newTree;
     }
 
     static logHitag(hitagNode, level)
@@ -157,7 +161,6 @@ export default class HitagUtils
         var matchingAtStart = [];
         for(var i=0; i<hitagNode.children.length; i++)
         {
-            console.log()
             if(hitagNode.children[i].tagName.indexOf(str)==0)
                 matchingAtStart.push(hitagNode.children[i].tagName);
         }

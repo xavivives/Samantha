@@ -214,7 +214,7 @@ function onSaveUrl()
 
         var page = createPage(tab.url, tab.title, tab.favIconUrl);
         var content = null;
-        console.log(retrieve);
+
         var atom = new Atom(page);
         atom.addRetrieve( retrieve);
 
@@ -236,13 +236,14 @@ function onAddHitag(hitag)
     tabs.getCurrentTab(function(tab)
     {
         var existingAtom = getAtomByUrl(tab.url);
-        console.log(existingAtom);
+        
 
         if(existingAtom)
         {
-            addHitagToAtom(existingAtom, hitag);
+            existingAtom.addHitag(hitag);
+            console.log(existingAtom);
 
-            HitagUtils.saveHitagNode(hitag, hitagsIndex);
+            //HitagUtils.saveHitagNode(hitag, hitagsIndex);
             updatePopupAtom(existingAtom);
             return;
         }
@@ -253,7 +254,7 @@ function onAddHitag(hitag)
     })
 }
 
-function addHitagToAtom(atom, hitag)
+function _addHitagToAtom(atom, hitag)
 {
     if(!atom.relations.hitags)
         atom.relations.hitags = HitagUtils.getNewTagNode("root");
@@ -282,7 +283,6 @@ function getAtomByUrl(url)
     {
        var atomData =  searchEngine.getDocumentByRef(results[0].ref);
        var atom = Utils.cast(atomData, Atom);
-       console.log(atom);
        return atom;
     }
 
@@ -324,10 +324,6 @@ function sendSaveOk(tabId)
 
 function _createAtom(page)
 {
-
-    var a = new Atom();
-    console.log(a);
-    console.log(JSON.stringify(a));
     var atom =
     {
         v:0,
@@ -394,7 +390,7 @@ function onDOMContentLoaded(e)
 
 function onGetSuggestedHitags(inProgressHitag)
 {
-    var currentHitagNode = HitagUtils.getHitagNode(inProgressHitag.hitag, hitagsIndex);
+    var currentHitagNode = HitagUtils.getHitagTree(inProgressHitag.hitag, hitagsIndex);
 
     if(!currentHitagNode)
         return null;

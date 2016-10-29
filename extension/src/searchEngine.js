@@ -8,7 +8,6 @@ export default class SearchEngine
         if(newIndex)
         {
             this.index = this.getNewIndex();
-            console.log(this.index);
             return;
         }
         
@@ -97,7 +96,6 @@ export default class SearchEngine
             expand: true
         }
 
-        console.log(this.index);
         var results = this.index.search(urlToSearch, config);
 
         return results;
