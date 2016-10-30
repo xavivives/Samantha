@@ -65,7 +65,7 @@ function onCopy(str)
 
 function onSearchRequested(searchStr, tabId)
 {
-    var lunrResults =  searchEngine.getLunrSearchResults(searchStr);
+    var lunrResults =  searchEngine.getLunrSearchResults(searchStr);;
     var uiResults = lunrResultsToUiResults(lunrResults);
     tabs.sendMessage("updateSearchResults", uiResults, tabId);
 }
@@ -118,6 +118,8 @@ function lunrResultsToSuggestions(results)
 function lunrResultToSuggestion(result)
 {
     var entry = searchEngine.getDocumentByRef(result.ref);
+    console.log(entry);
+
     var scoreStr = (Math.round(result.score * 100) / 100).toString();
 
     var suggestion =
@@ -164,13 +166,27 @@ function lunrResultToUiResult(result)
 {
     var entry = searchEngine.getDocumentByRef(result.ref);
 
+    ChromeStorage.loadElement(entry.id, function(existingAtomData)
+       {
+            var atom = new Atom();
+            if(existingAtomData)
+                atom.populate(existingAtom);
+            else
+                return null;
+
+            uiResult = getUiResult(result, entry, atom);
+                  
+       });
+}
+
+function getUiResult(result, entry, atom)
+{
     var uiResult =
     {
         score: result.score,
         timestamp:entry.timestamp,
         id:entry.id,
-        url: entry.url, 
-        content: entry.content
+        atom:atom
     }
 
     return uiResult;
@@ -178,10 +194,29 @@ function lunrResultToUiResult(result)
 
 function lunrResultsToUiResults(results)
 {
-    var uiResults = [];
+    var ids = [];
+    console.log(results);
     for (var i = 0; i < results.length; i++)
-        uiResults.push(lunrResultToUiResult(results[i]));
-    return uiResults;
+    {
+        var entry = searchEngine.getDocumentByRef(results[i].ref);
+        console.log(entry);
+        ids.push(entry.id);
+    }
+    console.log(ids);
+
+    ChromeStorage.loadElements(ids, function(existingAtomData)
+       {
+        console.log("here");
+            /*var atom = new Atom();
+            if(existingAtomData)
+                atom.populate(existingAtom);
+            else
+                return null;
+
+            uiResult = getUiResult(result, entry, atom);
+                  */
+       });
+
 }
 
 //BROWSER ACTION
@@ -211,7 +246,10 @@ function onSaveUrl()
                     sendSaveOk(tabs.popupId);
 
                 atom.addName(tab.title);
+                atom.addContentData(tab.url);
+                atom.addContentLink(hash);
                 saveAtom(hash, atom);
+
                 updatePopupAtom(atom);
             }); 
     })

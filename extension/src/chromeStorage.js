@@ -20,4 +20,16 @@ export default class ChromeStorage
 
         chrome.storage.local.get(key, onElementLoaded);
     }
+
+    static loadElements(keys, onLoaded)
+    {
+        function onElementsLoaded(obj)
+        {
+            console.log(obj)
+            onLoaded(obj);
+        }
+
+        chrome.storage.local.get(keys, onElementsLoaded);
+    }
+
 }

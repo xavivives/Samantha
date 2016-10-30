@@ -28,13 +28,6 @@ export default class SearchEngine
         return newIndex;
     }
 
-    _onSearchRequested(searchStr, tabId)
-    {
-        var lunrResults =  this.getLunrSearchResults(searchStr);
-        var uiResults = lunrResultsToUiResults(lunrResults);
-        sendMessage("updateSearchResults", uiResults, tabId);
-    }
-
     getLunrSearchResults(textToSearch)
     {
         var config =
@@ -63,7 +56,6 @@ export default class SearchEngine
 
         
         var results = this.index.search(textToSearch, config);
-
         return results;
     }
 
@@ -73,8 +65,8 @@ export default class SearchEngine
         {
             "id" : uID,
             "url" : atom.getContentData(),
-            "urlTitle" : atom.getContentData(),
-            "searchWordsSum":atom.getContentData()
+            "urlTitle" : atom.getName(),
+            "searchWordsSum":atom.getName()
         }
 
         return entry;
@@ -121,6 +113,7 @@ export default class SearchEngine
 
     addSearchEntry(entry)
     {
+        console.log(entry);
         this.index.addDoc(entry);
     }
 

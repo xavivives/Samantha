@@ -5,9 +5,7 @@ export default class atom
 {
     constructor(atomData)
     {
-        this.atom = {};
-        if(this.atomData)
-            this.atom = atomData;
+        this.populate(atomData);
         //this.v=0;
         //this.page = page;
         //this.searchWordsSum = "";
@@ -16,13 +14,22 @@ export default class atom
         //this.relations.hitags = {};
     }
 
+    populate(atomData)
+    {
+        if(this.atomData)
+            this.atom = atomData;
+        else
+            this.atom = {};
+    }
+
     addContentLink(contentLink)
     {
-        this.atom.contentLink = contentLink;
+        this.atom.contentLink = contentLink; //content hash
     }
 
     getContentLink()
     {
+        console.log(atom);
         if(this.atom.contentLink)
             return  this.atom.contentLink;
         return "null";
@@ -30,7 +37,7 @@ export default class atom
 
     addContentData(contentData)
     {
-        this.atom.contentData = contentData;
+        this.atom.contentData = contentData; // content as string
     }
 
     getContentData()
@@ -42,7 +49,7 @@ export default class atom
 
     addName(name)
     {
-        this.atom.name = name;
+        this.atom.name = name; //title/main non unique identifier
     }
 
     getName()
