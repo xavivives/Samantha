@@ -6,12 +6,6 @@ export default class atom
     constructor(atomData)
     {
         this.populate(atomData);
-        //this.v=0;
-        //this.page = page;
-        //this.searchWordsSum = "";
-        //this.retrieves = [];
-        //this.relations = {};
-        //this.relations.hitags = {};
     }
 
     populate(atomData)

@@ -66,7 +66,6 @@ function onCopy(str)
 function onSearchRequested(searchStr, tabId)
 {
     var searchResults =  searchEngine.getLunrSearchResults(searchStr);
-
     var ids = [];
     var entries = [];
     for (var i = 0; i < searchResults.length; i++)
@@ -191,32 +190,6 @@ function prepareSuggestion(str)
     //linebreaks are not supported on Omnibox
     if(str)
     return str.replace(/(\r\n|\n|\r)/gm,"");
-}
-
-//SAMANTHA SEARCH PAGE
-function lunrResultToUiResult(result)
-{
-    var entry = searchEngine.getDocumentByRef(result.ref);
-
-    ChromeStorage.loadElement(entry.id, function(existingAtomData)
-       {
-            var atom = new Atom();
-            if(existingAtomData)
-                atom.populate(existingAtom);
-            else
-                return null;
-
-            uiResult = getUiResult(result, entry, atom);
-                  
-       });
-}
-
-
-
-function lunrResultsToUiResults(results)
-{
-    
-
 }
 
 //BROWSER ACTION
