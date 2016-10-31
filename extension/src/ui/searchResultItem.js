@@ -15,11 +15,20 @@ export default class searchResultItem extends React.Component
         this.atom.populate(props.result.atom);
 
         this.onClicked = this.onClicked.bind(this);
-        this.urlDomain = DomainUtil.getDomain(this.atom.getContentData());
 
-        var subdomain = DomainUtil.getSubdomain(this.atom.getContentData());
-        if(subdomain)
-          this.urlDomain=subdomain+"."+this.urlDomain;
+        this.url = this.atom.getContentData();
+        this.urlDomain = DomainUtil.getDomain(this.url);      
+        this.subdomain = DomainUtil.getSubdomain(this.url);
+        this.fullDomain = this.urlDomain;
+
+        if(this.subdomain)
+          this.fullDomain = this.subdomain + "." + this.urlDomain;
+
+        var domainStartIndex = this.url.indexOf(this.fullDomain);
+        var domainFinishIndex = domainStartIndex + this.fullDomain.length;
+
+        this.beginingOfUrl = this.url.substr(0,domainStartIndex);
+        this.endOfUrl = this.url.substr(domainFinishIndex);
 
         this.state= {
             imageUrl: null,
@@ -108,9 +117,7 @@ export default class searchResultItem extends React.Component
 
                 <div style={{flexGrow: 1, paddingRight:10}}>
 
-                    <p style = {{opacity:0.9, marginBottom:"0.5em", marginTop:0}}> 
-                        {this.atom.getContentData()}
-                    </p>
+                    
 
                      <p style = {{opacity:0.9, marginBottom:"0.5em", marginTop:0}}> 
                         {this.atom.getName()}
@@ -121,7 +128,17 @@ export default class searchResultItem extends React.Component
                             {Math.round(this.props.result.score*100)/100+ " "}
                         </span>
 
-                        {this.urlDomain}
+                      
+                         <span style = {{opacity:0.3}}>
+                           {this.beginingOfUrl}
+                        </span>
+                        <span style = {{opacity:0.8}}>
+                           {this.fullDomain}
+                        </span> 
+                        <span style = {{opacity:0.3}}>
+                           {this.endOfUrl}
+                        </span>                      
+                 
 
                     </p> 
                 </div>
