@@ -16,7 +16,8 @@ export default class atom
 
     populate(atomData)
     {
-        if(this.atomData)
+        //TODO verify atomData
+        if(atomData)
             this.atom = atomData;
         else
             this.atom = {};
@@ -29,7 +30,6 @@ export default class atom
 
     getContentLink()
     {
-        console.log(atom);
         if(this.atom.contentLink)
             return  this.atom.contentLink;
         return "null";

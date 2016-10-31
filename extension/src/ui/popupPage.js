@@ -15,8 +15,6 @@ import {cyan500} from 'material-ui/styles/colors';
 import {HotKeys, HotKeyMapMixin} from 'react-hotkeys';
 import FontAwesome from 'react-fontawesome';
 
-
-
 export default class PopupPage extends React.Component
 {
     constructor(props)
@@ -27,7 +25,8 @@ export default class PopupPage extends React.Component
         this.connector = new Connector();
         this.closePopup = this.closePopup.bind(this);
 
-        this.state = {
+        this.state =
+        {
             status:
             {
                 statusType:"normal",
@@ -37,7 +36,8 @@ export default class PopupPage extends React.Component
             atomHitags:[]
         };
 
-        this.muiTheme = getMuiTheme({
+        this.muiTheme = getMuiTheme(
+        {
           palette: {
             textColor: cyan500,
           },

@@ -65,11 +65,43 @@ function onCopy(str)
 
 function onSearchRequested(searchStr, tabId)
 {
-    var lunrResults =  searchEngine.getLunrSearchResults(searchStr);;
-    var uiResults = lunrResultsToUiResults(lunrResults);
-    tabs.sendMessage("updateSearchResults", uiResults, tabId);
+    var searchResults =  searchEngine.getLunrSearchResults(searchStr);
+
+    var ids = [];
+    var entries = [];
+    for (var i = 0; i < searchResults.length; i++)
+    {
+        var entry = searchEngine.getDocumentByRef(searchResults[i].ref);
+        entries.push(entry);
+        ids.push(entry.id);
+    }
+
+    ChromeStorage.loadElements(ids, function(objects)
+       {
+            var uiResults = [];
+
+            for (var i = 0; i < ids.length; i++)
+            {           
+                var atomData = objects[ids[i]]
+                uiResults.push(getUiResult(searchResults[i], entries[i], atomData));
+            }
+
+            tabs.sendMessage("updateSearchResults", uiResults, tabId);
+       });
 }
 
+function getUiResult(result, entry, atom)
+{
+    var uiResult =
+    {
+        score: result.score,
+        timestamp:entry.timestamp,
+        id:entry.id,
+        atom:atom
+    }
+
+    return uiResult;
+}
 //OMNIBOX
 
 function getSearchPageUrl(searchStr)
@@ -179,43 +211,11 @@ function lunrResultToUiResult(result)
        });
 }
 
-function getUiResult(result, entry, atom)
-{
-    var uiResult =
-    {
-        score: result.score,
-        timestamp:entry.timestamp,
-        id:entry.id,
-        atom:atom
-    }
 
-    return uiResult;
-}
 
 function lunrResultsToUiResults(results)
 {
-    var ids = [];
-    console.log(results);
-    for (var i = 0; i < results.length; i++)
-    {
-        var entry = searchEngine.getDocumentByRef(results[i].ref);
-        console.log(entry);
-        ids.push(entry.id);
-    }
-    console.log(ids);
-
-    ChromeStorage.loadElements(ids, function(existingAtomData)
-       {
-        console.log("here");
-            /*var atom = new Atom();
-            if(existingAtomData)
-                atom.populate(existingAtom);
-            else
-                return null;
-
-            uiResult = getUiResult(result, entry, atom);
-                  */
-       });
+    
 
 }
 

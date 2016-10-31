@@ -2,16 +2,22 @@ import React from 'react';
 import LazyLoad from 'react-lazy-load';
 import Metaget from 'metaget';
 import DomainUtil from 'tldjs';
+import Atom from './../atom.js';
 
 export default class searchResultItem extends React.Component
 {
     constructor(props)
     {
         super(props);
-        this.onClicked = this.onClicked.bind(this);
-        this.urlDomain = DomainUtil.getDomain(props.result.url);
+        console.log(props);
 
-        var subdomain = DomainUtil.getSubdomain(props.result.url);
+        this.atom = new Atom();
+        this.atom.populate(props.result.atom);
+
+        this.onClicked = this.onClicked.bind(this);
+        this.urlDomain = DomainUtil.getDomain(this.atom.getContentData());
+
+        var subdomain = DomainUtil.getSubdomain(this.atom.getContentData());
         if(subdomain)
           this.urlDomain=subdomain+"."+this.urlDomain;
 
@@ -23,7 +29,7 @@ export default class searchResultItem extends React.Component
 
         var that = this;
 
-        setTimeout(function(){ that.fetchMetadata(props.result.url) }, 200);    
+        setTimeout(function(){ that.fetchMetadata(ntData()) }, 200);    
     }
 
     componentWillMount()
@@ -38,6 +44,9 @@ export default class searchResultItem extends React.Component
 
     fetchMetadata(url)
     {
+        if(!url)
+            return;
+
         var that = this;
 
         if(!that.resultStillActive)
@@ -100,7 +109,11 @@ export default class searchResultItem extends React.Component
                 <div style={{flexGrow: 1, paddingRight:10}}>
 
                     <p style = {{opacity:0.9, marginBottom:"0.5em", marginTop:0}}> 
-                        {this.props.result.content}
+                        {this.atom.getContentData()}
+                    </p>
+
+                     <p style = {{opacity:0.9, marginBottom:"0.5em", marginTop:0}}> 
+                        {this.atom.getName()}
                     </p>
                     <p style = {{opacity:0.6, marginBottom:"0.5em", marginTop:0}}> 
 
