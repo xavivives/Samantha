@@ -1,5 +1,6 @@
 import HitagUtils from './hitagUtils.js';
 import Utils from './utils.js';
+import HitagTree from './hitagTree.js';
 
 export default class atom
 {
@@ -55,10 +56,16 @@ export default class atom
 
     addHitag(hitag)
     {
-        if(!this.relations.hitags)
-            this.relations.hitags = HitagUtils.getNewTagNode("root");
+        if(!this.atom.hitags)
+            this.atom.hitags = [];
         
-        HitagUtils.AddHitagToTree(hitag, this.relations.hitags);
+        HitagTree.addHitagToTree(hitag, this.atom.hitags);
+        //HitagUtils.AddHitagToTree(hitag, this.hitags);
+    }
+
+    getHitags()
+    {
+        return this.hitags;
     }
 
     serialize ()
