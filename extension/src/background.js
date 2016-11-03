@@ -269,49 +269,23 @@ function onAddHitag(hitag)
 {
     tabs.getCurrentTab(function(tab)
     {
-        var existingAtom = getAtomByUrl(tab.url);
-        
-
-        if(existingAtom)
-        {
-            existingAtom.addHitag(hitag);
-            console.log(existingAtom);
-
-            //HitagUtils.saveHitagNode(hitag, hitagsIndex);
-            updatePopupAtom(existingAtom);
-            return;
-        }
-        else
-        {
-            console.log("Trying to save hitag to unexisting content");
-        }
+        getAtom(tab.url, function(hash, atom, isExisting)
+            {
+                if(isExisting)
+                {
+                    atom.addHitag(hitag);
+                    //HitagUtils.saveHitagNode(hitag, hitagsIndex);
+                    saveAtom(hash, atom);
+                    updatePopupAtom(atom);
+                    console.log(atom);
+                    return;
+                }
+                else
+                {
+                    console.log("Trying to save hitag to unexisting content");
+                }
+            }); 
     })
-}
-
-function _addHitagToAtom(atom, hitag)
-{
-    if(!atom.relations.hitags)
-        atom.relations.hitags = HitagUtils.getNewTagNode("root");
-
-    HitagUtils.saveHitagNode(hitag, atom.relations.hitags);
-}
-
-
-function getAtomByUrl(url)
-{
-    var results = searchEngine.getLunrUrlSearchResults(url);
-
-    if(results.length>1)
-        console.warn("Some how there are multipe atoms for url:" + url);
-
-    if(results.length>0)
-    {
-       var atomData =  searchEngine.getDocumentByRef(results[0].ref);
-       var atom = Utils.cast(atomData, Atom);
-       return atom;
-    }
-
-    return null;
 }
 
 function sendSaveError(tabId)
@@ -347,20 +321,6 @@ function sendSaveOk(tabId)
     tabs.sendMessage("updatePopupStatus", status, tabId);
 }
 
-function _createAtom(page)
-{
-    var atom =
-    {
-        v:0,
-        page: page,
-        //content : content,
-        searchWordsSum: "",
-        retrieves : [],
-        relations: [],
-    }
-
-    return atom;
-}
 
 function _addRetrieve(atom, retrieve)
 {

@@ -113,7 +113,6 @@ export default class SearchEngine
 
     addSearchEntry(entry)
     {
-        console.log(entry);
         this.index.addDoc(entry);
     }
 

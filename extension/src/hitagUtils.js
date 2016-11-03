@@ -92,14 +92,6 @@ export default class HitagUtils
         HitagUtils.getHitagTree(hitag, rootHitag, forceCreation);
     }
 
-
-    static AddHitagToTree(hitag, tree)
-    {
-        var forceCreation = true;
-        var newTree = HitagUtils.getHitagTree(hitag, tree, forceCreation);
-        return newTree;
-    }
-
     static logHitag(hitagNode, level)
     {
         if(!level)
