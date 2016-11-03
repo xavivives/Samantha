@@ -9,7 +9,6 @@ export default class searchResultItem extends React.Component
     constructor(props)
     {
         super(props);
-        console.log(props);
 
         this.atom = new Atom();
         this.atom.populate(props.result.atom);
@@ -38,7 +37,7 @@ export default class searchResultItem extends React.Component
 
         var that = this;
 
-        setTimeout(function(){ that.fetchMetadata(ntData()) }, 200);    
+        setTimeout(function(){ that.fetchMetadata(that.url) }, 200);    
     }
 
     componentWillMount()
@@ -79,7 +78,6 @@ export default class searchResultItem extends React.Component
 
     processMetadata(metadata)
     {
-        console.log(metadata);
         var imageUrl = this.getImageUrl(metadata);
         if(imageUrl)
         {   
@@ -103,7 +101,7 @@ export default class searchResultItem extends React.Component
     onClicked(result)
     {
       //this.setState({open: true});
-      this.gotoUrl(result.url);
+      this.gotoUrl(this.url);
     }
 
     gotoUrl(url)
@@ -115,9 +113,7 @@ export default class searchResultItem extends React.Component
         return (
             <div onClick= {()=>this.onClicked(this.props.result)}  style={{cursor: 'pointer', display: 'flex', paddingBottom:5}}>
 
-                <div style={{flexGrow: 1, paddingRight:10}}>
-
-                    
+                <div style={{flexGrow: 1, paddingRight:10}}>   
 
                      <p style = {{opacity:0.9, marginBottom:"0.5em", marginTop:0}}> 
                         {this.atom.getName()}
@@ -127,18 +123,16 @@ export default class searchResultItem extends React.Component
                         <span style = {{color: 'green'}}>
                             {Math.round(this.props.result.score*100)/100+ " "}
                         </span>
-
                       
-                         <span style = {{opacity:0.3}}>
+                         <span style = {{opacity:0.6}}>
                            {this.beginingOfUrl}
                         </span>
-                        <span style = {{opacity:0.8}}>
+                        <span style = {{opacity:0.8, fontWeight:"bold"}}>
                            {this.fullDomain}
                         </span> 
-                        <span style = {{opacity:0.3}}>
+                        <span style = {{opacity:0.6}}>
                            {this.endOfUrl}
-                        </span>                      
-                 
+                        </span>                                
 
                     </p> 
                 </div>

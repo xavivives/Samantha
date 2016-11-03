@@ -112,7 +112,7 @@ export default class PopupPage extends React.Component
                 <MuiThemeProvider muiTheme={this.muiTheme}>
                     <div style={{minWidth: 350, minHeight: 350}}>
 
-                        <div style={{whiteSpace: 'nowrap'}}>
+                        <div style={{}}>
                             <p style ={{color:"gray"}}> {this.state.atom.name} </p>
                             <p style ={messageStyle}> {this.state.status.message} </p>                         
                         </div>
