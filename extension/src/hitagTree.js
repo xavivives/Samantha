@@ -15,13 +15,17 @@ export default class hitagTree
                 if(currentHitags[k].name == hitag[i])
                 {
                     found = true;
+
+                    if(!currentHitags[k].hitags)
+                        currentHitags[k].hitags = [];
+
                     currentHitags = currentHitags[k].hitags;
-                    break;
                 }  
             }
+
             if(!found)
             {
-                var newBranch = hitagTree.getNewBranch(hitag.slice(i));            
+                var newBranch = hitagTree.getNewBranch(hitag.slice(i));     
                 currentHitags.push(newBranch);
                 return hitags;
             }                

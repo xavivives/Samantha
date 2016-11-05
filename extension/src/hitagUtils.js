@@ -119,33 +119,47 @@ export default class HitagUtils
     }
 
     //Todo: Make it not suck
-    static hitagNodeToHitagList(hitagNode, list, level, currentHitag)
-    {   
+    static hitagTreeToHitagList(hitags,list, level, currentHitag)
+    {     
+        if(!hitags)
+            return list;
+
         if(!level)
             level = 0;
 
         if(level == 0)
+        {
+            list = []; 
             currentHitag = [];
+        }
 
         currentHitag = currentHitag.slice(0,level);
-        currentHitag[level]= hitagNode.tagName;
-
-        if(hitagNode.children.length == 0)
-        {
-            var hitagClone=currentHitag.slice(0);
-            hitagClone.shift(); // This is to remove 'root' tag. Needs redesign.
-            list.push(hitagClone);
-        }
-        else
-        {
-            for(var i=0; i<hitagNode.children.length; i++)
-            {
-                level = level+1;
-                HitagUtils.hitagNodeToHitagList(hitagNode.children[i], list, level, currentHitag);
-            }
-        }
         
+
+        for(var i=0; i<hitags.length; i++)
+        {
+            currentHitag[level] = hitags[i].name;
+            HitagUtils.hitagTreeToHitagList(hitags[i].hitags, list, level + 1 , currentHitag);
+
+            if(!hitags[i].hitags)
+            {
+                var hitagClone = currentHitag.slice(0);
+                list.push(hitagClone);
+
+               // hitagClone.shift(); // This is to remove 'root' tag. Needs redesign.
+            }
+            
+        }
         return list;    
+    }
+
+    static getList(hitags)
+    {
+        for(var i=0; i<hitags.length; i++)
+        {
+            level = 0;
+            HitagUtils.hitagTreeToHitagList(hitags.hitags[i], list, level, currentHitag);
+        }
     }
 
     static getMatchingChildren(hitagNode, str)

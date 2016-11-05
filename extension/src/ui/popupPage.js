@@ -76,9 +76,9 @@ export default class PopupPage extends React.Component
     updatePopupAtom(atom)
     {
         console.log(atom);
-        var atomHitags=[];
-        if(atom.relations && atom.relations.hitags)
-            HitagUtils.hitagNodeToHitagList(atom.relations.hitags, atomHitags);
+        var atomHitags= HitagUtils.hitagTreeToHitagList(atom.hitags);
+
+        console.log(atomHitags);
         
         this.setState({atom: atom, atomHitags:atomHitags});     
     }
