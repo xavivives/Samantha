@@ -46,7 +46,7 @@ export default class tabsController
         {
             this.resetTabHisoryAndSearch(tabId);
             this.setTabSearch(tabId, searchText);
-            injectSamanthaResults(tab.id, searchText);
+            this.injectSamanthaResults(tab.id, searchText);
         }
         
         if(this.tabHistoryExists(tab.id))
@@ -162,7 +162,7 @@ export default class tabsController
         
         while(this.tabs[tabId].queuedMessages.length>0)
         {
-            this.tabs[tabId].port.postMessage(tabs[tabId].queuedMessages.shift());
+            this.tabs[tabId].port.postMessage(this.tabs[tabId].queuedMessages.shift());
         }
 
         //if(userState.getHelpShownTimes() == 0)
