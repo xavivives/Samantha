@@ -3,15 +3,25 @@ import ChromeStorage from './chromeStorage.js';
 
 export default class SearchEngine
 { 
-    constructor(newIndex)
+    constructor(loadedIndex)
     {
-        if(newIndex)
+        this.index = {};
+
+        if(loadedIndex)
         {
-            this.index = this.getNewIndex();
-            return;
+            try
+            {
+                this.index = ElasticLunr.Index.load(loadedIndex);
+            }
+            catch(e)
+            {
+                console.warn("Samantha: Loaded index was corrupted. Creating a new one");
+                this.index = this.getNewIndex();
+            }
+            
         }
-        
-        this.index = newIndex;
+        else
+            this.index = this.getNewIndex();
     }
 
     getNewIndex()
@@ -113,6 +123,7 @@ export default class SearchEngine
 
     addSearchEntry(entry)
     {
+        console.log(this.index);
         this.index.addDoc(entry);
     }
 
