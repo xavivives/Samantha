@@ -9,6 +9,9 @@ import TabsController from './tabsController.js';
 
 import Atom from './atom.js';
 import Hash from './hash.js';
+import IPFSController from './ipfsController';
+
+var ipfs = new IPFSController();
 
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
