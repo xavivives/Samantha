@@ -12,7 +12,8 @@ import Hash from './hash.js';
 import IPFSController from './ipfs/ipfsController';
 
 var ipfs = new IPFSController();
-ipfs.addFileFromUrl("https://lasersandlemons.files.wordpress.com/2014/04/pigandhorn.jpg");
+
+ipfs.addFromString("Hello", function(result){console.log(result)});
 
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);

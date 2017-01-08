@@ -7,7 +7,6 @@ export default class ipfsController
     {
         this.ipfs = {};
         this.initExternal();
-
     }
 
     initExternal()
@@ -15,9 +14,15 @@ export default class ipfsController
         this.ipfs = new exIPFS();
     }
 
-    addFileFromUrl(url)
+    addFromUrl(url)
     {
         this.ipfs.addFileFromUrl(url);
+    }
+
+
+    addFromString(str, callback)
+    {
+        this.ipfs.addFromString(str, callback);
     }
 
 }

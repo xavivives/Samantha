@@ -30,7 +30,6 @@
     "react-hotkeys": "^0.9.0",
     "react-lazy-load": "^3.0.10",
     "react-tap-event-plugin": "^1.0.0",
-    "readable-stream": "^2.2.2",
     "require-dir": "^0.3.0",
     "tldjs": "^1.6.2",
     "underscore": "^1.8.3",

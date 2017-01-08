@@ -1,6 +1,5 @@
 import ipfsAPI from 'ipfs-api'
 
-
 export default class externalIpfs
 {
     constructor()
@@ -17,7 +16,7 @@ export default class externalIpfs
 
     }
 
-    addFileFromSystem(path)
+    addFromFileSystem(path)
     {
        /* ipfs.util.addFromFs(path, { recursive: true }, (err, result) => {
           if (err) {
@@ -28,7 +27,7 @@ export default class externalIpfs
         */
     }
 
-    addFileFromUrl(url)
+    addFromUrl(url)
     {
         this.ipfs.util.addFromURL(url , (err, result) => {
           if (err) {
@@ -37,4 +36,17 @@ export default class externalIpfs
           console.log(result)
         })
     }
+
+    addFromString(str, callback)
+    {
+        var buffer = Buffer.from(str, 'utf8');
+        this.ipfs.util.addFromStream(buffer, (err, result) => {
+          if (err) {
+            console.error(err);
+            callback(null);
+            return;
+          }
+          callback(result);
+        })
+    }        
 }
