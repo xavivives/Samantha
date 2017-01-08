@@ -9,9 +9,10 @@ import TabsController from './tabsController.js';
 
 import Atom from './atom.js';
 import Hash from './hash.js';
-import IPFSController from './ipfsController';
+import IPFSController from './ipfs/ipfsController';
 
 var ipfs = new IPFSController();
+ipfs.addFileFromUrl("https://lasersandlemons.files.wordpress.com/2014/04/pigandhorn.jpg");
 
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
