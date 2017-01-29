@@ -13,7 +13,10 @@ import IPFSController from './ipfs/ipfsController';
 
 var ipfs = new IPFSController();
 
-ipfs.addFromString("Hello", function(result){console.log(result)});
+//ipfs.addFromString("Hello").then(function(hash){ console.log(hash)});
+ 
+console.log(ipfs.addFromString("Hello"));
+
 
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
 chrome.omnibox.onInputChanged.addListener(onOmniboxInputChanged);
@@ -235,11 +238,23 @@ function onSaveUrl()
 
 function getAtom(content, onAtomReady)
 {
+
+    ipfs.addFromString("Hello")
+        .then(function(hash){
+            console.log(hash);
+        })
+        .catch(function(error){
+            console.log("Ups");
+        })
+    
+
+
+    //ipfs.addFromString(content, function(hash)) 
     Hash.sha256(content).then(function(hash)
     {
         ChromeStorage.loadElement(hash, function(existingAtomData)
         {
-            var isExistingAtom = false;
+             var isExistingAtom = false;
             if(existingAtomData)
             {
                 isExistingAtom = true;

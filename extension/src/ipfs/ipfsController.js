@@ -19,10 +19,21 @@ export default class ipfsController
         this.ipfs.addFileFromUrl(url);
     }
 
-
-    addFromString(str, callback)
+    addFromString(str)
     {
-        this.ipfs.addFromString(str, callback);
+        return this.ipfs.addFromString(str);
+    }
+
+    _addFromString(str)
+    {
+        console.log("here");
+        //return this.ipfs.addFromString(str);
+        this.ipfs.addFromString(str).then(function(hash){
+            console.log(hash);
+        })
+        .catch(function(error){
+            console.log("Ups");
+        })
     }
 
 }
