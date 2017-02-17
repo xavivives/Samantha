@@ -13,9 +13,11 @@ import IPFSController from './ipfs/ipfsController';
 
 var ipfs = new IPFSController();
 
-//ipfs.addFromString("Hello").then(function(hash){ console.log(hash)});
- 
-console.log(ipfs.addFromString("Hello"));
+ipfs.addFromString("Hello").then(function(hash){ console.log(hash)});
+ipfs.addFromString("Hello").then(function(hash){ console.log(hash)});
+
+ipfs.addFromString("Fuck").then(function(hash){ console.log(hash)});
+//console.log(ipfs.addFromString("Hello"));
 
 
 chrome.omnibox.onInputEntered.addListener(onOmniboxEnter);
