@@ -12,11 +12,6 @@ import Hash from './hash.js';
 import IPFSController from './ipfs/ipfsController';
 
 var ipfs = new IPFSController();
-
-ipfs.addFromString("Hello").then(function(hash){ console.log(hash)});
-ipfs.addFromString("Hello").then(function(hash){ console.log(hash)});
-
-ipfs.addFromString("Fuck").then(function(hash){ console.log(hash)});
 //console.log(ipfs.addFromString("Hello"));
 
 
@@ -240,8 +235,9 @@ function onSaveUrl()
 
 function getAtom(content, onAtomReady)
 {
+    /*ipfs.addString("Hello").then(function(hash){ console.log(hash)});
 
-    ipfs.addFromString("Hello")
+    ipfs.addString("Hello")
         .then(function(hash){
             console.log(hash);
         })
@@ -249,14 +245,15 @@ function getAtom(content, onAtomReady)
             console.log("Ups");
         })
     
-
+*/
 
     //ipfs.addFromString(content, function(hash)) 
-    Hash.sha256(content).then(function(hash)
+    //Hash.sha256(content).then
+    ipfs.addString(content).then(function(hash)
     {
         ChromeStorage.loadElement(hash, function(existingAtomData)
         {
-             var isExistingAtom = false;
+            var isExistingAtom = false;
             if(existingAtomData)
             {
                 isExistingAtom = true;

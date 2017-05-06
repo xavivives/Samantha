@@ -37,42 +37,28 @@ export default class externalIpfs
         })
     }
 
-    __addFromString(str, callback)
-    {
-        var buffer = Buffer.from(str, 'utf8');
-        //this returns
-
-        this.ipfs.util.addFromStream(buffer, (err, result) =>
-        {
-            console.log(result);
-            return new Promise(
-                function (resolve, reject) {
-                    if (err)
-                        reject(err);
-                    else
-                        resolve(result.hash);
-                }
-            );
-            
-        });
-    } 
-
-    addFromString(str, callback)
+    addString(str, callback)
     {
         var buffer = Buffer.from(str, 'utf8');
         var that = this;
-        //this returns
+
+        console.log(str);
+
         return new Promise(function(resolve, reject)
         {
             that.ipfs.util.addFromStream(buffer, (err, result) =>
             {
                 if (err)
+                {
+                    console.log(err);
                         reject(err);
-                    else
-                    {
-                        console.log(result[0].hash);
-                        resolve(result[0].hash);
-                    }
+                }
+                else
+                {
+                    console.log(result);
+                    console.log(result[0].hash);
+                    resolve(result[0].hash);
+                }
             });
             
         });
